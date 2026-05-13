@@ -1,0 +1,307 @@
+import re
+
+from markdown_it import MarkdownIt
+from bs4 import BeautifulSoup, Tag
+
+_REMOVE_TAGS = {"style", "script", "iframe", "svg"}
+_ACCENT = "#2b6cb0"  # primary accent blue
+_ACCENT_LIGHT = "#ebf4ff"  # light blue bg
+_TEXT = "#2d3748"
+_TEXT_MUTED = "#718096"
+_BG_SOFT = "#f7fafc"
+
+
+def markdown_to_wechat_html(md: str) -> str:
+    """Convert markdown to beautifully styled WeChat-compatible HTML."""
+
+    # Pre-process: convert ===highlight=== to <mark> tags
+    md = re.sub(r"===(.+?)===", r"<mark>\1</mark>", md)
+
+    html = MarkdownIt().render(md)
+
+    soup = BeautifulSoup(html, "html.parser")
+
+    # Remove unsupported elements
+    for tag_name in _REMOVE_TAGS:
+        for el in soup.find_all(tag_name):
+            el.decompose()
+
+    # --- Paragraphs ---
+    for p in soup.find_all("p"):
+        _merge_styles(p, _P)
+        for child in list(p.children):
+            if isinstance(child, str) and child.strip():
+                span = soup.new_tag("span")
+                span.string = child
+                child.replace_with(span)
+        _attach_spacer(soup, p)
+
+    # Emphasize first sentence of multi-sentence paragraphs
+    _emphasize_first_sentences(soup)
+
+    # --- Blockquotes ---
+    for bq in soup.find_all("blockquote"):
+        _merge_styles(bq, _BLOCKQUOTE)
+        # Add decorative quote marker
+        marker = soup.new_tag("span")
+        _merge_styles(marker, _BLOCKQUOTE_MARKER)
+        marker.string = "💡"
+        bq.insert(0, marker)
+        for p in bq.find_all("p"):
+            _merge_styles(p, _BLOCKQUOTE_P)
+
+    # --- Headings ---
+    for h2 in soup.find_all("h2"):
+        _merge_styles(h2, _H2)
+        _prepend_accent_bar(soup, h2)
+
+    for h3 in soup.find_all("h3"):
+        _merge_styles(h3, _H3)
+
+    # --- Lists ---
+    for ul in soup.find_all("ul"):
+        _merge_styles(ul, _UL)
+    for ol in soup.find_all("ol"):
+        _merge_styles(ol, _OL)
+    for li in soup.find_all("li"):
+        _merge_styles(li, _LI)
+
+    # --- Dividers ---
+    for hr in soup.find_all("hr"):
+        _wrap_divider(soup, hr)
+
+    # --- Inline text ---
+    for strong in soup.find_all("strong"):
+        _merge_styles(strong, _STRONG)
+
+    for em in soup.find_all("em"):
+        _merge_styles(em, _EM)
+
+    for a in soup.find_all("a"):
+        href = a.get("href", "")
+        a["style"] = f"color: {_ACCENT}; text-decoration: underline;"
+        if href and not href.startswith("#"):
+            a["target"] = "_blank"
+            a["rel"] = "noopener noreferrer"
+
+    for code in soup.find_all("code"):
+        _merge_styles(code, _CODE)
+
+    for pre in soup.find_all("pre"):
+        _merge_styles(pre, _PRE)
+        for c in pre.find_all("code"):
+            _merge_styles(c, _PRE_CODE)
+
+    # --- Styled <mark> (converted from ===text===) ---
+    for mark in soup.find_all("mark"):
+        _merge_styles(mark, _MARK)
+
+    # --- Images ---
+    for img in soup.find_all("img"):
+        _merge_styles(img, _IMG)
+        # try wrapping in a centered container
+        parent = img.parent
+        if parent and parent.name != "p":
+            _wrap_image(soup, img)
+
+    # --- Tables ---
+    for table in soup.find_all("table"):
+        _merge_styles(table, _TABLE)
+        for td in soup.find_all("td"):
+            _merge_styles(td, _TD)
+        for th in soup.find_all("th"):
+            _merge_styles(th, _TH)
+
+    return str(soup)
+
+
+# ── Style definitions ──────────────────────────────────────────────────
+
+_P = (
+    f"margin: 0 0 16px 0; padding: 0;"
+    f"font-size: 16px; color: {_TEXT};"
+    f"letter-spacing: 1.2px; line-height: 1.85;"
+)
+
+_H2 = (
+    f"font-size: 20px; font-weight: 700;"
+    f"color: #1a202c; margin: 36px 0 16px 0; padding: 0 0 0 14px;"
+    f"letter-spacing: 2px; line-height: 1.6;"
+    f"border-left: 4px solid {_ACCENT};"
+)
+
+_H3 = (
+    f"font-size: 18px; font-weight: 600;"
+    f"color: #2d3748; margin: 28px 0 12px 0;"
+    f"letter-spacing: 1.5px; line-height: 1.5;"
+)
+
+_BLOCKQUOTE = (
+    f"margin: 24px 0; padding: 16px 20px 16px 18px;"
+    f"border-left: 4px solid {_ACCENT};"
+    f"background-color: {_BG_SOFT};"
+    f"border-radius: 0 6px 6px 0;"
+    f"font-size: 15px; color: {_TEXT_MUTED};"
+    f"letter-spacing: 1px; line-height: 1.7;"
+)
+
+_BLOCKQUOTE_MARKER = "display: block; font-size: 16px; margin-bottom: 6px;"
+
+_BLOCKQUOTE_P = (
+    f"margin: 0 0 6px 0; padding: 0;"
+    f"font-size: 15px; color: {_TEXT_MUTED};"
+    f"letter-spacing: 1px; line-height: 1.7;"
+)
+
+_UL = (
+    f"padding-left: 22px; margin: 10px 0 18px 0;"
+    f"font-size: 16px; color: {_TEXT};"
+    f"letter-spacing: 1.2px; line-height: 1.85;"
+)
+
+_OL = (
+    f"padding-left: 24px; margin: 10px 0 18px 0;"
+    f"font-size: 16px; color: {_TEXT};"
+    f"letter-spacing: 1.2px; line-height: 1.85;"
+)
+
+_LI = (
+    f"margin-bottom: 8px;"
+    f"font-size: 16px; color: {_TEXT};"
+    f"letter-spacing: 1.2px; line-height: 1.85;"
+)
+
+_STRONG = f"font-weight: 700; color: #1a202c;"
+
+_EM = "font-style: italic;"
+
+_MARK = (
+    f"background: linear-gradient(180deg,transparent 60%,{_ACCENT_LIGHT} 60%);"
+    f"padding: 0 4px; font-weight: 500; color: {_TEXT};"
+)
+
+_CODE = (
+    f"font-size: 14px; background-color: #edf2f7;"
+    f"padding: 2px 8px; border-radius: 4px;"
+    f"font-family: 'SF Mono', Menlo, monospace; color: {_TEXT};"
+)
+
+_PRE = (
+    f"background-color: #1a202c; padding: 18px 20px;"
+    f"border-radius: 8px; overflow-x: auto;"
+    f"font-size: 14px; line-height: 1.6;"
+    f"margin: 20px 0;"
+)
+
+_PRE_CODE = (
+    f"background: transparent; padding: 0;"
+    f"border-radius: 0; color: #e2e8f0;"
+    f"font-family: 'SF Mono', Menlo, monospace;"
+    f"font-size: 14px;"
+)
+
+_IMG = (
+    f"max-width: 100%; height: auto;"
+    f"border-radius: 8px; margin: 20px auto; display: block;"
+)
+
+_TABLE = (
+    f"width: 100%; border-collapse: collapse;"
+    f"margin: 20px 0; font-size: 15px;"
+    f"color: {_TEXT}; line-height: 1.6;"
+)
+
+_TD = (
+    f"border: 1px solid #e2e8f0; padding: 10px 14px;"
+    f"color: {_TEXT};"
+)
+
+_TH = (
+    f"border: 1px solid #e2e8f0; padding: 10px 14px;"
+    f"background-color: {_BG_SOFT}; font-weight: 600;"
+    f"color: #1a202c;"
+)
+
+# Delicate horizontal rule
+_DIVIDER_CONTAINER = (
+    f"margin: 36px auto; text-align: center;"
+    f"font-size: 13px; color: {_TEXT_MUTED}; letter-spacing: 8px;"
+)
+
+# ── Helpers ────────────────────────────────────────────────────────────
+
+_SENTENCE_END = re.compile(r"([。？！.!?])\s*")
+
+_LEAD_STYLE = "font-size: 17px; font-weight: 700; color: #1a202c;"
+
+
+def _emphasize_first_sentences(soup: BeautifulSoup) -> None:
+    """Bolden + slightly enlarge the first sentence of multi-sentence paragraphs."""
+    for p in soup.find_all("p"):
+        if p.find_parent("blockquote"):
+            continue
+
+        text = p.get_text(strip=True)
+        if len(text) < 15:
+            continue
+
+        # find first span child that holds text
+        first_span: Tag | None = None
+        for child in p.children:
+            if isinstance(child, Tag) and child.name == "span" and child.get_text(strip=True):
+                first_span = child
+                break
+        if first_span is None:
+            continue
+
+        full = first_span.string or ""
+        m = _SENTENCE_END.search(full)
+        if m is None:
+            continue
+
+        split_at = m.end()
+        lead = full[:split_at]
+        rest = full[split_at:]
+        if not rest.strip():
+            continue
+        if len(lead) > 60 or len(lead) < 10:
+            continue
+
+        lead_span = soup.new_tag("span")
+        lead_span["style"] = _LEAD_STYLE
+        lead_span.string = lead
+
+        first_span.string = rest
+        p.insert(0, lead_span)
+
+
+def _merge_styles(el: Tag, extra: str) -> None:
+    existing = el.get("style", "")
+    if existing:
+        el["style"] = f"{existing}; {extra}" if not existing.rstrip().endswith(";") else f"{existing} {extra}"
+    else:
+        el["style"] = extra
+
+
+def _prepend_accent_bar(soup: BeautifulSoup, el: Tag) -> None:
+    """h2 headings get a left accent bar (added via padding+style already)."""
+
+
+def _wrap_divider(soup: BeautifulSoup, hr: Tag) -> None:
+    """Replace <hr> with a subtle centered ellipsis."""
+    div = soup.new_tag("div")
+    div["style"] = _DIVIDER_CONTAINER
+    div.string = "· · ·"
+    hr.replace_with(div)
+
+
+def _attach_spacer(soup: BeautifulSoup, el: Tag) -> None:
+    """Attach a zero-height clearfix after the paragraph for spacing."""
+
+
+def _wrap_image(soup: BeautifulSoup, img: Tag) -> None:
+    """Wrap image in a centered container."""
+    wrapper = soup.new_tag("div")
+    wrapper["style"] = "text-align: center; margin: 20px 0;"
+    img.replace_with(wrapper)
+    wrapper.append(img)
