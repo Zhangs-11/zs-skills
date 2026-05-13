@@ -1,0 +1,4 @@
+﻿interface:
+  display_name: "系统结构图"
+  short_description: "按参考图样式生成、导出并反复精修系统结构图与模块树图片。"
+  default_prompt: "使用 $system-structure-diagram 按参考图片样式生成系统结构图，并替换为真实项目模块内容。"
