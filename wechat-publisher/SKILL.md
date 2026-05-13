@@ -71,6 +71,21 @@ ln -sf $(pwd)/tools/wechat-publisher/venv/bin/wechat-publisher ~/.local/bin/wech
 ### 第一步：写作
 调用 kakarot-writer skill 生成 markdown 文章。
 
+在文章中需要配图的位置，使用以下格式插入占位标记：
+
+```markdown
+[插图：图片内容描述]
+[绘图提示：可复制的英文 prompt，适合 Midjourney / DALL-E / 即梦 等生图工具]
+```
+
+例：
+```markdown
+[插图：传统RAG工作流程图]
+[绘图提示：A clean technical diagram showing the classic RAG pipeline, flat design with blue and white color scheme, modern minimalist style.]
+```
+
+这告诉用户两个信息：**哪里需要配图**、**用什么 prompt 生成图片**。
+
 ### 第二步：保存
 将文章保存到 `~/公众号草稿/` 目录。
 
