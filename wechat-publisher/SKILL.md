@@ -98,12 +98,20 @@ ln -sf $(pwd)/tools/wechat-publisher/venv/bin/wechat-publisher ~/.local/bin/wech
 
 ### 第三步：尝试发布
 
+发布前必须把 `[插图：...]` / `[绘图提示：...]` 占位符替换为真实 Markdown 图片：
+
+```markdown
+![传统RAG工作流程图](images/rag-flow.png)
+```
+
+`wechat-publisher` 会自动上传 Markdown 图片到微信 CDN。已经是 `mmbiz.qpic.cn` 的图片不会重复上传。
+
 ```bash
 # 检查当前公网 IP
 curl -s ip.sb
 
 # 尝试发布
-wechat-publisher create --title "文章标题" --content-file ~/公众号草稿/文件名.md
+wechat-publisher create --title "文章标题" --content-file ~/公众号草稿/文件名.md --digest "120字以内摘要"
 ```
 
 ### 第四步：结果处理
@@ -153,7 +161,6 @@ wechat-publisher upload-cover cover.jpg
 | 元素 | 效果 |
 |------|------|
 | 正文段落 | 16px, 深灰, 行距 1.85 |
-| 起始句 | 17px 加粗深色 |
 | `===高亮===` | 蓝色渐变底强调 |
 | `> 引用` | 💡 蓝色竖线卡片 |
 | `## 标题` | 蓝色左竖线装饰 |
@@ -162,7 +169,17 @@ wechat-publisher upload-cover cover.jpg
 | ```代码块``` | 深色圆角代码块 |
 | `**加粗**` | 700 字重深色 |
 | `*斜体*` | 斜体 |
-| 链接 | 蓝色 + 新窗口打开 |
+| 表格 | 微信兼容表格样式 |
+| 外链 | 正文标注序号，底部生成参考资料 |
+
+## 内容质检规则
+
+高流量 AI 公众号文章发布前要做四项检查：
+
+1. 标题有具体对象、反常识或真实体验，不使用空泛震惊体。
+2. 前三行必须交代“发生了什么”和“为什么值得读”。
+3. 每 3-5 段至少有一个人为加粗的判断句，方便扫读；不要依赖工具自动加粗。
+4. 配图必须服务理解：流程图、对比表、架构图、截图优先，纯氛围图少用。
 
 ## 常见错误
 
@@ -172,3 +189,9 @@ wechat-publisher upload-cover cover.jpg
 | 40007 invalid media_id | 封面 media_id 无效或为空 | 上传封面图获取正确的 media_id |
 | 40001 | token 过期或无效 | 会自动刷新，持久失败检查 appsecret 是否正确 |
 | 45009 | 接口频率超限 | 会自动重试 |
+
+## 发布前失败保护
+
+- 如果缺少封面 `media_id`，命令会失败并提示配置 `WECHAT_DEFAULT_COVER_MEDIA_ID` 或传 `--cover-media-id`。
+- 如果正文仍包含 `[插图：...]` / `[绘图提示：...]`，命令会失败，防止半成品进入草稿箱。
+- 如果遇到 40164，命令会提示去微信后台添加当前公网 IP 白名单。

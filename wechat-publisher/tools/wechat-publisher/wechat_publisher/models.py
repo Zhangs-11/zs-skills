@@ -6,6 +6,9 @@ class Article(BaseModel):
     author: str = ""
     content: str
     thumb_media_id: str | None = None
+    digest: str | None = None
+    content_source_url: str | None = None
+    show_cover_pic: int = 0
     need_open_comment: int = 0
     only_fans_can_comment: int = 0
 
@@ -21,7 +24,7 @@ class CreateDraftResponse(BaseModel):
 class UpdateDraftRequest(BaseModel):
     media_id: str
     index: int = 0
-    articles: list[Article]
+    articles: Article
 
 
 class UpdateDraftResponse(BaseModel):

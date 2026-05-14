@@ -1,7 +1,7 @@
 import re
 
 from markdown_it import MarkdownIt
-from bs4 import BeautifulSoup, Tag
+from bs4 import BeautifulSoup, NavigableString, Tag
 
 _REMOVE_TAGS = {"style", "script", "iframe", "svg"}
 _ACCENT = "#2b6cb0"  # primary accent blue
@@ -17,7 +17,7 @@ def markdown_to_wechat_html(md: str) -> str:
     # Pre-process: convert ===highlight=== to <mark> tags
     md = re.sub(r"===(.+?)===", r"<mark>\1</mark>", md)
 
-    html = MarkdownIt().render(md)
+    html = MarkdownIt("commonmark").enable("table").render(md)
 
     soup = BeautifulSoup(html, "html.parser")
 
@@ -34,10 +34,6 @@ def markdown_to_wechat_html(md: str) -> str:
                 span = soup.new_tag("span")
                 span.string = child
                 child.replace_with(span)
-        _attach_spacer(soup, p)
-
-    # Emphasize first sentence of multi-sentence paragraphs
-    _emphasize_first_sentences(soup)
 
     # --- Blockquotes ---
     for bq in soup.find_all("blockquote"):
@@ -53,7 +49,6 @@ def markdown_to_wechat_html(md: str) -> str:
     # --- Headings ---
     for h2 in soup.find_all("h2"):
         _merge_styles(h2, _H2)
-        _prepend_accent_bar(soup, h2)
 
     for h3 in soup.find_all("h3"):
         _merge_styles(h3, _H3)
@@ -77,12 +72,17 @@ def markdown_to_wechat_html(md: str) -> str:
     for em in soup.find_all("em"):
         _merge_styles(em, _EM)
 
-    for a in soup.find_all("a"):
+    references: list[tuple[int, str, str]] = []
+    for a in list(soup.find_all("a")):
         href = a.get("href", "")
-        a["style"] = f"color: {_ACCENT}; text-decoration: underline;"
-        if href and not href.startswith("#"):
-            a["target"] = "_blank"
-            a["rel"] = "noopener noreferrer"
+        if not href or href.startswith("#"):
+            a["style"] = f"color: {_ACCENT}; text-decoration: underline;"
+            continue
+
+        number = len(references) + 1
+        label = a.get_text(strip=True) or href
+        references.append((number, label, href))
+        a.replace_with(NavigableString(f"{label}[{number}]"))
 
     for code in soup.find_all("code"):
         _merge_styles(code, _CODE)
@@ -107,10 +107,13 @@ def markdown_to_wechat_html(md: str) -> str:
     # --- Tables ---
     for table in soup.find_all("table"):
         _merge_styles(table, _TABLE)
-        for td in soup.find_all("td"):
+        for td in table.find_all("td"):
             _merge_styles(td, _TD)
-        for th in soup.find_all("th"):
+        for th in table.find_all("th"):
             _merge_styles(th, _TH)
+
+    if references:
+        _append_references(soup, references)
 
     return str(soup)
 
@@ -230,61 +233,12 @@ _DIVIDER_CONTAINER = (
 
 # ── Helpers ────────────────────────────────────────────────────────────
 
-_SENTENCE_END = re.compile(r"([。？！.!?])\s*")
-
-_LEAD_STYLE = "font-size: 17px; font-weight: 700; color: #1a202c;"
-
-
-def _emphasize_first_sentences(soup: BeautifulSoup) -> None:
-    """Bolden + slightly enlarge the first sentence of multi-sentence paragraphs."""
-    for p in soup.find_all("p"):
-        if p.find_parent("blockquote"):
-            continue
-
-        text = p.get_text(strip=True)
-        if len(text) < 15:
-            continue
-
-        # find first span child that holds text
-        first_span: Tag | None = None
-        for child in p.children:
-            if isinstance(child, Tag) and child.name == "span" and child.get_text(strip=True):
-                first_span = child
-                break
-        if first_span is None:
-            continue
-
-        full = first_span.string or ""
-        m = _SENTENCE_END.search(full)
-        if m is None:
-            continue
-
-        split_at = m.end()
-        lead = full[:split_at]
-        rest = full[split_at:]
-        if not rest.strip():
-            continue
-        if len(lead) > 60 or len(lead) < 10:
-            continue
-
-        lead_span = soup.new_tag("span")
-        lead_span["style"] = _LEAD_STYLE
-        lead_span.string = lead
-
-        first_span.string = rest
-        p.insert(0, lead_span)
-
-
 def _merge_styles(el: Tag, extra: str) -> None:
     existing = el.get("style", "")
     if existing:
         el["style"] = f"{existing}; {extra}" if not existing.rstrip().endswith(";") else f"{existing} {extra}"
     else:
         el["style"] = extra
-
-
-def _prepend_accent_bar(soup: BeautifulSoup, el: Tag) -> None:
-    """h2 headings get a left accent bar (added via padding+style already)."""
 
 
 def _wrap_divider(soup: BeautifulSoup, hr: Tag) -> None:
@@ -294,14 +248,34 @@ def _wrap_divider(soup: BeautifulSoup, hr: Tag) -> None:
     div.string = "· · ·"
     hr.replace_with(div)
 
-
-def _attach_spacer(soup: BeautifulSoup, el: Tag) -> None:
-    """Attach a zero-height clearfix after the paragraph for spacing."""
-
-
 def _wrap_image(soup: BeautifulSoup, img: Tag) -> None:
     """Wrap image in a centered container."""
     wrapper = soup.new_tag("div")
     wrapper["style"] = "text-align: center; margin: 20px 0;"
     img.replace_with(wrapper)
     wrapper.append(img)
+
+
+def _append_references(
+    soup: BeautifulSoup,
+    references: list[tuple[int, str, str]],
+) -> None:
+    section = soup.new_tag("section")
+    section["style"] = (
+        f"margin: 32px 0 0 0; padding-top: 16px;"
+        f"border-top: 1px solid #e2e8f0; color: {_TEXT_MUTED};"
+        f"font-size: 13px; line-height: 1.7;"
+    )
+
+    title = soup.new_tag("p")
+    title["style"] = "margin: 0 0 8px 0; font-weight: 700; color: #4a5568;"
+    title.string = "参考资料"
+    section.append(title)
+
+    for number, label, href in references:
+        item = soup.new_tag("p")
+        item["style"] = "margin: 0 0 6px 0; word-break: break-all;"
+        item.string = f"[{number}] {label}：{href}"
+        section.append(item)
+
+    soup.append(section)

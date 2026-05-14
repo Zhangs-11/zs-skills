@@ -1,4 +1,5 @@
 import asyncio
+from typing import Any
 
 import httpx
 
@@ -16,6 +17,14 @@ from .token import TokenManager
 API_BASE = "https://api.weixin.qq.com/cgi-bin"
 
 
+class WeChatAPIError(RuntimeError):
+    def __init__(self, code: int, message: str, payload: dict[str, Any]) -> None:
+        super().__init__(f"WeChat API error ({code}): {message}")
+        self.code = code
+        self.message = message
+        self.payload = payload
+
+
 class WeChatClient:
     def __init__(self, settings: Settings) -> None:
         self.settings = settings
@@ -26,7 +35,7 @@ class WeChatClient:
         if cached:
             return cached
 
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(timeout=30) as client:
             r = await client.get(
                 f"{API_BASE}/token",
                 params={
@@ -35,7 +44,7 @@ class WeChatClient:
                     "secret": self.settings.wechat_app_secret,
                 },
             )
-            body = r.json()
+            body = _parse_json_response(r)
             if "access_token" not in body:
                 raise RuntimeError(f"token fetch failed: {body}")
             self.token_mgr.save(body["access_token"], body["expires_in"])
@@ -49,9 +58,13 @@ class WeChatClient:
             async with httpx.AsyncClient(timeout=30) as client:
                 try:
                     r = await client.request(method, url, **kwargs)
-                    data = r.json()
+                    data = _parse_json_response(r)
                 except httpx.TimeoutException:
-                    last_err = Exception("timeout")
+                    last_err = RuntimeError("request timed out")
+                    await asyncio.sleep(1)
+                    continue
+                except httpx.HTTPError as exc:
+                    last_err = RuntimeError(f"HTTP request failed: {exc}")
                     await asyncio.sleep(1)
                     continue
 
@@ -64,20 +77,28 @@ class WeChatClient:
                     await asyncio.sleep(wait)
                     continue
                 if code != 0:
-                    raise RuntimeError(
-                        f"WeChat API error ({code}): {data.get('errmsg', '')}"
-                    )
+                    raise WeChatAPIError(code, data.get("errmsg", ""), data)
                 return data
         raise last_err or RuntimeError("request failed after retries")
 
-    async def create_draft(self, title: str, content_html: str) -> CreateDraftResponse:
-        article = Article(
+    async def create_draft(
+        self,
+        title: str,
+        content_html: str,
+        *,
+        cover_media_id: str | None = None,
+        digest: str | None = None,
+        content_source_url: str | None = None,
+        show_cover_pic: int = 0,
+    ) -> CreateDraftResponse:
+        article = self._build_article(
             title=title,
-            author=self.settings.wechat_author,
-            content=content_html,
+            content_html=content_html,
+            cover_media_id=cover_media_id,
+            digest=digest,
+            content_source_url=content_source_url,
+            show_cover_pic=show_cover_pic,
         )
-        if self.settings.wechat_default_cover_media_id:
-            article.thumb_media_id = self.settings.wechat_default_cover_media_id
         req = CreateDraftRequest(articles=[article])
         data = await self._request(
             "POST", "/draft/add", json=req.model_dump(exclude_none=True)
@@ -85,23 +106,59 @@ class WeChatClient:
         return CreateDraftResponse(media_id=data.get("media_id", ""))
 
     async def update_draft(
-        self, media_id: str, title: str, content_html: str
+        self,
+        media_id: str,
+        title: str,
+        content_html: str,
+        *,
+        cover_media_id: str | None = None,
+        digest: str | None = None,
+        content_source_url: str | None = None,
+        show_cover_pic: int = 0,
     ) -> UpdateDraftResponse:
-        article = Article(
+        article = self._build_article(
             title=title,
-            author=self.settings.wechat_author,
-            content=content_html,
+            content_html=content_html,
+            cover_media_id=cover_media_id,
+            digest=digest,
+            content_source_url=content_source_url,
+            show_cover_pic=show_cover_pic,
         )
-        if self.settings.wechat_default_cover_media_id:
-            article.thumb_media_id = self.settings.wechat_default_cover_media_id
         req = UpdateDraftRequest(
             media_id=media_id,
-            articles=[article],
+            articles=article,
         )
         data = await self._request(
             "POST", "/draft/update", json=req.model_dump(exclude_none=True)
         )
         return UpdateDraftResponse(media_id=data.get("media_id", ""))
+
+    def _build_article(
+        self,
+        *,
+        title: str,
+        content_html: str,
+        cover_media_id: str | None,
+        digest: str | None,
+        content_source_url: str | None,
+        show_cover_pic: int,
+    ) -> Article:
+        resolved_cover = cover_media_id or self.settings.wechat_default_cover_media_id
+        if not resolved_cover:
+            raise ValueError(
+                "cover media_id is required. Set WECHAT_DEFAULT_COVER_MEDIA_ID "
+                "or pass --cover-media-id."
+            )
+
+        return Article(
+            title=title,
+            author=self.settings.wechat_author,
+            content=content_html,
+            thumb_media_id=resolved_cover,
+            digest=digest,
+            content_source_url=content_source_url,
+            show_cover_pic=show_cover_pic,
+        )
 
     async def upload_image(self, file_path: str) -> UploadImageResponse:
         token = await self._ensure_token()
@@ -112,7 +169,7 @@ class WeChatClient:
                     params={"access_token": token},
                     files={"media": f},
                 )
-            data = r.json()
+            data = _parse_json_response(r)
             if "url" not in data:
                 raise RuntimeError(f"image upload failed: {data}")
             return UploadImageResponse(url=data["url"])
@@ -127,7 +184,18 @@ class WeChatClient:
                     params={"access_token": token, "type": "image"},
                     files={"media": f},
                 )
-            data = r.json()
+            data = _parse_json_response(r)
             if "media_id" not in data:
                 raise RuntimeError(f"cover upload failed: {data}")
             return data["media_id"]
+
+
+def _parse_json_response(response: httpx.Response) -> dict[str, Any]:
+    response.raise_for_status()
+    try:
+        data = response.json()
+    except ValueError as exc:
+        raise RuntimeError("WeChat API returned a non-JSON response") from exc
+    if not isinstance(data, dict):
+        raise RuntimeError(f"WeChat API returned unexpected JSON: {data!r}")
+    return data
