@@ -9,12 +9,13 @@ import os
 import re
 import sys
 import urllib.request
+import urllib.error
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable, Iterable
 
 API_BASE = "https://api.siliconflow.cn/v1"
-MODEL = "stabilityai/stable-diffusion-xl-base-1.0"
+MODEL = "Tongyi-MAI/Z-Image-Turbo"
 IMAGE_SIZE = "1024x1024"
 
 PLACEHOLDER_RE = re.compile(
@@ -194,8 +195,12 @@ def generate_one_image(
         },
         method="POST",
     )
-    with urllib.request.urlopen(request, timeout=120) as response:
-        data = json.loads(response.read().decode("utf-8"))
+    try:
+        with urllib.request.urlopen(request, timeout=120) as response:
+            data = json.loads(response.read().decode("utf-8"))
+    except urllib.error.HTTPError as exc:
+        body = exc.read().decode("utf-8", "replace")
+        raise RuntimeError(f"SiliconFlow image generation failed ({exc.code}): {body}") from exc
 
     image_url = _extract_image_url(data)
     output_path.parent.mkdir(parents=True, exist_ok=True)

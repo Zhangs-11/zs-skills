@@ -101,7 +101,7 @@ ln -sf $(pwd)/tools/wechat-publisher/venv/bin/wechat-publisher ~/.local/bin/wech
 
 ### 第三步：生成图片
 
-发布前必须先运行图片生成脚本。脚本使用 SiliconFlow 图片生成接口，默认模型是 `stabilityai/stable-diffusion-xl-base-1.0`。
+发布前必须先运行图片生成脚本。脚本使用 SiliconFlow 图片生成接口，默认模型是 `Tongyi-MAI/Z-Image-Turbo`。
 
 如果文章包含 `[插图：...]` / `[绘图提示：...]`，脚本会按这些 prompt 生成对应正文图。如果文章没有占位符，脚本会按正文段落自动插入 3 张配图，并生成封面图。
 

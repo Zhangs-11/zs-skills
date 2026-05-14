@@ -61,7 +61,7 @@ class GenerateImagesScriptTests(unittest.TestCase):
 
         payload = script.build_generation_payload("prompt", image_size="1024x1024")
 
-        self.assertEqual(payload["model"], "stabilityai/stable-diffusion-xl-base-1.0")
+        self.assertEqual(payload["model"], "Tongyi-MAI/Z-Image-Turbo")
         self.assertEqual(payload["prompt"], "prompt")
         self.assertEqual(payload["image_size"], "1024x1024")
 
