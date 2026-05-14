@@ -71,6 +71,13 @@ ln -sf $(pwd)/tools/wechat-publisher/venv/bin/wechat-publisher ~/.local/bin/wech
 ### 第一步：写作
 调用 kakarot-writer skill 生成 markdown 文章。
 
+**标题策略：使用问句形式作为标题。** 问句能制造好奇缺口（curiosity gap），吸引读者点击。例如：
+
+- ❌ "RAG不会被替代，它只是换了个马甲"
+- ✅ "传统RAG真要完？我花了两天研究PageIndex和Wiki，发现事情没那么简单"
+
+标题应该：用问句开头 + 暗示文章有独家信息/真实体验 + 保持克制不浮夸。
+
 在文章中需要配图的位置，使用以下格式插入占位标记：
 
 ```markdown
