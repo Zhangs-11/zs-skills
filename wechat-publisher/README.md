@@ -50,7 +50,8 @@ export SILICONFLOW_API_KEY="your_key_here"
 
 python wechat-publisher/scripts/generate_wechat_images.py \
   --article ~/公众号草稿/article.md \
-  --title "文章标题"
+  --title "文章标题" \
+  --auto-insert 3
 ```
 
 默认接口和模型：
@@ -59,7 +60,7 @@ python wechat-publisher/scripts/generate_wechat_images.py \
 - Endpoint: `/images/generations`
 - Model: `stabilityai/stable-diffusion-xl-base-1.0`
 
-脚本会生成 `images/cover.png`，并把正文中的 `[插图：...]` / `[绘图提示：...]` 替换成真实 Markdown 图片。
+脚本会生成 `images/cover.png`。如果正文里有 `[插图：...]` / `[绘图提示：...]`，会按这些 prompt 生成图片并替换成真实 Markdown 图片；如果没有占位符，会按正文段落自动插入 `--auto-insert` 张配图。
 
 ## 图片和链接
 

@@ -101,7 +101,9 @@ ln -sf $(pwd)/tools/wechat-publisher/venv/bin/wechat-publisher ~/.local/bin/wech
 
 ### 第三步：生成图片
 
-如果文章包含 `[插图：...]` / `[绘图提示：...]`，或者用户要求生成封面图，必须先运行图片生成脚本。脚本使用 SiliconFlow 图片生成接口，默认模型是 `stabilityai/stable-diffusion-xl-base-1.0`。
+发布前必须先运行图片生成脚本。脚本使用 SiliconFlow 图片生成接口，默认模型是 `stabilityai/stable-diffusion-xl-base-1.0`。
+
+如果文章包含 `[插图：...]` / `[绘图提示：...]`，脚本会按这些 prompt 生成对应正文图。如果文章没有占位符，脚本会按正文段落自动插入 3 张配图，并生成封面图。
 
 **密钥只放在运行环境中，不写入仓库或文章文件。**
 
@@ -110,14 +112,15 @@ export SILICONFLOW_API_KEY="用户提供的 SiliconFlow API Key"
 
 python wechat-publisher/scripts/generate_wechat_images.py \
   --article ~/公众号草稿/文件名.md \
-  --title "文章标题"
+  --title "文章标题" \
+  --auto-insert 3
 ```
 
 脚本会：
 
 1. 调用 `https://api.siliconflow.cn/v1/images/generations` 生成图片。
 2. 立即下载图片到 `~/公众号草稿/images/`，不要只保存临时 URL。
-3. 把正文占位符替换成真实 Markdown 图片，例如 `![传统RAG工作流程图](images/01-rag.png)`。
+3. 把正文占位符替换成真实 Markdown 图片；没有占位符时，自动在正文段落后插入配图，例如 `![配图1](images/01-image.png)`。
 4. 生成封面图 `images/cover.png`。
 
 ### 第四步：尝试发布

@@ -85,6 +85,7 @@ def generate_article_images(
     generator: Callable[..., None] = None,
     image_dir: Path | None = None,
     cover_prompt: str | None = None,
+    auto_insert: int = 3,
     api_key: str | None = None,
     api_base: str = API_BASE,
     model: str = MODEL,
@@ -98,6 +99,9 @@ def generate_article_images(
 
     generated_paths: list[Path] = []
     requests = extract_image_requests(md)
+    if not requests and auto_insert > 0:
+        md, requests = auto_insert_image_requests(md, count=auto_insert)
+
     for item in requests:
         output_path = output_dir / item.filename
         generate(
@@ -125,6 +129,45 @@ def generate_article_images(
     )
 
     return {"images": generated_paths, "cover": cover_path}
+
+
+def auto_insert_image_requests(
+    md: str,
+    *,
+    count: int = 3,
+) -> tuple[str, list[ImageRequest]]:
+    blocks = re.split(r"(\n\s*\n)", md)
+    paragraph_indexes = [
+        idx
+        for idx, block in enumerate(blocks)
+        if _is_content_paragraph(block)
+    ]
+    if not paragraph_indexes:
+        return md, []
+
+    selected = _spread_indexes(paragraph_indexes, min(count, len(paragraph_indexes)))
+    inserted = list(blocks)
+    requests: list[ImageRequest] = []
+    offset = 0
+    for image_index, block_index in enumerate(selected, start=1):
+        paragraph = blocks[block_index].strip()
+        description = f"配图{image_index}"
+        prompt = _auto_image_prompt(paragraph)
+        filename = f"{image_index:02d}-image.png"
+        markdown_image = f"\n\n![{description}](images/{filename})"
+        inserted_at = block_index + offset
+        inserted[inserted_at] = f"{inserted[inserted_at]}{markdown_image}"
+        offset += 0
+        requests.append(
+            ImageRequest(
+                description=description,
+                prompt=prompt,
+                filename=filename,
+                placeholder=markdown_image.strip(),
+            )
+        )
+
+    return "".join(inserted), requests
 
 
 def generate_one_image(
@@ -176,6 +219,18 @@ def _article_image_prompt(prompt: str) -> str:
     )
 
 
+def _auto_image_prompt(paragraph: str) -> str:
+    clean = re.sub(r"[*_`>#-]+", "", paragraph)
+    clean = re.sub(r"\s+", " ", clean).strip()
+    clean = clean[:220]
+    return (
+        "Create a clean editorial AI technology illustration for this article idea: "
+        f"{clean}. Use abstract product-style diagrams, architecture blocks, "
+        "retrieval pipelines, documents, vectors, or knowledge graph motifs where relevant. "
+        "No readable text, no logo, no watermark."
+    )
+
+
 def _cover_prompt(title: str, md: str) -> str:
     summary = _first_text_block(md)
     return (
@@ -218,12 +273,34 @@ def _relative_path(path: Path, start: Path) -> Path:
         return Path(os.path.relpath(path, start))
 
 
+def _is_content_paragraph(block: str) -> bool:
+    text = block.strip()
+    if len(text) < 15:
+        return False
+    if text.startswith(("#", "![", "[插图：", "[绘图提示：", "---", "|")):
+        return False
+    return True
+
+
+def _spread_indexes(indexes: list[int], count: int) -> list[int]:
+    if count <= 0:
+        return []
+    if count == 1:
+        return [indexes[min(1, len(indexes) - 1)]]
+    positions = []
+    for i in range(count):
+        raw = round((i + 1) * (len(indexes) / (count + 1)))
+        positions.append(indexes[min(max(raw, 0), len(indexes) - 1)])
+    return sorted(dict.fromkeys(positions))
+
+
 def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Generate images for a WeChat markdown article.")
     parser.add_argument("--article", required=True, type=Path)
     parser.add_argument("--title", required=True)
     parser.add_argument("--image-dir", type=Path)
     parser.add_argument("--cover-prompt")
+    parser.add_argument("--auto-insert", type=int, default=3)
     parser.add_argument("--api-base", default=API_BASE)
     parser.add_argument("--model", default=MODEL)
     parser.add_argument("--image-size", default=IMAGE_SIZE)
@@ -237,6 +314,7 @@ def main(argv: list[str] | None = None) -> int:
         title=args.title,
         image_dir=args.image_dir.expanduser() if args.image_dir else None,
         cover_prompt=args.cover_prompt,
+        auto_insert=args.auto_insert,
         api_base=args.api_base,
         model=args.model,
         image_size=args.image_size,

@@ -94,6 +94,38 @@ class GenerateImagesScriptTests(unittest.TestCase):
         self.assertTrue(calls[1][1].name == "cover.png")
         self.assertTrue(cover_exists)
 
+    def test_auto_inserts_images_when_article_has_no_placeholders(self) -> None:
+        script = load_script_module()
+        with tempfile.TemporaryDirectory() as tmp:
+            article = Path(tmp) / "article.md"
+            article.write_text(
+                "# RAG切分为什么会翻车\n\n"
+                "第一段解释问题背景，说明chunk切分会破坏上下文。\n\n"
+                "第二段讲parent-child retrieval如何工作，小块负责召回，大块负责阅读。\n\n"
+                "第三段总结工程取舍，说明不同文档需要不同策略。\n",
+                encoding="utf-8",
+            )
+            calls = []
+
+            def fake_generate(prompt, output_path, **kwargs):
+                calls.append((prompt, output_path))
+                output_path.write_bytes(b"png")
+
+            script.generate_article_images(
+                article,
+                title="RAG切分为什么会翻车",
+                generator=fake_generate,
+                auto_insert=2,
+            )
+
+            updated = article.read_text(encoding="utf-8")
+
+        self.assertIn("![配图1](images/01-image.png)", updated)
+        self.assertIn("![配图2](images/02-image.png)", updated)
+        self.assertTrue(calls[0][1].name == "01-image.png")
+        self.assertTrue(calls[1][1].name == "02-image.png")
+        self.assertTrue(calls[2][1].name == "cover.png")
+
 
 if __name__ == "__main__":
     unittest.main()
