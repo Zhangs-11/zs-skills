@@ -18,7 +18,10 @@ description: |
 kakarot-writer skill 生成 markdown 文章
        │
        ▼
-wechat-publisher create --title "xxx" --content-file xxx.md
+scripts/generate_wechat_images.py → 生成正文图 + 封面图
+       │
+       ▼
+wechat-publisher create --title "xxx" --content-file xxx.md --cover-file images/cover.png
        │
        ├─ formatter.py  →  Markdown → 微信兼容 HTML
        ├─ token.py      →  access_token 缓存管理
@@ -96,25 +99,44 @@ ln -sf $(pwd)/tools/wechat-publisher/venv/bin/wechat-publisher ~/.local/bin/wech
 ### 第二步：保存
 将文章保存到 `~/公众号草稿/` 目录。
 
-### 第三步：尝试发布
+### 第三步：生成图片
 
-发布前必须把 `[插图：...]` / `[绘图提示：...]` 占位符替换为真实 Markdown 图片：
+如果文章包含 `[插图：...]` / `[绘图提示：...]`，或者用户要求生成封面图，必须先运行图片生成脚本。脚本使用 SiliconFlow 图片生成接口，默认模型是 `stabilityai/stable-diffusion-xl-base-1.0`。
 
-```markdown
-![传统RAG工作流程图](images/rag-flow.png)
+**密钥只放在运行环境中，不写入仓库或文章文件。**
+
+```bash
+export SILICONFLOW_API_KEY="用户提供的 SiliconFlow API Key"
+
+python wechat-publisher/scripts/generate_wechat_images.py \
+  --article ~/公众号草稿/文件名.md \
+  --title "文章标题"
 ```
 
-`wechat-publisher` 会自动上传 Markdown 图片到微信 CDN。已经是 `mmbiz.qpic.cn` 的图片不会重复上传。
+脚本会：
+
+1. 调用 `https://api.siliconflow.cn/v1/images/generations` 生成图片。
+2. 立即下载图片到 `~/公众号草稿/images/`，不要只保存临时 URL。
+3. 把正文占位符替换成真实 Markdown 图片，例如 `![传统RAG工作流程图](images/01-rag.png)`。
+4. 生成封面图 `images/cover.png`。
+
+### 第四步：尝试发布
+
+`wechat-publisher` 会自动上传正文 Markdown 图片到微信 CDN。封面图用 `--cover-file` 上传成微信永久素材，再用返回的 `media_id` 创建草稿。已经是 `mmbiz.qpic.cn` 的图片不会重复上传。
 
 ```bash
 # 检查当前公网 IP
 curl -s ip.sb
 
 # 尝试发布
-wechat-publisher create --title "文章标题" --content-file ~/公众号草稿/文件名.md --digest "120字以内摘要"
+wechat-publisher create \
+  --title "文章标题" \
+  --content-file ~/公众号草稿/文件名.md \
+  --cover-file ~/公众号草稿/images/cover.png \
+  --digest "120字以内摘要"
 ```
 
-### 第四步：结果处理
+### 第五步：结果处理
 
 **成功** → 告知用户 `SUCCESS: Draft created (media_id=xxx)`
 
@@ -129,6 +151,9 @@ wechat-publisher create --title "文章标题" --content-file ~/公众号草稿/
 ```bash
 # 从文件
 wechat-publisher create --title "标题" --content-file article.md
+
+# 自动上传封面文件
+wechat-publisher create --title "标题" --content-file article.md --cover-file images/cover.png
 
 # 从管道
 cat article.md | wechat-publisher create --title "标题"
@@ -192,6 +217,6 @@ wechat-publisher upload-cover cover.jpg
 
 ## 发布前失败保护
 
-- 如果缺少封面 `media_id`，命令会失败并提示配置 `WECHAT_DEFAULT_COVER_MEDIA_ID` 或传 `--cover-media-id`。
+- 如果缺少封面，命令会失败并提示配置 `WECHAT_DEFAULT_COVER_MEDIA_ID`、传 `--cover-media-id`，或传 `--cover-file`。
 - 如果正文仍包含 `[插图：...]` / `[绘图提示：...]`，命令会失败，防止半成品进入草稿箱。
 - 如果遇到 40164，命令会提示去微信后台添加当前公网 IP 白名单。

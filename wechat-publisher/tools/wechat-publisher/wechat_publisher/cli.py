@@ -60,6 +60,7 @@ def _add_content_args(parser: argparse.ArgumentParser) -> None:
     group.add_argument("--content-file", "-f", help="Read markdown from file")
     group.add_argument("--stdin", "-s", action="store_true", help="Read markdown from stdin")
     parser.add_argument("--cover-media-id", help="Override WECHAT_DEFAULT_COVER_MEDIA_ID")
+    parser.add_argument("--cover-file", help="Upload this cover image before publishing")
     parser.add_argument("--digest", help="Article digest shown in WeChat feeds")
     parser.add_argument("--source-url", help="Original source URL for the article")
     parser.add_argument(
@@ -92,12 +93,13 @@ async def _dispatch(args: argparse.Namespace) -> None:
     html = markdown_to_wechat_html(md)
     digest = args.digest or _derive_digest(md)
     show_cover_pic = 1 if args.show_cover_pic else 0
+    cover_media_id = await _resolve_cover_media_id(client, args)
 
     if cmd == "create":
         result = await client.create_draft(
             args.title,
             html,
-            cover_media_id=args.cover_media_id,
+            cover_media_id=cover_media_id,
             digest=digest,
             content_source_url=args.source_url,
             show_cover_pic=show_cover_pic,
@@ -108,12 +110,23 @@ async def _dispatch(args: argparse.Namespace) -> None:
             args.media_id,
             args.title,
             html,
-            cover_media_id=args.cover_media_id,
+            cover_media_id=cover_media_id,
             digest=digest,
             content_source_url=args.source_url,
             show_cover_pic=show_cover_pic,
         )
         print(f"SUCCESS: Draft updated (media_id={result.media_id})")
+
+
+async def _resolve_cover_media_id(
+    client: WeChatClient,
+    args: argparse.Namespace,
+) -> str | None:
+    if args.cover_file and args.cover_media_id:
+        raise ValueError("Choose either --cover-file or --cover-media-id, not both.")
+    if args.cover_file:
+        return await client.upload_cover(args.cover_file)
+    return args.cover_media_id
 
 
 def _read_content(args: argparse.Namespace) -> tuple[str, Path | None]:
