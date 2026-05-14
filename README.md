@@ -34,6 +34,62 @@ Kakarot 的个人 Claude Code Skill 合集。
 
 ---
 
+## 新电脑配置指南
+
+如果你的工作流需要自动完成「写文章 → 生图 → 发草稿箱」全流程，换新电脑后按以下步骤配置。
+
+微信长文自动发布的完整流程：
+
+```
+kakarot-writer 写文 → 存 md → 生成配图+封面 → 查公网 IP → 发到草稿箱
+```
+
+### 1. 安装 skills
+将本仓库里的 skill 文件夹复制到对应路径：
+
+| Skill | 复制到 |
+|-------|--------|
+| `kakarot-writer/` | `~/.claude/skills/kakarot-writer/` |
+| `wechat-publisher/` | `~/.codex/skills/wechat-publisher/` |
+
+### 2. 安装 wechat-publisher CLI
+```bash
+cd ~/.codex/skills/wechat-publisher/tools/wechat-publisher
+python3 -m venv venv
+venv/bin/pip install .
+```
+
+### 3. 配置公众号凭证
+创建 `~/.wechat-publisher/.env`：
+```
+WECHAT_APP_ID=wx你的AppID
+WECHAT_APP_SECRET=你的AppSecret
+WECHAT_AUTHOR=Kakarot说AI
+WECHAT_DEFAULT_COVER_MEDIA_ID=上传封面后获得的media_id
+```
+
+> **获取封面 media_id：** 首次使用时，用 `wechat-publisher upload-cover 封面图.jpg` 上传一张封面图，把返回的 media_id 填入。
+
+### 4. 配置生图 API Key
+创建 `~/.siliconflow_env`：
+```
+export SILICONFLOW_API_KEY=你的硅基流动APIKey
+```
+
+生图使用硅基流动的 `Tongyi-MAI/Z-Image-Turbo` 模型，每张图约 2-3 秒完成。
+
+### 5. 添加 IP 白名单
+首次发布时会报 `40164` 错误并告知当前 IP。去 mp.weixin.qq.com → 开发 → 基本配置 → IP 白名单 添加该 IP，之后即可自动发布。
+
+### 6. 创建草稿目录
+```bash
+mkdir -p ~/公众号草稿/images
+```
+
+配置完成后，对 Claude 说"帮我写篇文章"，即可自动完成写文、生图、发布全流程。
+
+---
+
 ## 安装
 
 在 Claude Code 中直接输入：
