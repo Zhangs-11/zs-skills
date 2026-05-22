@@ -11,6 +11,7 @@ Kakarot 的个人 Claude Code Skill 合集。
 | Skill | 能做什么 | 怎么触发（对 Claude 说） |
 |-------|---------|------------------------|
 | **kakarot-writer** | 按「Kakarot说AI」的风格写公众号长文 | "帮我写篇文章"、"写稿子"、"按我的风格写" |
+| **fable-writer** | 用精炼的寓言解释抽象概念，附概念解析和检验问题 | "写寓言解释XX"、"用寓言讲明白"、"fable" |
 | **wechat-publisher** | 把写好的文章一键存到微信草稿箱 | "存到公众号"、"发到草稿箱"、"推到公众号" |
 | **aihot** | 查 AI 圈今天发生了什么 | "AI 圈"、"AI 日报"、"今天 AI 有什么新闻" |
 | **system-structure-diagram** | 按参考图风格生成系统结构图 | "画系统架构图"、"按这个样式画图" |
@@ -26,6 +27,7 @@ Kakarot 的个人 Claude Code Skill 合集。
 | Skill | 需要准备 |
 |-------|---------|
 | **kakarot-writer** | 什么都不用装。安装后直接对 Claude 说"帮我写篇文章"就行。 |
+| **fable-writer** | 什么都不用装。安装后直接说"写寓言解释XX"就行。 |
 | **aihot** | 什么都不用装。安装后直接问"AI 圈有什么"就行。底层调公开 API，不需要 API Key。 |
 | **system-structure-diagram** | 需要装好 [Inkscape](https://inkscape.org/release/)（SVG 转 PNG 用）。macOS: `brew install inkscape`。Windows/Linux 去官网下载。 |
 | **wechat-publisher** | 需要准备两样东西：<br>1. **Python 3.12+**（macOS: `brew install python@3.13`）<br>2. **公众号 AppID 和 AppSecret**（去 mp.weixin.qq.com → 开发 → 基本配置 获取）<br>3. **公网 IP 加入白名单**（装好后运行时报错会告诉你当前 IP，去后台加一下就行） |
@@ -98,7 +100,7 @@ mkdir -p ~/公众号草稿/images
 帮我安装这个 skill：https://github.com/Zhangs-11/zs-skills/tree/main/<skill-name>
 ```
 
-将 `<skill-name>` 替换为 `kakarot-writer`、`wechat-publisher`、`aihot` 或 `system-structure-diagram-skill`。
+将 `<skill-name>` 替换为 `kakarot-writer`、`fable-writer`、`wechat-publisher`、`aihot` 或 `system-structure-diagram-skill`。
 
 ---
 
