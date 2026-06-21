@@ -16,7 +16,26 @@ from typing import Callable, Iterable
 
 API_BASE = "https://api.siliconflow.cn/v1"
 MODEL = "Tongyi-MAI/Z-Image-Turbo"
+# auto 兜底通道用它把中文段落转成英文视觉概念（避免中文被画进图里变错别字）
+CHAT_MODEL = "Qwen/Qwen2.5-7B-Instruct"
 IMAGE_SIZE = "1024x1024"
+
+# 配图统一创作方向：用比喻/概念表达语义，画面里绝不出现任何文字（根治错别字）
+CREATIVE_DIRECTION = (
+    "Express the idea through visual metaphor and symbolism, not by writing it out. "
+    "Modern flat editorial illustration for an AI-technology article, one strong focal "
+    "concept, clean composition, limited blue-centered palette, generous negative space, "
+    "tasteful and a little imaginative. "
+    "Absolutely no text of any kind: no words, no letters, no Chinese characters, no "
+    "numbers, no captions, no labels, no watermark, no logo anywhere in the image."
+)
+
+# 负向词：进一步压制模型把文字画进图里
+NEGATIVE_PROMPT = (
+    "text, words, letters, captions, subtitles, label, typography, chinese characters, "
+    "japanese characters, korean characters, numbers, digits, watermark, logo, signature, "
+    "ui, interface, gibberish, misspelled text, garbled text, blurry, low quality, deformed"
+)
 
 PLACEHOLDER_RE = re.compile(
     r"(?P<placeholder>\[插图：(?P<description>.+?)\]\s*\n"
@@ -72,6 +91,7 @@ def build_generation_payload(
     return {
         "model": model,
         "prompt": prompt,
+        "negative_prompt": NEGATIVE_PROMPT,
         "image_size": image_size,
         "batch_size": 1,
         "num_inference_steps": 28,
@@ -101,7 +121,7 @@ def generate_article_images(
     generated_paths: list[Path] = []
     requests = extract_image_requests(md)
     if not requests and auto_insert > 0:
-        md, requests = auto_insert_image_requests(md, count=auto_insert)
+        md, requests = auto_insert_image_requests(md, count=auto_insert, api_key=api_key)
 
     for item in requests:
         output_path = output_dir / item.filename
@@ -121,7 +141,7 @@ def generate_article_images(
 
     cover_path = output_dir / "cover.png"
     generate(
-        cover_prompt or _cover_prompt(title, md),
+        cover_prompt or _cover_prompt(title, md, api_key=api_key),
         cover_path,
         api_key=api_key,
         api_base=api_base,
@@ -136,6 +156,7 @@ def auto_insert_image_requests(
     md: str,
     *,
     count: int = 3,
+    api_key: str | None = None,
 ) -> tuple[str, list[ImageRequest]]:
     blocks = re.split(r"(\n\s*\n)", md)
     paragraph_indexes = [
@@ -153,7 +174,7 @@ def auto_insert_image_requests(
     for image_index, block_index in enumerate(selected, start=1):
         paragraph = blocks[block_index].strip()
         description = f"配图{image_index}"
-        prompt = _auto_image_prompt(paragraph)
+        prompt = _auto_image_prompt(paragraph, api_key=api_key)
         filename = f"{image_index:02d}-image.png"
         markdown_image = f"\n\n![{description}](images/{filename})"
         inserted_at = block_index + offset
@@ -218,30 +239,85 @@ def _extract_image_url(data: dict[str, object]) -> str:
 
 
 def _article_image_prompt(prompt: str) -> str:
-    return (
-        f"{prompt}. WeChat official account article illustration, clean AI technology "
-        "editorial style, high information density, no watermark, no logo, no readable text."
-    )
+    # 作者在 [绘图提示] 里手写的英文创意概念，直接作为画面主体，再叠加统一创作方向
+    return f"{prompt}. {CREATIVE_DIRECTION}"
 
 
-def _auto_image_prompt(paragraph: str) -> str:
-    clean = re.sub(r"[*_`>#-]+", "", paragraph)
+def _auto_image_prompt(paragraph: str, *, api_key: str | None = None) -> str:
+    # 兜底通道：先把中文段落转成英文视觉概念，绝不把中文塞进生图 prompt
+    # （只要 prompt 里出现中文，模型就会把它画成图上的错别字）。
+    concept = _summarize_concept_en(_theme_seed(paragraph), api_key)
+    if not concept:
+        concept = (
+            "an abstract idea from a modern AI and large-language-model technology article, "
+            "shown through symbolic motifs like flowing data streams, light, funnels, "
+            "layered blocks or neural threads"
+        )
+    return f"{concept}. {CREATIVE_DIRECTION}"
+
+
+def _theme_seed(paragraph: str) -> str:
+    clean = re.sub(r"!\[[^\]]*\]\([^)]+\)", "", paragraph)
+    clean = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", clean)
+    clean = re.sub(r"[*_`>#-]+", "", clean)
     clean = re.sub(r"\s+", " ", clean).strip()
-    clean = clean[:220]
-    return (
-        "Create a clean editorial AI technology illustration for this article idea: "
-        f"{clean}. Use abstract product-style diagrams, architecture blocks, "
-        "retrieval pipelines, documents, vectors, or knowledge graph motifs where relevant. "
-        "No readable text, no logo, no watermark."
-    )
+    return clean[:160]
 
 
-def _cover_prompt(title: str, md: str) -> str:
-    summary = _first_text_block(md)
+def _summarize_concept_en(theme: str, api_key: str | None) -> str | None:
+    """用对话模型把中文主题转成一句英文视觉概念；任何失败都返回 None 走通用兜底。"""
+    key = api_key or os.environ.get("SILICONFLOW_API_KEY")
+    if not key or not theme:
+        return None
+    payload = {
+        "model": CHAT_MODEL,
+        "messages": [
+            {
+                "role": "system",
+                "content": (
+                    "You turn a Chinese sentence from an AI-technology article into ONE short "
+                    "English prompt describing a single concrete visual scene (objects, colors, "
+                    "action) that metaphorically conveys its meaning. Max 25 words. "
+                    "No technical jargon, no numbers, no math notation, no Chinese, no quotes. "
+                    "Output only the visual description."
+                ),
+            },
+            {"role": "user", "content": theme},
+        ],
+        "temperature": 0.7,
+        "max_tokens": 90,
+    }
+    try:
+        req = urllib.request.Request(
+            f"{API_BASE}/chat/completions",
+            data=json.dumps(payload).encode("utf-8"),
+            headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
+        )
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+        text = data["choices"][0]["message"]["content"].strip()
+        # 兜底清洗：去掉任何残留中文字符，确保不把中文带进生图 prompt
+        text = re.sub(r"[一-鿿]+", " ", text)
+        text = re.sub(r"\s+", " ", text).strip().strip('"').strip()
+        return text or None
+    except Exception:
+        return None
+
+
+def _cover_prompt(title: str, md: str, *, api_key: str | None = None) -> str:
+    # 封面同样不能带中文：把标题+首段语义转成英文概念再生图
+    seed = _theme_seed(f"{title}. {_first_text_block(md)}")
+    concept = _summarize_concept_en(seed, api_key)
+    if not concept:
+        concept = (
+            "a bold central metaphor for a modern AI and large-language-model breakthrough, "
+            "such as a vast field of light converging into one bright focal point"
+        )
     return (
-        f"Cover image for a Chinese AI technology WeChat article titled '{title}'. "
-        f"Core idea: {summary}. Premium editorial technology visual, strong focal point, "
-        "clean composition, suitable for mobile feed thumbnail, no readable text, no logo, no watermark."
+        f"Eye-catching magazine cover concept: {concept}. "
+        "Bold single focal subject that reads well as a small mobile thumbnail, "
+        "premium and a little surprising. "
+        f"{CREATIVE_DIRECTION}"
     )
 
 
