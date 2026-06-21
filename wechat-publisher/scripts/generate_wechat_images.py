@@ -17,7 +17,7 @@ from typing import Callable, Iterable
 API_BASE = "https://api.siliconflow.cn/v1"
 MODEL = "Tongyi-MAI/Z-Image-Turbo"
 # auto 兜底通道用它把中文段落转成英文视觉概念（避免中文被画进图里变错别字）
-CHAT_MODEL = "Qwen/Qwen2.5-7B-Instruct"
+CHAT_MODEL = "deepseek-ai/DeepSeek-V3"  # 概念生成比 7B 小模型稳得多，不易出乱码/串语种
 IMAGE_SIZE = "1024x1024"
 
 # 配图统一创作方向：用比喻/概念表达语义，画面里绝不出现任何文字（根治错别字）
@@ -113,7 +113,8 @@ def generate_article_images(
     image_size: str = IMAGE_SIZE,
 ) -> dict[str, list[Path] | Path]:
     md = article_path.read_text(encoding="utf-8")
-    output_dir = image_dir or article_path.parent / "images"
+    # 每篇文章用以文件名命名的独立子目录，避免多篇共用 images/ 时同名图互相覆盖
+    output_dir = image_dir or article_path.parent / "images" / article_path.stem
     output_dir.mkdir(parents=True, exist_ok=True)
     relative_image_dir = _relative_path(output_dir, article_path.parent)
     generate = generator or generate_one_image
@@ -279,7 +280,8 @@ def _summarize_concept_en(theme: str, api_key: str | None) -> str | None:
                     "English prompt describing a single concrete visual scene (objects, colors, "
                     "action) that metaphorically conveys its meaning. Max 25 words. "
                     "No technical jargon, no numbers, no math notation, no Chinese, no quotes. "
-                    "Output only the visual description."
+                    "No brand names, no acronyms (like AI, GPT, LLM), no abbreviations, no text or "
+                    "letters in the scene. Output only the visual description."
                 ),
             },
             {"role": "user", "content": theme},
@@ -298,24 +300,31 @@ def _summarize_concept_en(theme: str, api_key: str | None) -> str | None:
         text = data["choices"][0]["message"]["content"].strip()
         # 兜底清洗：去掉任何残留中文字符，确保不把中文带进生图 prompt
         text = re.sub(r"[一-鿿]+", " ", text)
+        text = _strip_acronyms(text)
         text = re.sub(r"\s+", " ", text).strip().strip('"').strip()
         return text or None
     except Exception:
         return None
 
 
+def _strip_acronyms(text: str) -> str:
+    """去掉独立的全大写缩写（AI、GPT、LLM、API 等），避免被生图模型当文字画到图上。"""
+    return re.sub(r"\b[A-Z]{2,5}\b", " ", text)
+
+
 def _cover_prompt(title: str, md: str, *, api_key: str | None = None) -> str:
-    # 封面同样不能带中文：把标题+首段语义转成英文概念再生图
-    seed = _theme_seed(f"{title}. {_first_text_block(md)}")
+    # 封面加固：标题原文不直接进画面（含 AI 等缩写易被画成文字），先转成纯英文视觉概念，
+    # 并去掉「杂志封面」这类会诱导模型加标题字的措辞。
+    seed = _theme_seed(_first_text_block(md))
     concept = _summarize_concept_en(seed, api_key)
     if not concept:
         concept = (
-            "a bold central metaphor for a modern AI and large-language-model breakthrough, "
+            "a bold central metaphor for a modern technology breakthrough, "
             "such as a vast field of light converging into one bright focal point"
         )
     return (
-        f"Eye-catching magazine cover concept: {concept}. "
-        "Bold single focal subject that reads well as a small mobile thumbnail, "
+        f"A single bold symbolic illustration: {concept}. "
+        "One strong focal subject that reads well as a small mobile thumbnail, "
         "premium and a little surprising. "
         f"{CREATIVE_DIRECTION}"
     )

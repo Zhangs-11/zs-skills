@@ -109,7 +109,9 @@ ln -sf $(pwd)/tools/wechat-publisher/venv/bin/wechat-publisher ~/.local/bin/wech
 
 发布前必须先运行图片生成脚本。脚本使用 SiliconFlow 图片生成接口，默认模型是 `Tongyi-MAI/Z-Image-Turbo`。
 
-如果文章包含 `[插图：...]` / `[绘图提示：...]`，脚本会按这些 prompt 生成对应正文图（**优先走这条**，因为 prompt 是你手写的、有创意）。如果文章没有占位符，脚本会按正文段落自动插入 3 张配图，并生成封面图——auto 兜底通道会先用对话模型（`Qwen/Qwen2.5-7B-Instruct`）把中文段落转成英文视觉概念再生图，**绝不把中文塞进画面**，从根上避免图上出现原文和错别字。封面同理（标题+首段也会转英文概念）。
+如果文章包含 `[插图：...]` / `[绘图提示：...]`，脚本会按这些 prompt 生成对应正文图（**优先走这条**，因为 prompt 是你手写的、有创意）。如果文章没有占位符，脚本会按正文段落自动插入 3 张配图，并生成封面图——auto 兜底通道会先用对话模型（`deepseek-ai/DeepSeek-V3`）把中文段落转成英文视觉概念再生图，**绝不把中文塞进画面**，从根上避免图上出现原文和错别字。封面也走概念化（不再把标题原文塞进 prompt，并去掉「杂志封面」这类诱导加标题字的措辞，缩写如 AI/GPT 也会被剔除）。封面对文字最敏感，**要最稳就手动传 `--cover-prompt "英文创意概念"`**。
+
+**图片目录**：每篇文章的图存在以文件名命名的独立子目录 `images/<文章名>/` 下（封面 `cover.png`、正文 `01-image.png`…），多篇之间不会再互相覆盖。
 
 > 所有生图 prompt 末尾都会自动叠加统一创作方向（视觉比喻、蓝色调、画面零文字）+ `negative_prompt` 负向词，进一步压制文字渲染。
 
@@ -127,9 +129,9 @@ python wechat-publisher/scripts/generate_wechat_images.py \
 脚本会：
 
 1. 调用 `https://api.siliconflow.cn/v1/images/generations` 生成图片。
-2. 立即下载图片到 `~/公众号草稿/images/`，不要只保存临时 URL。
-3. 把正文占位符替换成真实 Markdown 图片；没有占位符时，自动在正文段落后插入配图，例如 `![配图1](images/01-image.png)`。
-4. 生成封面图 `images/cover.png`。
+2. 立即下载图片到 `~/公众号草稿/images/<文章名>/`，不要只保存临时 URL。
+3. 把正文占位符替换成真实 Markdown 图片；没有占位符时，自动在正文段落后插入配图，例如 `![配图1](images/<文章名>/01-image.png)`。
+4. 生成封面图 `images/<文章名>/cover.png`。
 
 ### 第四步：尝试发布
 

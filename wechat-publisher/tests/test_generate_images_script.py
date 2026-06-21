@@ -86,10 +86,10 @@ class GenerateImagesScriptTests(unittest.TestCase):
             )
 
             updated = article.read_text(encoding="utf-8")
-            cover = Path(tmp) / "images" / "cover.png"
+            cover = Path(tmp) / "images" / "article" / "cover.png"
             cover_exists = cover.exists()
 
-        self.assertIn("![架构图](images/01-image.png)", updated)
+        self.assertIn("![架构图](images/article/01-image.png)", updated)
         self.assertTrue(calls[0][1].name == "01-image.png")
         self.assertTrue(calls[1][1].name == "cover.png")
         self.assertTrue(cover_exists)
@@ -120,8 +120,8 @@ class GenerateImagesScriptTests(unittest.TestCase):
 
             updated = article.read_text(encoding="utf-8")
 
-        self.assertIn("![配图1](images/01-image.png)", updated)
-        self.assertIn("![配图2](images/02-image.png)", updated)
+        self.assertIn("![配图1](images/article/01-image.png)", updated)
+        self.assertIn("![配图2](images/article/02-image.png)", updated)
         self.assertTrue(calls[0][1].name == "01-image.png")
         self.assertTrue(calls[1][1].name == "02-image.png")
         self.assertTrue(calls[2][1].name == "cover.png")
