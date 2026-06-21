@@ -14,8 +14,10 @@ _BG_SOFT = "#f7fafc"
 def markdown_to_wechat_html(md: str) -> str:
     """Convert markdown to beautifully styled WeChat-compatible HTML."""
 
-    # Pre-process: convert ===highlight=== to <mark> tags
+    # Pre-process: convert ===highlight=== to <mark> tags（先处理三等号）
     md = re.sub(r"===(.+?)===", r"<mark>\1</mark>", md)
+    # 再处理 ==注意小句==：克制的荧光笔下划线（此时三等号已被替换，不会冲突）
+    md = re.sub(r"==(.+?)==", r'<mark class="note">\1</mark>', md)
 
     html = MarkdownIt("commonmark").enable("table").render(md)
 
@@ -93,9 +95,13 @@ def markdown_to_wechat_html(md: str) -> str:
         for c in pre.find_all("code"):
             _merge_styles(c, _PRE_CODE)
 
-    # --- Styled <mark> (converted from ===text===) ---
+    # --- Styled <mark> ---
+    # 普通 ===高亮=== 用 _MARK；==注意小句== (class=note) 用更克制的 _NOTE
     for mark in soup.find_all("mark"):
-        _merge_styles(mark, _MARK)
+        classes = mark.get("class") or []
+        _merge_styles(mark, _NOTE if "note" in classes else _MARK)
+        if mark.has_attr("class"):
+            del mark["class"]
 
     # --- Images ---
     for img in soup.find_all("img"):
@@ -190,6 +196,12 @@ _EM = "font-style: italic;"
 _MARK = (
     f"background: linear-gradient(180deg,transparent 60%,{_ACCENT_LIGHT} 60%);"
     f"padding: 0 4px; font-weight: 500; color: {_TEXT};"
+)
+
+# ==注意小句== 的轻样式：底部浅蓝荧光带，字色不变、不加粗（比 _MARK 更克制）
+_NOTE = (
+    "background: linear-gradient(180deg,transparent 62%,#d6e8fb 62%);"
+    "padding: 0 2px;"
 )
 
 _CODE = (
