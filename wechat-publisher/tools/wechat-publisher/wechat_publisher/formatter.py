@@ -133,25 +133,23 @@ _P = (
     f"letter-spacing: 1.2px; line-height: 1.85;"
 )
 
-# 小标题图标+色块背景型（B 样式）：浅蓝圆角底 + 加粗左竖线 + 蓝字 + 前置图标
+# 小标题：左竖线型。无背景，字色与竖线同为主题蓝，字号与正文一致（16px），仅靠加粗+蓝色+竖线区分
 _DEFAULT_H2_ICON = "🔹"
 
 _H2 = (
-    f"font-size: 21px; font-weight: 700;"
-    f"color: {_ACCENT}; margin: 34px 0 16px 0;"
-    f"padding: 10px 14px 10px 16px;"
-    f"letter-spacing: 1.5px; line-height: 1.5;"
-    f"background: {_ACCENT_LIGHT};"
-    f"border-left: 5px solid {_ACCENT};"
-    f"border-radius: 0 8px 8px 0;"
+    f"font-size: 16px; font-weight: 700;"
+    f"color: {_ACCENT}; margin: 30px 0 14px 0;"
+    f"padding: 0 0 0 12px;"
+    f"letter-spacing: 1.2px; line-height: 1.85;"
+    f"border-left: 4px solid {_ACCENT};"
 )
 
 _H3 = (
-    f"font-size: 18px; font-weight: 700;"
-    f"color: {_ACCENT}; margin: 26px 0 12px 0;"
-    f"padding: 4px 0 4px 12px;"
-    f"letter-spacing: 1.2px; line-height: 1.5;"
-    f"border-left: 4px solid {_ACCENT};"
+    f"font-size: 16px; font-weight: 700;"
+    f"color: {_ACCENT}; margin: 24px 0 12px 0;"
+    f"padding: 0 0 0 10px;"
+    f"letter-spacing: 1.2px; line-height: 1.85;"
+    f"border-left: 3px solid {_ACCENT};"
 )
 
 _BLOCKQUOTE = (
@@ -198,10 +196,9 @@ _MARK = (
     f"padding: 0 4px; font-weight: 500; color: {_TEXT};"
 )
 
-# ==注意小句== 的轻样式：底部浅蓝荧光带，字色不变、不加粗（比 _MARK 更克制）
+# ==注意小句== 的轻样式：仅把字变成主题蓝，不加底色、不加粗（最克制）
 _NOTE = (
-    "background: linear-gradient(180deg,transparent 62%,#d6e8fb 62%);"
-    "padding: 0 2px;"
+    f"color: {_ACCENT};"
 )
 
 _CODE = (
