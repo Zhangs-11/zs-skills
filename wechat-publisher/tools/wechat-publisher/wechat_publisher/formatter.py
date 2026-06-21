@@ -49,6 +49,7 @@ def markdown_to_wechat_html(md: str) -> str:
     # --- Headings ---
     for h2 in soup.find_all("h2"):
         _merge_styles(h2, _H2)
+        _prepend_heading_icon(h2, _DEFAULT_H2_ICON)
 
     for h3 in soup.find_all("h3"):
         _merge_styles(h3, _H3)
@@ -126,17 +127,25 @@ _P = (
     f"letter-spacing: 1.2px; line-height: 1.85;"
 )
 
+# 小标题图标+色块背景型（B 样式）：浅蓝圆角底 + 加粗左竖线 + 蓝字 + 前置图标
+_DEFAULT_H2_ICON = "🔹"
+
 _H2 = (
-    f"font-size: 20px; font-weight: 700;"
-    f"color: #1a202c; margin: 36px 0 16px 0; padding: 0 0 0 14px;"
-    f"letter-spacing: 2px; line-height: 1.6;"
-    f"border-left: 4px solid {_ACCENT};"
+    f"font-size: 21px; font-weight: 700;"
+    f"color: {_ACCENT}; margin: 34px 0 16px 0;"
+    f"padding: 10px 14px 10px 16px;"
+    f"letter-spacing: 1.5px; line-height: 1.5;"
+    f"background: {_ACCENT_LIGHT};"
+    f"border-left: 5px solid {_ACCENT};"
+    f"border-radius: 0 8px 8px 0;"
 )
 
 _H3 = (
-    f"font-size: 18px; font-weight: 600;"
-    f"color: #2d3748; margin: 28px 0 12px 0;"
-    f"letter-spacing: 1.5px; line-height: 1.5;"
+    f"font-size: 18px; font-weight: 700;"
+    f"color: {_ACCENT}; margin: 26px 0 12px 0;"
+    f"padding: 4px 0 4px 12px;"
+    f"letter-spacing: 1.2px; line-height: 1.5;"
+    f"border-left: 4px solid {_ACCENT};"
 )
 
 _BLOCKQUOTE = (
@@ -239,6 +248,21 @@ def _merge_styles(el: Tag, extra: str) -> None:
         el["style"] = f"{existing}; {extra}" if not existing.rstrip().endswith(";") else f"{existing} {extra}"
     else:
         el["style"] = extra
+
+
+# 标题开头若已带 emoji/符号图标，沿用作者写的；否则补一个默认图标
+_LEADING_ICON_RE = re.compile(
+    "^\\s*[\U0001F000-\U0001FAFF\U00002600-\U000027BF\U00002190-\U000021FF"
+    "\U00002B00-\U00002BFF\U0001F1E6-\U0001F1FF•■-◿✀-➿️]"
+)
+
+
+def _prepend_heading_icon(heading: Tag, icon: str) -> None:
+    """If the heading text does not already start with an emoji/icon, prepend one."""
+    text = heading.get_text()
+    if _LEADING_ICON_RE.match(text):
+        return
+    heading.insert(0, NavigableString(f"{icon}  "))
 
 
 def _wrap_divider(soup: BeautifulSoup, hr: Tag) -> None:
