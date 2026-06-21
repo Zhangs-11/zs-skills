@@ -196,9 +196,10 @@ _MARK = (
     f"padding: 0 4px; font-weight: 500; color: {_TEXT};"
 )
 
-# ==注意小句== 的轻样式：仅把字变成主题蓝，不加底色、不加粗（最克制）
+# ==注意小句== 的轻样式：仅把字变成主题蓝，不加粗
+# background:transparent 必须显式写——否则 <mark> 标签会露出默认的黄色底
 _NOTE = (
-    f"color: {_ACCENT};"
+    f"color: {_ACCENT}; background: transparent;"
 )
 
 _CODE = (
