@@ -7,6 +7,7 @@
 | Skill | 安装位置 |
 |-------|---------|
 | kakarot-writer | `~/.claude/skills/kakarot-writer/` |
+| kakarot-repurposer | `~/.claude/skills/kakarot-repurposer/` |
 | fable-writer | `~/.claude/skills/fable-writer/` |
 | wechat-publisher | `~/.codex/skills/wechat-publisher/` |
 | aihot | `~/.claude/skills/aihot/` |
