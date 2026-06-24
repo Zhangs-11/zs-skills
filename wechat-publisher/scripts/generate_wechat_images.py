@@ -22,6 +22,7 @@ MODEL = "Tongyi-MAI/Z-Image-Turbo"
 # auto 兜底通道用它把中文段落转成英文视觉概念（避免中文被画进图里变错别字）
 CHAT_MODEL = "deepseek-ai/DeepSeek-V3"  # 概念生成比 7B 小模型稳得多，不易出乱码/串语种
 IMAGE_SIZE = "1024x1024"
+COVER_IMAGE_SIZE = "1280x720"  # 微信文章封面横版比例
 JPEG_QUALITY = 85  # 肉眼无损阈值，比 PNG 体积小 60-70%
 
 # 配图统一创作方向：用比喻/概念表达语义，画面里绝不出现任何文字（根治错别字）
@@ -155,7 +156,7 @@ def generate_article_images(
         api_key=api_key,
         api_base=api_base,
         model=model,
-        image_size=image_size,
+        image_size=COVER_IMAGE_SIZE,
     )
 
     return {"images": generated_paths, "cover": cover_path}
