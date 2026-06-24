@@ -26,6 +26,10 @@ CREATIVE_DIRECTION = (
     "Modern flat editorial illustration for an AI-technology article, one strong focal "
     "concept, clean composition, limited blue-centered palette, generous negative space, "
     "tasteful and a little imaginative. "
+    "IMPORTANT: Do NOT depict whiteboards, blackboards, flowcharts, mind maps, diagrams, "
+    "text boxes, bullet lists, screens showing text, sticky notes, signs, or any scene "
+    "that naturally contains written words — these always produce garbled characters. "
+    "Use abstract shapes, natural scenery, objects, or people instead. "
     "Absolutely no text of any kind: no words, no letters, no Chinese characters, no "
     "numbers, no captions, no labels, no watermark, no logo anywhere in the image."
 )
