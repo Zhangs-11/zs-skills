@@ -331,9 +331,9 @@ def _strip_acronyms(text: str) -> str:
 
 
 def _cover_prompt(title: str, md: str, *, api_key: str | None = None) -> str:
-    # 封面加固：标题原文不直接进画面（含 AI 等缩写易被画成文字），先转成纯英文视觉概念，
-    # 并去掉「杂志封面」这类会诱导模型加标题字的措辞。
-    seed = _theme_seed(_first_text_block(md))
+    # 封面加固：用标题 + 正文多段采样生成主题，避免开头套话导致不同文章封面雷同。
+    # 标题原文不直接进画面（含 AI 等缩写易被画成文字），先转成纯英文视觉概念。
+    seed = _cover_theme_seed(title, md)
     concept = _summarize_concept_en(seed, api_key)
     if not concept:
         concept = (
@@ -348,23 +348,22 @@ def _cover_prompt(title: str, md: str, *, api_key: str | None = None) -> str:
     )
 
 
-def _first_text_block(md: str, limit: int = 160) -> str:
-    for block in re.split(r"\n\s*\n", md):
-        text = block.strip()
-        if not text or text.startswith(("#", "![", "[插图：", "[绘图提示：")):
-            continue
+def _cover_theme_seed(title: str, md: str, limit: int = 300) -> str:
+    """标题 + 正文首/中/尾三段采样，让每篇封面主题足够独特。"""
+    def clean(text: str) -> str:
         text = re.sub(r"!\[[^\]]*\]\([^)]+\)", "", text)
         text = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", text)
-        text = re.sub(r"[*_`>#-]+", "", text)
-        text = re.sub(r"\s+", " ", text).strip()
-        if text:
-            return text[:limit]
-    return title_safe_fallback(md)
+        text = re.sub(r"[*_`>#=|\-]+", "", text)
+        return re.sub(r"\s+", " ", text).strip()
 
+    blocks = [clean(b) for b in re.split(r"\n\s*\n", md) if _is_content_paragraph(b)]
+    if not blocks:
+        return clean(title)
 
-def title_safe_fallback(md: str) -> str:
-    first_line = next((line.strip("# ").strip() for line in md.splitlines() if line.strip()), "")
-    return first_line or "AI technology analysis"
+    indices = _spread_indexes(list(range(len(blocks))), min(3, len(blocks)))
+    sampled = " ".join(blocks[i] for i in indices)
+    seed = f"{clean(title)}. {sampled}"
+    return seed[:limit]
 
 
 def _slugify(text: str) -> str:
