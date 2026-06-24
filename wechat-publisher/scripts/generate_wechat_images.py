@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import io
 import json
 import os
 import re
@@ -14,11 +15,14 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable, Iterable
 
+from PIL import Image
+
 API_BASE = "https://api.siliconflow.cn/v1"
 MODEL = "Tongyi-MAI/Z-Image-Turbo"
 # auto 兜底通道用它把中文段落转成英文视觉概念（避免中文被画进图里变错别字）
 CHAT_MODEL = "deepseek-ai/DeepSeek-V3"  # 概念生成比 7B 小模型稳得多，不易出乱码/串语种
 IMAGE_SIZE = "1024x1024"
+JPEG_QUALITY = 85  # 肉眼无损阈值，比 PNG 体积小 60-70%
 
 # 配图统一创作方向：用比喻/概念表达语义，画面里绝不出现任何文字（根治错别字）
 CREATIVE_DIRECTION = (
@@ -65,7 +69,7 @@ def extract_image_requests(md: str) -> list[ImageRequest]:
             ImageRequest(
                 description=description,
                 prompt=prompt,
-                filename=f"{index:02d}-{_slugify(description)}.png",
+                filename=f"{index:02d}-{_slugify(description)}.jpg",
                 placeholder=match.group("placeholder"),
             )
         )
@@ -144,7 +148,7 @@ def generate_article_images(
         updated = replace_placeholders(md, requests, relative_image_dir)
         article_path.write_text(updated, encoding="utf-8")
 
-    cover_path = output_dir / "cover.png"
+    cover_path = output_dir / "cover.jpg"
     generate(
         cover_prompt or _cover_prompt(title, md, api_key=api_key),
         cover_path,
@@ -180,7 +184,7 @@ def auto_insert_image_requests(
         paragraph = blocks[block_index].strip()
         description = f"配图{image_index}"
         prompt = _auto_image_prompt(paragraph, api_key=api_key)
-        filename = f"{image_index:02d}-image.png"
+        filename = f"{image_index:02d}-image.jpg"
         markdown_image = f"\n\n![{description}](images/{filename})"
         inserted_at = block_index + offset
         inserted[inserted_at] = f"{inserted[inserted_at]}{markdown_image}"
@@ -230,7 +234,9 @@ def generate_one_image(
 
     image_url = _extract_image_url(data)
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    urllib.request.urlretrieve(image_url, output_path)
+    with urllib.request.urlopen(image_url, timeout=30) as resp:
+        image_bytes = resp.read()
+    _save_as_jpeg(image_bytes, output_path)
 
 
 def _extract_image_url(data: dict[str, object]) -> str:
@@ -241,6 +247,13 @@ def _extract_image_url(data: dict[str, object]) -> str:
     if not isinstance(first, dict) or not isinstance(first.get("url"), str):
         raise RuntimeError(f"SiliconFlow image item did not contain url: {data}")
     return first["url"]
+
+
+def _save_as_jpeg(image_bytes: bytes, output_path: Path) -> None:
+    with Image.open(io.BytesIO(image_bytes)) as img:
+        if img.mode in ("RGBA", "LA", "P"):
+            img = img.convert("RGB")
+        img.save(output_path.with_suffix(".jpg"), "JPEG", quality=JPEG_QUALITY, optimize=True)
 
 
 def _article_image_prompt(prompt: str) -> str:
