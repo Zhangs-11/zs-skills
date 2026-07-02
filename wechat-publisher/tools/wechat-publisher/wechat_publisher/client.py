@@ -105,6 +105,16 @@ class WeChatClient:
         )
         return CreateDraftResponse(media_id=data.get("media_id", ""))
 
+    async def get_draft_cover(self, media_id: str) -> str | None:
+        """Fetch the existing draft's thumb_media_id."""
+        data = await self._request(
+            "POST", "/draft/get", json={"media_id": media_id}
+        )
+        items = data.get("news_item") or []
+        if items:
+            return items[0].get("thumb_media_id")
+        return None
+
     async def update_draft(
         self,
         media_id: str,
@@ -116,6 +126,8 @@ class WeChatClient:
         content_source_url: str | None = None,
         show_cover_pic: int = 0,
     ) -> UpdateDraftResponse:
+        if not cover_media_id:
+            cover_media_id = await self.get_draft_cover(media_id)
         article = self._build_article(
             title=title,
             content_html=content_html,
