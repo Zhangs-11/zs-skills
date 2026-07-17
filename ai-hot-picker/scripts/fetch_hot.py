@@ -53,6 +53,34 @@ def fetch_merged(hours=24):
     return selected
 
 
+def fetch_hot_topics():
+    """解析首页「当前热点」板块（站点服务端聚类，多信源合并为一个话题）。
+
+    该板块没有公开 JSON API，数据在首页 HTML 的 RSC payload 里，
+    按 hot-topics-link 的 id/title + 信源数正则提取。解析失败返回空列表，
+    不影响主流程。
+    """
+    try:
+        req = Request(BASE, headers={"User-Agent": UA})
+        with urlopen(req, timeout=15) as resp:
+            html = resp.read().decode("utf-8", errors="replace")
+        text = html.replace('\\"', '"')
+        links = re.findall(
+            r'"hot-topics-link","id":"([a-z0-9]+)","title":"([^"]+)"', text
+        )
+        counts = re.findall(r'children":\[(\d+)," 个信源同时报道"', text)
+        topics = []
+        for i, (item_id, title) in enumerate(links):
+            topics.append({
+                "title": title,
+                "sources_count": int(counts[i]) if i < len(counts) else None,
+                "url": f"{BASE}/items/{item_id}",
+            })
+        return topics
+    except Exception:
+        return []
+
+
 def get_recent_draft_titles(days=7):
     titles = []
     if not DRAFTS_DIR.exists():
@@ -177,6 +205,7 @@ def main():
         "fetched_at": now_str,
         "total": len(unique),
         "showing": len(items),
+        "hot_topics": fetch_hot_topics(),
         "recent_drafts": recent_drafts,
         "items": items,
     }
