@@ -22,15 +22,35 @@ def fetch_daily():
         return json.loads(resp.read().decode())
 
 
-def fetch_items(hours=24, take=30):
+def fetch_items(hours=24, take=30, mode="selected"):
     since = (datetime.now(timezone.utc) - timedelta(hours=hours)).strftime(
         "%Y-%m-%dT%H:%M:%SZ"
     )
-    url = f"{BASE}/api/public/items?mode=selected&since={since}&take={take}"
+    url = f"{BASE}/api/public/items?mode={mode}&since={since}&take={take}"
     req = Request(url, headers={"User-Agent": UA})
     with urlopen(req, timeout=15) as resp:
         data = json.loads(resp.read().decode())
     return data.get("items", [])
+
+
+def fetch_merged(hours=24):
+    """selected 精选通道为主，all 全量通道兜底补漏。
+
+    精选通道可能漏掉重大新闻（如 Kimi K3 发布当天全量通道有 24 条、
+    精选只收录 1 条且时间戳错误），所以把全量通道里的高分条目也并进来，
+    靠 dedup 收敛同话题的重复报道。
+    """
+    selected = fetch_items(hours=hours, take=50, mode="selected")
+    seen_urls = {it.get("url") for it in selected}
+    try:
+        extra = fetch_items(hours=hours, take=100, mode="all")
+    except Exception:
+        extra = []
+    for it in extra:
+        if it.get("score", 0) >= 55 and it.get("url") not in seen_urls:
+            selected.append(it)
+            seen_urls.add(it.get("url"))
+    return selected
 
 
 def get_recent_draft_titles(days=7):
@@ -81,7 +101,7 @@ def main():
     top_n = int(sys.argv[1]) if len(sys.argv) > 1 else 10
 
     try:
-        raw_items = fetch_items(hours=24, take=30)
+        raw_items = fetch_merged(hours=24)
     except (URLError, Exception) as e:
         json.dump({"error": f"AI HOT API 不可用: {e}"}, sys.stdout, ensure_ascii=False)
         sys.exit(1)
@@ -125,18 +145,26 @@ def main():
         keywords = set(re.findall(r'[一-鿿]+|[a-z]{3,}', clean))
         return frozenset(keywords)
 
+    LATIN_STOPWORDS = {"ai", "llm", "app", "api", "the", "and", "for", "with"}
+
+    def entity_tokens(title):
+        # 拉丁实体词（kimi、k3、grok、fable 等），同话题的不同报道靠它们收敛
+        tokens = set(re.findall(r'[a-z]+\d+[a-z0-9]*|\d*[a-z]{2,}', title.lower()))
+        return tokens - LATIN_STOPWORDS
+
     seen_groups = []
     unique = []
     for item in all_items:
         keys = dedup_key(item["title"])
+        ents = entity_tokens(item["title"])
         is_dup = False
-        for seen in seen_groups:
-            overlap = len(keys & seen) / max(len(keys | seen), 1)
-            if overlap > 0.3:
+        for seen_keys, seen_ents in seen_groups:
+            overlap = len(keys & seen_keys) / max(len(keys | seen_keys), 1)
+            if overlap > 0.3 or len(ents & seen_ents) >= 2:
                 is_dup = True
                 break
         if not is_dup:
-            seen_groups.append(keys)
+            seen_groups.append((keys, ents))
             unique.append(item)
 
     recent_drafts = get_recent_draft_titles()
