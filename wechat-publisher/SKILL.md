@@ -185,8 +185,10 @@ cat article.md | wechat-publisher create --title "标题"
 ### update — 更新现有草稿
 
 ```bash
-wechat-publisher update --media-id "xxx" --title "新标题" --content-file article.md
+wechat-publisher update --media-id "xxx" --title "新标题" --content-file article.md --cover-file images/cover.png
 ```
+
+**⚠️ 必须每次都带 `--cover-file` 或 `--cover-media-id`**，否则封面会被重置为默认封面（WECHAT_DEFAULT_COVER_MEDIA_ID）。只改正文/标题时也不能省。
 
 ### upload-image — 上传正文图片（返回 CDN URL）
 
