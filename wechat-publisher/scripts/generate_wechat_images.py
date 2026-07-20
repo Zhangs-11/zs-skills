@@ -9,6 +9,7 @@ import json
 import os
 import re
 import sys
+import tempfile
 import urllib.request
 import urllib.error
 from dataclasses import dataclass
@@ -16,6 +17,7 @@ from pathlib import Path
 from typing import Callable, Iterable
 
 from PIL import Image
+from wechat_publisher.secure_download import SecureDownloadError, download_public_url
 
 API_BASE = "https://api.siliconflow.cn/v1"
 MODEL = "Tongyi-MAI/Z-Image-Turbo"
@@ -24,6 +26,9 @@ CHAT_MODEL = "deepseek-ai/DeepSeek-V3"  # 概念生成比 7B 小模型稳得多�
 IMAGE_SIZE = "1024x1024"
 COVER_IMAGE_SIZE = "1280x720"  # 微信文章封面横版比例
 JPEG_QUALITY = 85  # 肉眼无损阈值，比 PNG 体积小 60-70%
+MAX_GENERATED_IMAGE_BYTES = 20 * 1024 * 1024
+MAX_GENERATED_IMAGE_PIXELS = 40_000_000
+SUPPORTED_GENERATED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/gif", "image/webp"}
 
 # 配图统一创作方向：用比喻/概念表达语义，画面里绝不出现任何文字（根治错别字）
 CREATIVE_DIRECTION = (
@@ -51,6 +56,11 @@ PLACEHOLDER_RE = re.compile(
     r"\[绘图提示：(?P<prompt>.+?)\])",
     re.DOTALL,
 )
+GENERATED_IMAGE_RE = re.compile(
+    r"!\[[^\]]*\]\(images/(?:[^/)\s]+/)?\d{2}-[^)\s]+\.(?:png|jpe?g|gif|webp)\)",
+    re.IGNORECASE,
+)
+MARKDOWN_IMAGE_RE = re.compile(r"!\[[^\]]*\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)")
 
 
 @dataclass(frozen=True)
@@ -131,7 +141,13 @@ def generate_article_images(
     generated_paths: list[Path] = []
     requests = extract_image_requests(md)
     if not requests and auto_insert > 0:
-        md, requests = auto_insert_image_requests(md, count=auto_insert, api_key=api_key)
+        if not _contains_image_from_directory(md, relative_image_dir):
+            md, requests = auto_insert_image_requests(
+                md,
+                count=auto_insert,
+                api_key=api_key,
+                api_base=api_base,
+            )
 
     for item in requests:
         output_path = output_dir / item.filename
@@ -145,19 +161,36 @@ def generate_article_images(
         )
         generated_paths.append(output_path)
 
-    if requests:
-        updated = replace_placeholders(md, requests, relative_image_dir)
-        article_path.write_text(updated, encoding="utf-8")
+    updated = replace_placeholders(md, requests, relative_image_dir) if requests else md
 
     cover_path = output_dir / "cover.jpg"
     generate(
-        cover_prompt or _cover_prompt(title, md, api_key=api_key),
+        cover_prompt or _cover_prompt(title, md, api_key=api_key, api_base=api_base),
         cover_path,
         api_key=api_key,
         api_base=api_base,
         model=model,
         image_size=COVER_IMAGE_SIZE,
     )
+
+    # 正文最后写入：若封面失败，文章仍保持原样，避免留下只生成一半的草稿。
+    if requests:
+        temp_article: Path | None = None
+        try:
+            with tempfile.NamedTemporaryFile(
+                mode="w",
+                encoding="utf-8",
+                dir=article_path.parent,
+                prefix=f".{article_path.name}.",
+                suffix=".tmp",
+                delete=False,
+            ) as tmp:
+                temp_article = Path(tmp.name)
+                tmp.write(updated)
+            temp_article.replace(article_path)
+        finally:
+            if temp_article is not None:
+                temp_article.unlink(missing_ok=True)
 
     return {"images": generated_paths, "cover": cover_path}
 
@@ -167,7 +200,10 @@ def auto_insert_image_requests(
     *,
     count: int = 3,
     api_key: str | None = None,
+    api_base: str = API_BASE,
 ) -> tuple[str, list[ImageRequest]]:
+    if GENERATED_IMAGE_RE.search(md):
+        return md, []
     blocks = re.split(r"(\n\s*\n)", md)
     paragraph_indexes = [
         idx
@@ -184,7 +220,7 @@ def auto_insert_image_requests(
     for image_index, block_index in enumerate(selected, start=1):
         paragraph = blocks[block_index].strip()
         description = f"配图{image_index}"
-        prompt = _auto_image_prompt(paragraph, api_key=api_key)
+        prompt = _auto_image_prompt(paragraph, api_key=api_key, api_base=api_base)
         filename = f"{image_index:02d}-image.jpg"
         markdown_image = f"\n\n![{description}](images/{filename})"
         inserted_at = block_index + offset
@@ -235,9 +271,33 @@ def generate_one_image(
 
     image_url = _extract_image_url(data)
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    with urllib.request.urlopen(image_url, timeout=30) as resp:
-        image_bytes = resp.read()
-    _save_as_jpeg(image_bytes, output_path)
+    try:
+        downloaded = download_public_url(
+            image_url,
+            max_bytes=MAX_GENERATED_IMAGE_BYTES,
+            supported_content_types=SUPPORTED_GENERATED_IMAGE_TYPES,
+            require_https=True,
+        )
+    except SecureDownloadError as exc:
+        raise RuntimeError(str(exc)) from exc
+    image_bytes = downloaded.body
+    if not _has_supported_image_signature(image_bytes):
+        raise RuntimeError("Downloaded file is not a valid image.")
+
+    temp_path: Path | None = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            dir=output_path.parent,
+            prefix=f".{output_path.name}.",
+            suffix=".jpg",
+            delete=False,
+        ) as tmp:
+            temp_path = Path(tmp.name)
+        _save_as_jpeg(image_bytes, temp_path)
+        temp_path.replace(output_path)
+    finally:
+        if temp_path is not None:
+            temp_path.unlink(missing_ok=True)
 
 
 def _extract_image_url(data: dict[str, object]) -> str:
@@ -252,9 +312,22 @@ def _extract_image_url(data: dict[str, object]) -> str:
 
 def _save_as_jpeg(image_bytes: bytes, output_path: Path) -> None:
     with Image.open(io.BytesIO(image_bytes)) as img:
+        if img.width * img.height > MAX_GENERATED_IMAGE_PIXELS:
+            raise RuntimeError("Generated image exceeds the decoded pixel limit.")
+        img.load()
         if img.mode in ("RGBA", "LA", "P"):
             img = img.convert("RGB")
-        img.save(output_path.with_suffix(".jpg"), "JPEG", quality=JPEG_QUALITY, optimize=True)
+        img.save(output_path, "JPEG", quality=JPEG_QUALITY, optimize=True)
+
+
+def _has_supported_image_signature(image_bytes: bytes) -> bool:
+    header = image_bytes[:12]
+    return (
+        header.startswith(b"\x89PNG\r\n\x1a\n")
+        or header.startswith(b"\xff\xd8\xff")
+        or header.startswith((b"GIF87a", b"GIF89a"))
+        or (header.startswith(b"RIFF") and header[8:12] == b"WEBP")
+    )
 
 
 def _article_image_prompt(prompt: str) -> str:
@@ -262,10 +335,15 @@ def _article_image_prompt(prompt: str) -> str:
     return f"{prompt}. {CREATIVE_DIRECTION}"
 
 
-def _auto_image_prompt(paragraph: str, *, api_key: str | None = None) -> str:
+def _auto_image_prompt(
+    paragraph: str,
+    *,
+    api_key: str | None = None,
+    api_base: str = API_BASE,
+) -> str:
     # 兜底通道：先把中文段落转成英文视觉概念，绝不把中文塞进生图 prompt
     # （只要 prompt 里出现中文，模型就会把它画成图上的错别字）。
-    concept = _summarize_concept_en(_theme_seed(paragraph), api_key)
+    concept = _summarize_concept_en(_theme_seed(paragraph), api_key, api_base)
     if not concept:
         concept = (
             "an abstract idea from a modern AI and large-language-model technology article, "
@@ -283,7 +361,11 @@ def _theme_seed(paragraph: str) -> str:
     return clean[:160]
 
 
-def _summarize_concept_en(theme: str, api_key: str | None) -> str | None:
+def _summarize_concept_en(
+    theme: str,
+    api_key: str | None,
+    api_base: str = API_BASE,
+) -> str | None:
     """用对话模型把中文主题转成一句英文视觉概念；任何失败都返回 None 走通用兜底。"""
     key = api_key or os.environ.get("SILICONFLOW_API_KEY")
     if not key or not theme:
@@ -309,7 +391,7 @@ def _summarize_concept_en(theme: str, api_key: str | None) -> str | None:
     }
     try:
         req = urllib.request.Request(
-            f"{API_BASE}/chat/completions",
+            f"{api_base.rstrip('/')}/chat/completions",
             data=json.dumps(payload).encode("utf-8"),
             headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
         )
@@ -330,11 +412,17 @@ def _strip_acronyms(text: str) -> str:
     return re.sub(r"\b[A-Z]{2,5}\b", " ", text)
 
 
-def _cover_prompt(title: str, md: str, *, api_key: str | None = None) -> str:
+def _cover_prompt(
+    title: str,
+    md: str,
+    *,
+    api_key: str | None = None,
+    api_base: str = API_BASE,
+) -> str:
     # 封面加固：用标题 + 正文多段采样生成主题，避免开头套话导致不同文章封面雷同。
     # 标题原文不直接进画面（含 AI 等缩写易被画成文字），先转成纯英文视觉概念。
     seed = _cover_theme_seed(title, md)
-    concept = _summarize_concept_en(seed, api_key)
+    concept = _summarize_concept_en(seed, api_key, api_base)
     if not concept:
         concept = (
             "a bold central metaphor for a modern technology breakthrough, "
@@ -380,25 +468,48 @@ def _relative_path(path: Path, start: Path) -> Path:
         return Path(os.path.relpath(path, start))
 
 
+def _contains_image_from_directory(md: str, image_dir: Path) -> bool:
+    expected = image_dir.as_posix().rstrip("/") + "/"
+    return any(
+        match.group(1).split("?", 1)[0].startswith(expected)
+        for match in MARKDOWN_IMAGE_RE.finditer(md)
+    )
+
+
 def _is_content_paragraph(block: str) -> bool:
     text = block.strip()
     if len(text) < 15:
         return False
-    if text.startswith(("#", "![", "[插图：", "[绘图提示：", "---", "|")):
+    if text.startswith(
+        (
+            "#",
+            "![",
+            "[插图：",
+            "[绘图提示：",
+            "---",
+            "|",
+            ">",
+            "```",
+            "~~~",
+        )
+    ):
+        return False
+    if text.startswith(("> / 作者：", "> / 投稿或爆料")):
         return False
     return True
 
 
 def _spread_indexes(indexes: list[int], count: int) -> list[int]:
-    if count <= 0:
+    if count <= 0 or not indexes:
         return []
+    count = min(count, len(indexes))
     if count == 1:
         return [indexes[min(1, len(indexes) - 1)]]
-    positions = []
-    for i in range(count):
-        raw = round((i + 1) * (len(indexes) / (count + 1)))
-        positions.append(indexes[min(max(raw, 0), len(indexes) - 1)])
-    return sorted(dict.fromkeys(positions))
+    # 直接在可用位置的首尾间等距取样，保证数量准确且不重复。
+    return [
+        indexes[round(i * (len(indexes) - 1) / (count - 1))]
+        for i in range(count)
+    ]
 
 
 def parse_args(argv: list[str]) -> argparse.Namespace:

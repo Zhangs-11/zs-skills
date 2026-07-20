@@ -10,7 +10,7 @@ description: |
 
 # wechat-publisher 公众号发布工具
 
-作者在「Kakarot说AI」公众号写文章，写完后需要一键存到微信草稿箱，不用手动复制粘贴。
+作者在「卡卡罗特学AI」公众号写文章，写完后需要一键存到微信草稿箱，不用手动复制粘贴。
 
 ## 架构概览
 
@@ -21,7 +21,7 @@ kakarot-writer skill 生成 markdown 文章
 scripts/generate_wechat_images.py → 生成正文图 + 封面图
        │
        ▼
-wechat-publisher create --title "xxx" --content-file xxx.md --cover-file images/cover.png
+wechat-publisher create --title "xxx" --content-file xxx.md --cover-file images/<文章名>/cover.jpg
        │
        ├─ formatter.py  →  Markdown → 微信兼容 HTML
        ├─ token.py      →  access_token 缓存管理
@@ -48,7 +48,7 @@ venv/bin/pip install -e .
 ```bash
 WECHAT_APP_ID=wx你的AppID
 WECHAT_APP_SECRET=你的AppSecret
-WECHAT_AUTHOR=Kakarot说AI
+WECHAT_AUTHOR=卡卡罗特学AI
 WECHAT_DEFAULT_COVER_MEDIA_ID=你的封面media_id
 ```
 
@@ -74,13 +74,18 @@ ln -sf $(pwd)/tools/wechat-publisher/venv/bin/wechat-publisher ~/.local/bin/wech
 ### 第一步：写作
 调用 kakarot-writer skill 生成 markdown 文章。
 
-**标题策略：制造信息缺口（curiosity gap），让人想点进来。** 问句、悬念陈述句、反差句都可以，不限形式。例如：
+标题、事实边界、文章主线和口语风格以 kakarot-writer 的完整规则为准。发布 skill 不再重复发明另一套写作规则，避免两个 skill 互相冲突。
 
-- ✅ "GitHub 25万星标的神级插件，为什么大家都在卸载它"（反差）
-- ✅ "跑了一下马斯克的编程工具，我的SSH密钥没了"（悬念）
-- ✅ "传统RAG真要完？我花了两天研究PageIndex和Wiki，发现事情没那么简单"（问句）
+### 发布前编辑检查
 
-标题应该：暗示文章有独家信息/真实体验 + 保持克制不浮夸 + 让普通人也看得懂。
+进入配图前，确认文章已经完成 kakarot-writer 的自检，尤其检查：
+
+- 标题承诺能被正文证据兑现，没有暗示不存在的实测或独家经历。
+- 没有把推测写成亲历；数据、发布日期、榜单和引用没有未说明的事实缺口。
+- 前三段已经建立事件、阅读理由或作者关系，全文围绕同一条主线推进。
+- 口语来自真实语境，没有为了模仿作者批量堆叠口癖和夸张标点。
+
+如果存在事实缺口，先向用户确认或收窄断言，不要带着问题进入发布流程。
 
 在文章中需要配图的位置，使用以下格式插入占位标记：
 
@@ -112,7 +117,7 @@ ln -sf $(pwd)/tools/wechat-publisher/venv/bin/wechat-publisher ~/.local/bin/wech
 
 如果文章包含 `[插图：...]` / `[绘图提示：...]`，脚本会按这些 prompt 生成对应正文图（**优先走这条**，因为 prompt 是你手写的、有创意）。如果文章没有占位符，脚本会按正文段落自动插入 3 张配图，并生成封面图——auto 兜底通道会先用对话模型（`deepseek-ai/DeepSeek-V3`）把中文段落转成英文视觉概念再生图，**绝不把中文塞进画面**，从根上避免图上出现原文和错别字。封面也走概念化（不再把标题原文塞进 prompt，并去掉「杂志封面」这类诱导加标题字的措辞，缩写如 AI/GPT 也会被剔除）。封面对文字最敏感，**要最稳就手动传 `--cover-prompt "英文创意概念"`**。
 
-**图片目录**：每篇文章的图存在以文件名命名的独立子目录 `images/<文章名>/` 下（封面 `cover.png`、正文 `01-image.png`…），多篇之间不会再互相覆盖。
+**图片目录**：每篇文章的图存在以文件名命名的独立子目录 `images/<文章名>/` 下（封面 `cover.jpg`、正文 `01-image.jpg`…），多篇之间不会再互相覆盖。
 
 > 所有生图 prompt 末尾都会自动叠加统一创作方向（视觉比喻、蓝色调、画面零文字）+ `negative_prompt` 负向词，进一步压制文字渲染。
 
@@ -120,8 +125,11 @@ ln -sf $(pwd)/tools/wechat-publisher/venv/bin/wechat-publisher ~/.local/bin/wech
 
 ```bash
 export SILICONFLOW_API_KEY="用户提供的 SiliconFlow API Key"
+export WECHAT_PUBLISHER_SKILL_DIR="${WECHAT_PUBLISHER_SKILL_DIR:-$HOME/.codex/skills/wechat-publisher}"
+export WECHAT_PUBLISHER_PYTHON="$WECHAT_PUBLISHER_SKILL_DIR/tools/wechat-publisher/venv/bin/python"
+export WECHAT_PUBLISHER_BIN="$WECHAT_PUBLISHER_SKILL_DIR/tools/wechat-publisher/venv/bin/wechat-publisher"
 
-python wechat-publisher/scripts/generate_wechat_images.py \
+"$WECHAT_PUBLISHER_PYTHON" "$WECHAT_PUBLISHER_SKILL_DIR/scripts/generate_wechat_images.py" \
   --article ~/公众号草稿/文件名.md \
   --title "文章标题" \
   --auto-insert 3
@@ -131,8 +139,10 @@ python wechat-publisher/scripts/generate_wechat_images.py \
 
 1. 调用 `https://api.siliconflow.cn/v1/images/generations` 生成图片。
 2. 立即下载图片到 `~/公众号草稿/images/<文章名>/`，不要只保存临时 URL。
-3. 把正文占位符替换成真实 Markdown 图片；没有占位符时，自动在正文段落后插入配图，例如 `![配图1](images/<文章名>/01-image.png)`。
-4. 生成封面图 `images/<文章名>/cover.png`。
+3. 把正文占位符替换成真实 Markdown 图片；没有占位符时，自动在正文段落后插入配图，例如 `![配图1](images/<文章名>/01-image.jpg)`。
+4. 生成封面图 `images/<文章名>/cover.jpg`。
+
+**硬性检查：** 只有当命令输出至少一个 `IMAGE: ...` 和一个 `COVER: ...`，并且文章对应的图片目录里能看到 JPEG 文件时，才能继续发布。否则停止并报告图片生成失败原因，不能跳过图片步骤。
 
 ### 第四步：对抗式事实审查（强制，不可跳过）
 
@@ -143,7 +153,7 @@ python wechat-publisher/scripts/generate_wechat_images.py \
 3. 绝对化表述（「没法刷」「史上最X」「全球第一」）要么有一手来源，要么加「有分析说」「据官方说法」限定
 4. 全部修正后才进入发布步骤，发布后把审查结果汇报给用户（❌抓出的错误 / ⚠️措辞修正 / ✅确认无误清单）
 
-### 第五步：尝试发布
+### 第五步：预检并尝试发布
 
 `wechat-publisher` 会自动上传正文 Markdown 图片到微信 CDN。封面图用 `--cover-file` 上传成微信永久素材，再用返回的 `media_id` 创建草稿。已经是 `mmbiz.qpic.cn` 的图片不会重复上传。
 
@@ -151,11 +161,17 @@ python wechat-publisher/scripts/generate_wechat_images.py \
 # 检查当前公网 IP
 curl -s ip.sb
 
-# 尝试发布
-wechat-publisher create \
+# 只读预检，不上传图片、不创建草稿
+"$WECHAT_PUBLISHER_BIN" preflight \
   --title "文章标题" \
   --content-file ~/公众号草稿/文件名.md \
-  --cover-file ~/公众号草稿/images/cover.png \
+  --cover-file ~/公众号草稿/images/<文章名>/cover.jpg
+
+# 尝试发布
+"$WECHAT_PUBLISHER_BIN" create \
+  --title "文章标题" \
+  --content-file ~/公众号草稿/文件名.md \
+  --cover-file ~/公众号草稿/images/<文章名>/cover.jpg \
   --digest "120字以内摘要"
 ```
 
@@ -167,6 +183,8 @@ wechat-publisher create \
 
 **失败（其他错误）** → 根据错误信息处理
 
+**读取超时** → 创建或更新结果未知。先检查公众号草稿箱，不要立刻重复执行，以免生成重复草稿。
+
 ## 命令参考
 
 ### create — 创建草稿
@@ -176,7 +194,7 @@ wechat-publisher create \
 wechat-publisher create --title "标题" --content-file article.md
 
 # 自动上传封面文件
-wechat-publisher create --title "标题" --content-file article.md --cover-file images/cover.png
+wechat-publisher create --title "标题" --content-file article.md --cover-file images/<文章名>/cover.jpg
 
 # 从管道
 cat article.md | wechat-publisher create --title "标题"
@@ -185,7 +203,7 @@ cat article.md | wechat-publisher create --title "标题"
 ### update — 更新现有草稿
 
 ```bash
-wechat-publisher update --media-id "xxx" --title "新标题" --content-file article.md --cover-file images/cover.png
+wechat-publisher update --media-id "xxx" --title "新标题" --content-file article.md --cover-file images/<文章名>/cover.jpg
 ```
 
 **⚠️ 必须每次都带 `--cover-file` 或 `--cover-media-id`**，否则封面会被重置为默认封面（WECHAT_DEFAULT_COVER_MEDIA_ID）。只改正文/标题时也不能省。
@@ -230,7 +248,7 @@ wechat-publisher upload-cover cover.jpg
 
 1. 标题有具体对象、反常识或真实体验，不使用空泛震惊体。
 2. 前三行必须交代“发生了什么”和“为什么值得读”。
-3. 每 3-5 段至少有一个人为加粗的判断句，方便扫读；不要依赖工具自动加粗。
+3. 只强调真正决定读者理解的关键判断，避免按固定段数机械加粗；优先使用克制的 `==关键小句==`。
 4. 配图必须服务理解，且**图里不要出现任何文字**（生图模型画中文会出错别字）。优先用视觉比喻/概念图传达意思，绘图提示用纯英文手写、有创意，不要把正文照搬进 prompt。
 
 ## 常见错误

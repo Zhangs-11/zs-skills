@@ -1,8 +1,10 @@
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from wechat_publisher.image import AssetProcessingError, prepare_markdown_assets
+import wechat_publisher.image as image_module
 
 
 class FakeUploadResult:
@@ -44,6 +46,63 @@ class AssetProcessingTests(unittest.IsolatedAsyncioTestCase):
         result = await prepare_markdown_assets(md, FakeClient())
 
         self.assertEqual(result, md)
+
+    def test_private_remote_image_addresses_are_rejected(self) -> None:
+        for url in (
+            "http://127.0.0.1/image.png",
+            "http://169.254.169.254/latest/meta-data",
+            "http://[::1]/image.png",
+        ):
+            with self.subTest(url=url):
+                with self.assertRaisesRegex(AssetProcessingError, "private or local"):
+                    image_module._validate_remote_image_url(url)
+
+    def test_remote_response_requires_supported_image_content_type(self) -> None:
+        with self.assertRaisesRegex(AssetProcessingError, "content type"):
+            image_module._validate_remote_image_response(
+                "text/html",
+                content_length=120,
+            )
+
+    def test_remote_response_rejects_declared_oversize_body(self) -> None:
+        with self.assertRaisesRegex(AssetProcessingError, "too large"):
+            image_module._validate_remote_image_response(
+                "image/png",
+                content_length=image_module.MAX_REMOTE_IMAGE_BYTES + 1,
+            )
+
+    async def test_streaming_failure_removes_temporary_file(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            with patch.object(
+                image_module,
+                "download_public_url",
+                side_effect=image_module.SecureDownloadError("remote image is too large"),
+            ):
+                with self.assertRaisesRegex(AssetProcessingError, "too large"):
+                    await image_module.upload_image_from_url(
+                        FakeClient(),
+                        "https://example.com/image.png",
+                    )
+
+            self.assertEqual(list(Path(tmp).iterdir()), [])
+
+    async def test_redirect_is_rejected_before_upload(self) -> None:
+        client = FakeClient()
+
+        with patch.object(
+            image_module,
+            "download_public_url",
+            side_effect=image_module.SecureDownloadError(
+                "remote image redirects are not allowed"
+            ),
+        ):
+            with self.assertRaisesRegex(AssetProcessingError, "redirects"):
+                await image_module.upload_image_from_url(
+                    client,
+                    "https://example.com/image.png",
+                )
+
+        self.assertEqual(client.uploaded, [])
 
 
 if __name__ == "__main__":

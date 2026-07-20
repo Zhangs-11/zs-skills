@@ -1,12 +1,14 @@
+import asyncio
+import ipaddress
+import socket
 import tempfile
 import re
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
 
-import httpx
-
 from .client import WeChatClient
+from .secure_download import SecureDownloadError, download_public_url
 
 
 class AssetProcessingError(RuntimeError):
@@ -16,6 +18,8 @@ class AssetProcessingError(RuntimeError):
 _PLACEHOLDER_RE = re.compile(r"\[插图：.+?\]|\[绘图提示：.+?\]")
 _MARKDOWN_IMAGE_RE = re.compile(r"!\[([^\]]*)\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)")
 _WECHAT_IMAGE_HOSTS = {"mmbiz.qpic.cn", "mmbiz.qlogo.cn"}
+_SUPPORTED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/gif", "image/webp"}
+MAX_REMOTE_IMAGE_BYTES = 10 * 1024 * 1024
 
 
 async def prepare_markdown_assets(
@@ -77,20 +81,93 @@ async def _upload_markdown_image(
 
 async def upload_image_from_url(client: WeChatClient, url: str) -> str:
     """Download image from *url*, upload to WeChat CDN, return WeChat URL."""
-    async with httpx.AsyncClient(timeout=30) as http:
-        r = await http.get(url)
-        r.raise_for_status()
-
-    ext = _guess_ext(r.headers.get("content-type", ""), url)
-    with tempfile.NamedTemporaryFile(suffix=ext, delete=False) as tmp:
-        tmp.write(r.content)
-        tmp_path = tmp.name
-
+    tmp_path: str | None = None
     try:
+        try:
+            downloaded = await asyncio.to_thread(
+                download_public_url,
+                url,
+                max_bytes=MAX_REMOTE_IMAGE_BYTES,
+                supported_content_types=_SUPPORTED_IMAGE_TYPES,
+            )
+        except SecureDownloadError as exc:
+            raise AssetProcessingError(str(exc)) from exc
+        ext = _guess_ext(downloaded.content_type, url)
+        with tempfile.NamedTemporaryFile(suffix=ext, delete=False) as tmp:
+            tmp_path = tmp.name
+            tmp.write(downloaded.body)
         result = await client.upload_image(tmp_path)
         return result.url
     finally:
-        Path(tmp_path).unlink(missing_ok=True)
+        if tmp_path is not None:
+            Path(tmp_path).unlink(missing_ok=True)
+
+
+def _validate_remote_image_url(
+    url: str,
+) -> set[ipaddress.IPv4Address | ipaddress.IPv6Address]:
+    parsed = urlparse(url)
+    if parsed.scheme not in {"http", "https"} or not parsed.hostname:
+        raise AssetProcessingError(f"不支持的远程图片地址：{url}")
+    try:
+        port = parsed.port
+    except ValueError as exc:
+        raise AssetProcessingError(f"不支持的远程图片地址：{url}") from exc
+    if port not in (None, 80, 443):
+        raise AssetProcessingError("remote image uses an unsupported port")
+    hostname = parsed.hostname.rstrip(".").lower()
+    if hostname == "localhost" or hostname.endswith(".localhost"):
+        raise AssetProcessingError("remote image points to a private or local address")
+    try:
+        addresses = [ipaddress.ip_address(hostname)]
+    except ValueError:
+        try:
+            addresses = [
+                ipaddress.ip_address(item[4][0])
+                for item in socket.getaddrinfo(hostname, None, type=socket.SOCK_STREAM)
+            ]
+        except socket.gaierror as exc:
+            raise AssetProcessingError(f"远程图片域名无法解析：{hostname}") from exc
+    if any(not _is_public_address(address) for address in addresses):
+        raise AssetProcessingError("remote image points to a private or local address")
+    return set(addresses)
+
+
+def _is_public_address(
+    address: ipaddress.IPv4Address | ipaddress.IPv6Address,
+) -> bool:
+    return not (
+        address.is_private
+        or address.is_loopback
+        or address.is_link_local
+        or address.is_reserved
+        or address.is_unspecified
+        or address.is_multicast
+    )
+
+
+def _validate_remote_image_response(
+    content_type: str,
+    *,
+    content_length: int | None,
+) -> None:
+    normalized = content_type.split(";", 1)[0].strip().lower()
+    if normalized not in _SUPPORTED_IMAGE_TYPES:
+        raise AssetProcessingError(f"unsupported remote image content type: {content_type or 'missing'}")
+    if content_length is not None and content_length > MAX_REMOTE_IMAGE_BYTES:
+        raise AssetProcessingError("remote image is too large")
+
+
+def _parse_content_length(value: str | None) -> int | None:
+    if value is None:
+        return None
+    try:
+        length = int(value)
+    except ValueError as exc:
+        raise AssetProcessingError("invalid remote image content length") from exc
+    if length < 0:
+        raise AssetProcessingError("invalid remote image content length")
+    return length
 
 
 def _guess_ext(content_type: str, url: str) -> str:

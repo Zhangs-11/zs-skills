@@ -1,8 +1,10 @@
 import argparse
 import asyncio
+import os
 import re
 import sys
 from pathlib import Path
+from urllib.parse import urlparse
 
 from .client import WeChatAPIError, WeChatClient
 from .config import Settings
@@ -35,6 +37,11 @@ def main() -> None:
     # --- upload-cover ---
     cover = sub.add_parser("upload-cover", help="Upload a cover image and get media_id")
     cover.add_argument("file", help="Path to the cover image file")
+
+    # --- preflight ---
+    preflight = sub.add_parser("preflight", help="Validate an article without uploading it")
+    preflight.add_argument("--title", "-t", required=True)
+    _add_content_args(preflight)
 
     args = parser.parse_args()
     try:
@@ -71,10 +78,25 @@ def _add_content_args(parser: argparse.ArgumentParser) -> None:
 
 
 async def _dispatch(args: argparse.Namespace) -> None:
+    cmd = args.command
+
+    if cmd == "preflight":
+        md, base_dir = _read_content(args)
+        findings = _preflight_findings(
+            title=args.title,
+            md=md,
+            base_dir=base_dir,
+            cover_file=args.cover_file,
+            cover_media_id=args.cover_media_id,
+        )
+        if findings:
+            raise AssetProcessingError("；".join(findings))
+        html = markdown_to_wechat_html(md)
+        print(f"PREFLIGHT: OK (html_chars={len(html)})")
+        return
+
     settings = Settings()
     client = WeChatClient(settings)
-
-    cmd = args.command
 
     if cmd == "upload-image":
         result = await client.upload_image(args.file)
@@ -86,14 +108,38 @@ async def _dispatch(args: argparse.Namespace) -> None:
         print(f"SUCCESS: Cover uploaded (media_id={media_id})")
         return
 
-    # create / update → read markdown and make assets publish-ready
+    # create / update：先完成所有本地验证，再发生任何上传，避免失败命令消耗素材配额。
+    _validate_cover_selection(args)
     md, base_dir = _read_content(args)
+    findings = _preflight_findings(
+        title=args.title,
+        md=md,
+        base_dir=base_dir,
+        cover_file=args.cover_file,
+        cover_media_id=args.cover_media_id,
+    )
+    if findings:
+        raise AssetProcessingError("；".join(findings))
+    markdown_to_wechat_html(md)  # 先验证 Markdown 可格式化；此时不上传任何内容。
+
+    cover_media_id = await _resolve_cover_media_id(client, args)
+    if cmd == "create" and not cover_media_id:
+        cover_media_id = settings.wechat_default_cover_media_id or None
+        if not cover_media_id:
+            raise ValueError(
+                "cover media_id is required. Set WECHAT_DEFAULT_COVER_MEDIA_ID, "
+                "pass --cover-media-id, or pass --cover-file."
+            )
+    elif cmd == "update" and not cover_media_id:
+        cover_media_id = await client.get_draft_cover(args.media_id)
+        if not cover_media_id:
+            raise ValueError("existing draft does not contain a usable cover media_id")
+
     md = await prepare_markdown_assets(md, client, base_dir=base_dir)
 
     html = markdown_to_wechat_html(md)
     digest = args.digest or _derive_digest(md)
     show_cover_pic = 1 if args.show_cover_pic else 0
-    cover_media_id = await _resolve_cover_media_id(client, args)
 
     if cmd == "create":
         result = await client.create_draft(
@@ -122,11 +168,14 @@ async def _resolve_cover_media_id(
     client: WeChatClient,
     args: argparse.Namespace,
 ) -> str | None:
-    if args.cover_file and args.cover_media_id:
-        raise ValueError("Choose either --cover-file or --cover-media-id, not both.")
     if args.cover_file:
         return await client.upload_cover(args.cover_file)
     return args.cover_media_id
+
+
+def _validate_cover_selection(args: argparse.Namespace) -> None:
+    if args.cover_file and args.cover_media_id:
+        raise ValueError("Choose either --cover-file or --cover-media-id, not both.")
 
 
 def _read_content(args: argparse.Namespace) -> tuple[str, Path | None]:
@@ -157,3 +206,39 @@ def _strip_markdown(text: str) -> str:
     text = re.sub(r"[*_`>#-]+", "", text)
     text = re.sub(r"\s+", " ", text)
     return text.strip()
+
+
+def _preflight_findings(
+    *,
+    title: str,
+    md: str,
+    base_dir: Path | None,
+    cover_file: str | None,
+    cover_media_id: str | None,
+) -> list[str]:
+    findings: list[str] = []
+    if not title.strip():
+        findings.append("标题不能为空")
+    placeholder = re.search(r"\[插图：.+?\]|\[绘图提示：.+?\]", md)
+    if placeholder:
+        findings.append(f"存在未解析插图占位符：{placeholder.group(0)}")
+    for image in re.finditer(r"!\[[^\]]*\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)", md):
+        src = image.group(1).strip()
+        parsed = urlparse(src)
+        if parsed.scheme in {"http", "https"}:
+            continue
+        if parsed.scheme:
+            findings.append(f"图片使用了不支持的地址：{src}")
+            continue
+        path = Path(src).expanduser()
+        if not path.is_absolute() and base_dir is not None:
+            path = base_dir / path
+        if not path.is_file() or not os.access(path, os.R_OK):
+            findings.append(f"图片文件不存在：{path}")
+    if cover_file and cover_media_id:
+        findings.append("封面文件与封面 media_id 只能选择一个")
+    elif cover_file:
+        cover_path = Path(cover_file).expanduser()
+        if not cover_path.is_file() or not os.access(cover_path, os.R_OK):
+            findings.append(f"封面文件不存在：{cover_path}")
+    return findings
