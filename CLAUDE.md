@@ -11,6 +11,7 @@
 | fable-writer | `~/.claude/skills/fable-writer/` |
 | wechat-publisher | `~/.codex/skills/wechat-publisher/` |
 | aihot | `~/.claude/skills/aihot/` |
+| leader | `~/.claude/skills/leader/` |
 
 技能文件夹内不包含 `.git`，直接从本 repo 复制过去即可。
 
