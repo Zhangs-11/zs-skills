@@ -1,0 +1,4 @@
+interface:
+  display_name: "费曼学习法：讲清楚才算懂"
+  short_description: "用费曼学习法主动复述、精准追问和迁移检验，真正掌握任意复杂主题"
+  default_prompt: "使用 $explain-to-master 按费曼学习法让我先亲自解释，再通过追问、纠错和迁移验证真正掌握这个主题。"

@@ -9,6 +9,7 @@
 | kakarot-writer | `~/.claude/skills/kakarot-writer/` |
 | kakarot-repurposer | `~/.claude/skills/kakarot-repurposer/` |
 | fable-writer | `~/.claude/skills/fable-writer/` |
+| explain-to-master | `~/.codex/skills/explain-to-master/` |
 | wechat-publisher | `~/.codex/skills/wechat-publisher/` |
 | aihot | `~/.claude/skills/aihot/` |
 | leader | `~/.claude/skills/leader/` |

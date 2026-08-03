@@ -1,6 +1,6 @@
 # zs-skills
 
-Kakarot 的个人 Claude Code Skill 合集。
+Kakarot 的个人 Claude Code / Codex Skill 合集。
 
 帮你写公众号文章、查 AI 资讯、画架构图，一条龙搞定。
 
@@ -13,6 +13,7 @@ Kakarot 的个人 Claude Code Skill 合集。
 | **kakarot-writer** | 按「卡卡罗特学AI」的风格写公众号长文 | "帮我写篇文章"、"写稿子"、"按我的风格写" |
 | **kakarot-repurposer** | 把公众号长文一稿改写成小红书笔记 + 抖音脚本（含 AI 配音、字幕、效果预览页） | "转成小红书"、"改成抖音脚本"、"一稿多平台" |
 | **fable-writer** | 用精炼的寓言解释抽象概念，附概念解析和检验问题 | "写寓言解释XX"、"用寓言讲明白"、"fable" |
+| **explain-to-master** | 用费曼学习法复述、追问、补洞并通过反例和迁移检验真正掌握任意主题 | "用费曼学习法带我学"、"我好像懂了但讲不清"、"考考我是否真懂" |
 | **wechat-publisher** | 把写好的文章一键存到微信草稿箱 | "存到公众号"、"发到草稿箱"、"推到公众号" |
 | **aihot** | 查 AI 圈今天发生了什么 | "AI 圈"、"AI 日报"、"今天 AI 有什么新闻" |
 | **ai-hot-picker** | 从 AI HOT 日报中挑选公众号选题，智能推荐 + 一键写推文或长文 | "选题"、"今天写什么"、"写推文"、"有什么热点" |
@@ -33,6 +34,7 @@ Kakarot 的个人 Claude Code Skill 合集。
 |-------|---------|
 | **kakarot-writer** | 什么都不用装。安装后直接对 Claude 说"帮我写篇文章"就行。 |
 | **fable-writer** | 什么都不用装。安装后直接说"写寓言解释XX"就行。 |
+| **explain-to-master** | 什么都不用装。安装后直接说"用费曼学习法带我学XX"就行。 |
 | **aihot** | 什么都不用装。安装后直接问"AI 圈有什么"就行。底层调公开 API，不需要 API Key。 |
 | **ai-hot-picker** | 什么都不用装。安装后说"选题"或"写推文"就行。底层调 AI HOT 公开 API。 |
 | **life-designer** | 什么都不用装。安装后直接说"帮我设计人生"就行。 |
@@ -103,13 +105,13 @@ mkdir -p ~/公众号草稿/images
 
 ## 安装
 
-在 Claude Code 中直接输入：
+在 Claude Code 或 Codex 中直接输入：
 
 ```
 帮我安装这个 skill：https://github.com/Zhangs-11/zs-skills/tree/main/<skill-name>
 ```
 
-将 `<skill-name>` 替换为 `kakarot-writer`、`fable-writer`、`wechat-publisher`、`aihot`、`life-designer`、`resume-optimizer`、`dating-chat-coach` 或 `system-structure-diagram-skill`。
+将 `<skill-name>` 替换为 `kakarot-writer`、`fable-writer`、`explain-to-master`、`wechat-publisher`、`aihot`、`life-designer`、`resume-optimizer`、`dating-chat-coach` 或 `system-structure-diagram-skill`。
 
 ---
 
