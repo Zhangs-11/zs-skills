@@ -18,13 +18,11 @@
 
 ## 安装
 
-复制本目录到 Claude Code 的 skills 路径：
-
 ```bash
-cp -r resume-optimizer ~/.claude/skills/resume-optimizer
+npx skills add Zhangs-11/zs-skills --skill resume-optimizer
 ```
 
-无额外依赖，不需要 API Key。
+无额外依赖，不需要 API Key。安装后重新启动或新开一次 Claude Code / Codex 会话。
 
 ## 怎么用
 
@@ -41,3 +39,17 @@ cp -r resume-optimizer ~/.claude/skills/resume-optimizer
 |------|------|
 | `SKILL.md` | 角色定义、铁律与工作流程 |
 | `references/resume-guide.md` | 简历写作规范全文（结构、各模块写法、评审清单） |
+
+## 风险边界
+
+- 不编造工作、项目、教育、技术栈或数据；信息缺口会先集中提问。
+- 面向具体岗位优化时，最好同时提供岗位描述与当前简历。
+- 输出仍需本人逐项核对，确保每一条都能在面试中解释和举证。
+
+## Troubleshooting
+
+| 问题 | 解决方法 |
+|---|---|
+| 建议过于通用 | 补充目标岗位、工作年限和当前简历 |
+| 缺少量化成果 | 提供真实基线、规模和结果；没有数据时不编数字 |
+| 排版文件无法直接修改 | 提供 `.docx`、PDF 或纯文本，并明确希望保留的版式 |

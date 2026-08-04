@@ -12,9 +12,13 @@ description: |
 
 ### 1. 获取数据
 
+先把当前 `SKILL.md` 所在目录记为 `<skill-dir>`，再执行：
+
 ```bash
-python3 /Users/zs/.claude/skills/ai-hot-picker/scripts/fetch_hot.py 10
+python3 <skill-dir>/scripts/fetch_hot.py 10
 ```
+
+从当前 skill 的真实安装位置解析 `<skill-dir>`，不要硬编码用户名或 `~/.claude`、`~/.codex` 路径。
 
 如果返回 `error` 字段，说明 AI HOT 站点不可用，提示用户稍后重试。
 

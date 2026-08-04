@@ -12,34 +12,19 @@
 
 ## 安装
 
-### 方式 A:让 Agent 自动装(Claude Code / Codex 通用)
-
-在你的 Agent 里直接发这句话:
-
-```
-帮我安装这个 skill：https://aihot.virxact.com/aihot-skill/
-```
-
-Agent 会 fetch SKILL.md 然后写到对应平台的 skills 目录。
-
-### 方式 B:一行命令手动装(Codex / Gemini CLI / OpenCode 等不会自动装的工具)
+一行安装到支持 Agent Skills 的工具：
 
 ```bash
-curl -fsSL https://aihot.virxact.com/aihot-skill/install.sh | bash
+npx skills add Zhangs-11/zs-skills --skill aihot
 ```
 
-默认装到 `~/.claude/skills/aihot/`。要装到 Codex / Gemini / OpenCode 等其它路径,设环境变量再跑:
+查看仓库内可发现的 skill 名称：
 
 ```bash
-SKILL_DIR=~/.codex/skills/aihot \
-  bash <(curl -fsSL https://aihot.virxact.com/aihot-skill/install.sh)
+npx skills add Zhangs-11/zs-skills --list
 ```
 
-(install.sh 不 chmod 不 sudo,只 mkdir + curl 三个文件。看安装脚本本身可 `curl https://aihot.virxact.com/aihot-skill/install.sh` 审查。)
-
-### 方式 C:从仓库拉
-
-本 Skill 同时同步到了卡兹克的 Skills 合集 [KKKKhazix/khazix-skills](https://github.com/KKKKhazix/khazix-skills/tree/main/aihot)(和 hv-analysis / khazix-writer / neat-freak 等其他 Skill 一起)。git clone 拉走对应子目录即可。
+安装后重新启动或新开一次 Agent 会话，让工具刷新 skill 清单。
 
 ## 触发示例
 
@@ -73,7 +58,15 @@ AI HOT 的数据 100% 公开免费，匿名可访。Skill 调以下接口：
 Skill 漏触发、漏筛选、想加新查询场景？
 
 - 在 [aihot.virxact.com/feedback](https://aihot.virxact.com/feedback) 留言
-- 或者直接在 [Skills 合集仓库](https://github.com/KKKKhazix/khazix-skills/tree/main/aihot) 提 issue
+- 或者直接在 [zs-skills issues](https://github.com/Zhangs-11/zs-skills/issues) 提交问题
+
+## Troubleshooting
+
+| 问题 | 原因 | 解决方法 |
+|---|---|---|
+| API 返回 `403` | `/api/public/*` 请求缺少浏览器 User-Agent | 按 [SKILL.md](SKILL.md) 中的示例设置 `UA` 请求头 |
+| “今天”的条目跨日期 | 日报按 UTC 整日切片，不等于滚动 24 小时 | 未明确说“日报”时优先查询精选条目 |
+| 安装后未触发 | 当前会话尚未刷新 skill 清单 | 新开会话并直接问“今天 AI 圈有什么” |
 
 ## License
 

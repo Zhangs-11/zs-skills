@@ -15,15 +15,18 @@
 ## 快速开始
 
 ```bash
-# 1. 安装
-cd tools/wechat-publisher
+# 1. 安装 skill
+npx skills add Zhangs-11/zs-skills --skill wechat-publisher
+
+# 2. 安装配套 CLI（进入实际安装目录）
+cd ~/.agents/skills/wechat-publisher/tools/wechat-publisher
 python3 -m venv venv
 venv/bin/pip install -e .
 
-# 2. 配置
+# 3. 配置
 # 编辑 ~/.wechat-publisher/.env，填入 AppID 和 AppSecret
 
-# 3. 上传封面图
+# 4. 上传封面图
 wechat-publisher upload-cover cover.jpg
 # 将返回的 media_id 填入 .env 的 WECHAT_DEFAULT_COVER_MEDIA_ID
 ```
@@ -107,3 +110,19 @@ tools/wechat-publisher/venv/bin/python -m unittest tests/test_generate_images_sc
 ```
 
 如果创建或更新草稿时发生读取超时，请把它视为结果未知：先去公众号草稿箱检查是否已经生成，不要立刻重复执行，以免创建重复草稿。
+
+## 前置条件与风险
+
+- [ ] Python 3.12+：运行 `python3 --version` 验证。
+- [ ] 已在微信公众平台取得 AppID/AppSecret，并把当前公网 IP 加入白名单。
+- [ ] 凭证只写入 `~/.wechat-publisher/.env`，不要提交到 Git。
+- [ ] `preflight` 是只读检查；`create` 和 `update` 会写入公众号草稿箱，执行前确认目标文章和封面。
+
+## Troubleshooting
+
+| 问题 | 解决方法 |
+|---|---|
+| `40164` | 将报错中的当前公网 IP 加入公众号后台白名单 |
+| 找不到封面 | 传 `--cover-file` / `--cover-media-id`，或配置默认 media ID |
+| 正文仍有插图占位符 | 先运行生图脚本替换为真实 Markdown 图片，再执行 `preflight` |
+| 请求超时 | 先检查草稿箱是否已生成，避免立即重试造成重复草稿 |

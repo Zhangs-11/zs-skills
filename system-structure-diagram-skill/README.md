@@ -1,6 +1,8 @@
 # system-structure-diagram
 
-一个给 Codex 使用的 skill，用于按参考图片的样式生成系统结构图、功能结构图和模块树图片。
+> 项目模块是真实的，参考图的版式也很明确，最容易翻车的却是连线、间距和字体这些细节。
+
+一个适用于 Codex 及其他 Agent Skills 兼容工具的 skill，用于按参考图片的样式生成系统结构图、功能结构图和模块树图片。
 
 它适合这类需求：
 
@@ -23,12 +25,11 @@
 
 ## 安装
 
-把整个 `system-structure-diagram` 文件夹放到你的 Codex skills 目录下：
+```bash
+npx skills add Zhangs-11/zs-skills --skill system-structure-diagram
+```
 
-- Windows: `C:\Users\你的用户名\.codex\skills\system-structure-diagram`
-- macOS / Linux: `~/.codex/skills/system-structure-diagram`
-
-放好后重启 Codex。
+安装后重启或新开一次 Agent 会话。
 
 ## 使用方式
 
@@ -69,3 +70,11 @@ system-structure-diagram/
 ## License
 
 MIT
+
+## Troubleshooting
+
+| 问题 | 解决方法 |
+|---|---|
+| 图中模块与项目不符 | 先读取路由、菜单、控制器和模块目录，不凭参考图猜内容 |
+| PNG 与 SVG 排版不一致 | 固定画布尺寸与字体，修改 SVG 后重新导出 PNG |
+| 竖排文字超框或连线有尾巴 | 按框体中心重算文字坐标，并让分支线在最后一个子框中心收口 |

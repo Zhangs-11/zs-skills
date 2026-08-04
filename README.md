@@ -1,144 +1,111 @@
 # zs-skills
 
-Kakarot 的个人 Claude Code / Codex Skill 合集。
+> 写公众号、追 AI 热点、做多平台分发、画结构图、清理磁盘……不用为每种工作流重新教 AI 一遍。
 
-帮你写公众号文章、查 AI 资讯、画架构图，一条龙搞定。
+<p align="center">
+  <a href="https://github.com/Zhangs-11/zs-skills/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/Zhangs-11/zs-skills?style=for-the-badge&logo=github" /></a>
+  <a href="https://github.com/Zhangs-11/zs-skills/network/members"><img alt="Forks" src="https://img.shields.io/github/forks/Zhangs-11/zs-skills?style=for-the-badge&logo=github" /></a>
+  <a href="https://github.com/Zhangs-11/zs-skills/issues"><img alt="Issues" src="https://img.shields.io/github/issues/Zhangs-11/zs-skills?style=for-the-badge&logo=github" /></a>
+  <a href="https://github.com/Zhangs-11/zs-skills/commits/main"><img alt="Last commit" src="https://img.shields.io/github/last-commit/Zhangs-11/zs-skills?style=for-the-badge&logo=git" /></a>
+  <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-blue.svg?style=for-the-badge" /></a>
+</p>
 
----
+这是一套面向 Claude Code、Codex 及其他 Agent Skills 兼容工具的中文 skills 合集。每个 skill 都把触发场景、工作流程、边界与配套资源放进独立目录，安装后直接用自然语言调用。
 
-## 技能一览
-
-| Skill | 能做什么 | 怎么触发（对 Claude 说） |
-|-------|---------|------------------------|
-| **kakarot-writer** | 按「卡卡罗特学AI」的风格写公众号长文 | "帮我写篇文章"、"写稿子"、"按我的风格写" |
-| **kakarot-repurposer** | 把公众号长文一稿改写成小红书笔记 + 抖音脚本（含 AI 配音、字幕、效果预览页） | "转成小红书"、"改成抖音脚本"、"一稿多平台" |
-| **fable-writer** | 用精炼的寓言解释抽象概念，附概念解析和检验问题 | "写寓言解释XX"、"用寓言讲明白"、"fable" |
-| **explain-to-master** | 用费曼学习法复述、追问、补洞并通过反例和迁移检验真正掌握任意主题 | "用费曼学习法带我学"、"我好像懂了但讲不清"、"考考我是否真懂" |
-| **wechat-publisher** | 把写好的文章一键存到微信草稿箱 | "存到公众号"、"发到草稿箱"、"推到公众号" |
-| **aihot** | 查 AI 圈今天发生了什么 | "AI 圈"、"AI 日报"、"今天 AI 有什么新闻" |
-| **ai-hot-picker** | 从 AI HOT 日报中挑选公众号选题，智能推荐 + 一键写推文或长文 | "选题"、"今天写什么"、"写推文"、"有什么热点" |
-| **system-structure-diagram** | 按参考图风格生成系统结构图 | "画系统架构图"、"按这个样式画图" |
-| **life-designer** | 斯坦福人生设计课方法论，多轮对话生成三个五年奥德赛计划，产出《个人人生设计蓝图》 | "帮我设计人生"、"人生规划"、"我很迷茫" |
-| **resume-optimizer** | 以技术面试官视角写简历、改简历、评审简历 | "帮我优化简历"、"写一份简历"、"评审下我的简历" |
-| **dating-chat-coach** | 异性线上聊天全流程指南（相亲/网上认识两套打法）：接话、转微信、约见面、安全防线 | "她说XX怎么回"、"相亲怎么开场"、"该约见面吗" |
-
-> 两个配合使用效果最好：`kakarot-writer` 写文章 → `wechat-publisher` 存到公众号，一条龙。
-
----
-
-## 前置条件
-
-每个 skill 需要的东西都在这里，**没有额外依赖的就不需要装任何东西**。
-
-| Skill | 需要准备 |
-|-------|---------|
-| **kakarot-writer** | 什么都不用装。安装后直接对 Claude 说"帮我写篇文章"就行。 |
-| **fable-writer** | 什么都不用装。安装后直接说"写寓言解释XX"就行。 |
-| **explain-to-master** | 什么都不用装。安装后直接说"用费曼学习法带我学XX"就行。 |
-| **aihot** | 什么都不用装。安装后直接问"AI 圈有什么"就行。底层调公开 API，不需要 API Key。 |
-| **ai-hot-picker** | 什么都不用装。安装后说"选题"或"写推文"就行。底层调 AI HOT 公开 API。 |
-| **life-designer** | 什么都不用装。安装后直接说"帮我设计人生"就行。 |
-| **resume-optimizer** | 什么都不用装。安装后直接说"帮我优化简历"就行。 |
-| **dating-chat-coach** | 什么都不用装。安装后直接问"她说XX我怎么回"就行。 |
-| **system-structure-diagram** | 需要装好 [Inkscape](https://inkscape.org/release/)（SVG 转 PNG 用）。macOS: `brew install inkscape`。Windows/Linux 去官网下载。 |
-| **wechat-publisher** | 需要准备两样东西：<br>1. **Python 3.12+**（macOS: `brew install python@3.13`）<br>2. **公众号 AppID 和 AppSecret**（去 mp.weixin.qq.com → 开发 → 基本配置 获取）<br>3. **公网 IP 加入白名单**（装好后运行时报错会告诉你当前 IP，去后台加一下就行） |
-
-> wechat-publisher 的配置一次性搞定，之后就不用再管了。
-
----
-
-## 新电脑配置指南
-
-如果你的工作流需要自动完成「写文章 → 生图 → 发草稿箱」全流程，换新电脑后按以下步骤配置。
-
-微信长文自动发布的完整流程：
-
-```
-kakarot-writer 写文 → 存 md → 生成配图+封面 → 查公网 IP → 发到草稿箱
-```
-
-### 1. 安装 skills
-将本仓库里的 skill 文件夹复制到对应路径：
-
-| Skill | 复制到 |
-|-------|--------|
-| `kakarot-writer/` | `~/.claude/skills/kakarot-writer/` |
-| `wechat-publisher/` | `~/.codex/skills/wechat-publisher/` |
-
-### 2. 安装 wechat-publisher CLI
 ```bash
-cd ~/.codex/skills/wechat-publisher/tools/wechat-publisher
-python3 -m venv venv
-venv/bin/pip install .
+npx skills add Zhangs-11/zs-skills
 ```
 
-### 3. 配置公众号凭证
-创建 `~/.wechat-publisher/.env`：
-```
-WECHAT_APP_ID=wx你的AppID
-WECHAT_APP_SECRET=你的AppSecret
-WECHAT_AUTHOR=Kakarot说AI
-WECHAT_DEFAULT_COVER_MEDIA_ID=上传封面后获得的media_id
-```
+## 13 个可安装 skills
 
-> **获取封面 media_id：** 首次使用时，用 `wechat-publisher upload-cover 封面图.jpg` 上传一张封面图，把返回的 media_id 填入。
-
-### 4. 配置生图 API Key
-创建 `~/.siliconflow_env`：
-```
-export SILICONFLOW_API_KEY=你的硅基流动APIKey
-```
-
-生图使用硅基流动的 `Tongyi-MAI/Z-Image-Turbo` 模型，每张图约 2-3 秒完成。
-
-### 5. 添加 IP 白名单
-首次发布时会报 `40164` 错误并告知当前 IP。去 mp.weixin.qq.com → 开发 → 基本配置 → IP 白名单 添加该 IP，之后即可自动发布。
-
-### 6. 创建草稿目录
-```bash
-mkdir -p ~/公众号草稿/images
-```
-
-配置完成后，对 Claude 说"帮我写篇文章"，即可自动完成写文、生图、发布全流程。
-
----
+| Skill | 解决什么问题 | 你可以这样说 |
+|---|---|---|
+| [ai-hot-picker](ai-hot-picker/) | 从当天 AI 热点中筛出适合创作的选题 | “今天写什么 AI 话题？” |
+| [aihot](aihot/) | 查询最新 AI 日报、发布、论文和行业动态 | “今天 AI 圈有什么大事？” |
+| [dating-chat-coach](dating-chat-coach/) | 相亲或线上认识后的接话、转微信、邀约与安全判断 | “她这么回，我该怎么接？” |
+| [explain-to-master](explain-to-master/) | 用费曼学习法、反例和迁移测试真正弄懂一个主题 | “我好像懂了，考考我。” |
+| [fable-writer](fable-writer/) | 用精炼寓言解释抽象概念，并附理解检验 | “用寓言讲明白沉没成本。” |
+| [kakarot-repurposer](kakarot-repurposer/) | 把公众号长文改成小红书笔记和抖音脚本 | “把这篇一稿多平台。” |
+| [kakarot-writer](kakarot-writer/) | 按「卡卡罗特学AI」风格写公众号长文 | “按我的风格写篇公众号文章。” |
+| [leader](leader/) | 把一句想法拆成 agent 能独立执行的目标任务书 | “把这个想法拆成可执行 brief。” |
+| [life-designer](life-designer/) | 用人生设计方法生成三套五年奥德赛计划 | “我想转行，帮我系统梳理。” |
+| [resume-optimizer](resume-optimizer/) | 从零撰写、优化或评审程序员简历 | “以面试官视角评审这份简历。” |
+| [storage-analyzer](storage-analyzer/) | 只读扫描磁盘并生成分级清理报告 | “电脑空间不够，帮我看看谁占满了。” |
+| [system-structure-diagram](system-structure-diagram-skill/) | 按参考图样式和真实项目模块生成结构图 | “按这张图的样式画项目结构图。” |
+| [wechat-publisher](wechat-publisher/) | 把 Markdown 文章预检、配图并存入公众号草稿箱 | “把这篇发到公众号草稿箱。” |
 
 ## 安装
 
-在 Claude Code 或 Codex 中直接输入：
+安装全部 skills：
 
-```
-帮我安装这个 skill：https://github.com/Zhangs-11/zs-skills/tree/main/<skill-name>
-```
-
-将 `<skill-name>` 替换为 `kakarot-writer`、`fable-writer`、`explain-to-master`、`wechat-publisher`、`aihot`、`life-designer`、`resume-optimizer`、`dating-chat-coach` 或 `system-structure-diagram-skill`。
-
----
-
-## 快速上手
-
-安装成功后，直接对 Claude 说：
-
-```
-帮我写一篇关于大模型价格战的文章
+```bash
+npx skills add Zhangs-11/zs-skills
 ```
 
-Claude 会自动用 kakarot-writer 的风格写出来。如果还想存到公众号：
+只安装一个：
 
-```
-存到公众号
-```
-
-Claude 会调用 wechat-publisher 帮你格式化并存入草稿箱。
-
-想查 AI 资讯：
-
-```
-今天 AI 圈有什么大事
+```bash
+npx skills add Zhangs-11/zs-skills --skill aihot
 ```
 
-想画架构图：
+查看仓库中可发现的名称：
 
+```bash
+npx skills add Zhangs-11/zs-skills --list
 ```
-帮我把项目的模块结构画成架构图，和这张图风格一样 [附图]
+
+安装后重新启动或新开一次 Claude Code / Codex 会话，让工具重新发现 skills。
+
+## 前置条件与风险边界
+
+- [ ] 已安装 Node.js 与 `npx`：运行 `node --version && npx --version` 验证。
+- [ ] `system-structure-diagram` 导出 PNG 时需要浏览器或 SVG 转换工具；仅生成 SVG 时不需要 Inkscape。
+- [ ] `wechat-publisher` 需要 Python 3.12+、微信公众号 AppID/AppSecret，以及已配置的 IP 白名单；写入草稿箱前会先做只读预检。
+- [ ] `storage-analyzer` 的扫描阶段只读；任何删除都必须由用户单独确认，报告中的可释放空间是估算值。
+- [ ] `aihot` 与 `ai-hot-picker` 会访问 AI HOT 的公开接口，不需要 API Key，但需要网络。
+- [ ] `dating-chat-coach` 提供沟通建议而非操控话术；遇到诈骗或线下见面风险时以安全为先。
+
+其余纯提示词 skills 无额外依赖。每个目录的 README 会列出更具体的输入、输出和限制。
+
+## 推荐工作流
+
+内容生产可以串起来使用：
+
+```text
+ai-hot-picker 选题
+        ↓
+kakarot-writer 写公众号长文
+        ↓
+kakarot-repurposer 改小红书与抖音版本
+        ↓
+wechat-publisher 预检并保存公众号草稿
 ```
+
+学习与执行也可以组合：先用 `explain-to-master` 建立可靠理解，再让 `leader` 把目标拆成可验收任务书。
+
+## 仓库结构
+
+每个一级子目录是一项独立 skill：
+
+```text
+<skill-name>/
+├── SKILL.md       # 触发描述与执行说明
+├── README.md      # 面向使用者的安装和使用说明
+├── scripts/       # 可选：确定性脚本
+├── references/    # 可选：按需读取的参考资料
+└── assets/        # 可选：模板和静态资源
+```
+
+## Troubleshooting
+
+| 问题 | 原因 | 解决方法 |
+|---|---|---|
+| `No valid skills found` | `SKILL.md` frontmatter 无效，或仓库路径错误 | 先运行 `npx skills add Zhangs-11/zs-skills --list`，确认目标名称存在 |
+| 安装后没有触发 | 当前会话尚未刷新 skill 清单，或提示过于模糊 | 新开会话，并使用表格中的自然语言示例重试 |
+| 只想装一个 skill | 默认命令会进入多选或安装多个 | 增加 `--skill <name>`，名称以 `--list` 输出为准 |
+| 脚本提示路径不存在 | skill 被安装到了不同 agent 的目录 | 优先从当前 skill 根目录解析脚本；必要时重新安装到当前 agent |
+| 微信发布失败 `40164` | 当前公网 IP 未加入公众号白名单 | 在微信公众平台添加报错中的 IP，再重新执行预检与发布 |
+
+## License
+
+MIT。详见 [LICENSE](LICENSE)。

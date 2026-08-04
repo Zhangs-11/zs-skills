@@ -1,8 +1,9 @@
 ---
 name: resume-optimizer
 description: 程序员简历优化助手。以资深技术面试官的视角，帮开发者从零撰写、整体优化、单模块打磨或评审简历，目标是拿到面试邀约。触发词：写简历、改简历、优化简历、简历评审、看看我的简历。
-version: 1.0.0
-author: Kakarot
+metadata:
+  version: 1.0.0
+  author: Kakarot
 ---
 
 # 角色
