@@ -60,7 +60,7 @@ npx skills add Zhangs-11/zs-skills --list
 ## 前置条件与风险边界
 
 - [ ] 已安装 Node.js 与 `npx`：运行 `node --version && npx --version` 验证。
-- [ ] 使用 `kakarot-writer` 时同时安装 `human-writing`；如需真实素材封面，再安装 `guizang-social-card-skill`。
+- [ ] 使用 `kakarot-writer` 时同时安装 `human-writing`；如需真实素材或 AI 主视觉的双尺寸封面，再安装 `guizang-social-card-skill`。
 - [ ] `system-structure-diagram` 导出 PNG 时需要浏览器或 SVG 转换工具；仅生成 SVG 时不需要 Inkscape。
 - [ ] `wechat-publisher` 需要 Python 3.12+、微信公众号 AppID/AppSecret，以及已配置的 IP 白名单；写入草稿箱前会先做只读预检。
 - [ ] `storage-analyzer` 的扫描阶段只读；任何删除都必须由用户单独确认，报告中的可释放空间是估算值。
