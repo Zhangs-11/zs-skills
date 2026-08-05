@@ -6,8 +6,8 @@
 
 1. 在 Claude Code 中用 kakarot-writer 生成公众号文章
 2. 自动保存到本地 markdown
-3. 用 `scripts/generate_wechat_images.py` 生成正文图和封面图
-4. 把正文占位符替换成 Markdown 图片语法，例如 `![流程图](images/<文章名>/01-image.jpg)`
+3. 复用 kakarot-writer 已交付的正文图和 `21:9` 封面
+4. 仍有素材缺口时，优先用真实素材工作流补齐；最后才用 `scripts/generate_wechat_images.py` 回退生成
 5. 用 `wechat-publisher preflight` 做只读预检
 6. 通过 wechat-publisher CLI 上传正文图片、封面图、格式化、调用微信 API
 7. 文章自动存入公众号草稿箱
@@ -46,9 +46,9 @@ IP 白名单：登录 mp.weixin.qq.com → 开发 → 基本配置 → IP 白名
 | `wechat-publisher upload-image photo.jpg` | 上传正文图片 |
 | `wechat-publisher upload-cover cover.jpg` | 上传封面图 |
 
-## 生成图片
+## 图片与封面
 
-图片生成由 skill 编排负责，不由发布 CLI 直接调用生图模型。运行时把 SiliconFlow Key 放在环境变量里，不要写进仓库。
+发布层默认消费 `kakarot-writer` 已经交付的正文图和封面，不重复生成，也不覆盖真实截图。只有文章仍有必要的素材缺口，且无法使用 `guizang-social-card-skill` 的真实素材工作流时，才使用下面的 SiliconFlow 回退脚本。Key 只放在环境变量里，不要写进仓库。
 
 ```bash
 export SILICONFLOW_API_KEY="your_key_here"
@@ -67,7 +67,7 @@ export WECHAT_PUBLISHER_PYTHON="$WECHAT_PUBLISHER_SKILL_DIR/tools/wechat-publish
 - Endpoint: `/images/generations`
 - Model: `Tongyi-MAI/Z-Image-Turbo`
 
-脚本会生成 `images/<文章名>/cover.jpg`。如果正文里有 `[插图：...]` / `[绘图提示：...]`，会按这些 prompt 生成图片并替换成真实 Markdown 图片；如果没有占位符，会按正文段落自动插入 `--auto-insert` 张配图。文章已经含有本工具生成的自动配图时，重复运行不会继续追加图片。封面概念会同时参考标题和正文多段采样。
+回退脚本会生成 `images/<文章名>/cover.jpg`。如果正文里有 `[插图：...]` / `[绘图提示：...]`，会按这些 prompt 生成图片并替换成真实 Markdown 图片；如果没有占位符，会按正文段落自动插入 `--auto-insert` 张配图。文章已经有可用图片和封面时不要运行此脚本。
 
 ## 图片和链接
 

@@ -1,98 +1,59 @@
 # zs-skills 使用说明
 
-本 repo 包含 Kakarot 的 Claude Code Skills 合集。每次在新电脑上使用时，按以下步骤配置才能正常工作。
+本仓库包含张硕维护的 Agent Skills。Claude Code、Codex 和其他兼容工具应从实际安装目录解析每项 Skill 的 `scripts/`、`references/`、`assets/` 和 `tools/`，不要假定它一定安装在某个固定的隐藏目录。
 
-## 安装与路径
+## 安装与发现
 
-优先用统一安装命令，不再手工维护 Claude/Codex 两套复制表：
+安装全部 Skills：
 
 ```bash
 npx skills add Zhangs-11/zs-skills
 ```
 
-只安装一项时使用 `--skill <name>`。运行时从当前 skill 的真实安装目录解析 `scripts/`、`references/` 和 `tools/`，不要假设一定安装在 `~/.claude` 或 `~/.codex`。
+只安装一项时使用 `--skill <name>`。安装后可通过下面的命令核对仓库中的可发现名称：
 
-## 公众号自动发布工作流
-
-当用户说"写一篇公众号文章"或类似意图时，自动执行以下流程：
-
-### Step 1: 写作
-调用 kakarot-writer skill 生成文章，严格遵循其风格规范。
-
-### Step 2: 保存
-将 `.md` 文件保存到 `~/公众号草稿/` 目录。
-
-### Step 3: 生图
-用 SiliconFlow 的 `Tongyi-MAI/Z-Image-Turbo` 模型生成正文配图（3张）+ 封面图。
-
-API Key 从 `~/.siliconflow_env` 加载（source 该文件后会 export `SILICONFLOW_API_KEY`）。
-
-生图脚本位于当前 `wechat-publisher` skill 的 `scripts/generate_wechat_images.py`。
-
-注意：需使用 curl 调 API + 下载图片（Python 3.13 urllib SSL 连阿里云 S3 有兼容问题）。
-
-图片保存到 `~/公众号草稿/images/`，并自动插入文章正文。
-
-### Step 4: 查 IP
-```
-curl -s ip.sb
+```bash
+npx skills add Zhangs-11/zs-skills --list
 ```
 
-### Step 5: 发布
-调 wechat-publisher CLI 发到草稿箱。先把当前 skill 根目录记为 `$WECHAT_SKILL_DIR`：
-```
-$WECHAT_SKILL_DIR/tools/wechat-publisher/venv/bin/wechat-publisher create \
-  --title "文章标题" \
-  --content-file ~/公众号草稿/文件名.md \
-  --cover-file ~/公众号草稿/images/cover.png \
-  --show-cover-pic \
-  --digest "摘要"
-```
+## 长文写作工作流
 
-### Step 6: 汇报
-以表格形式告知用户每一步的状态。
+用户说“帮我写篇文章”“按我的风格写”或提供链接、PDF、brief、采访和笔记要求出稿时，使用 `kakarot-writer`。
 
-- **成功** → 告知 media_id
-- **失败 40164（IP 白名单）** → 告知当前 IP，让用户去微信后台添加白名单
-- **其他失败** → 告知具体原因和解决步骤
+`kakarot-writer` 是个人长文总调度：它先确定张硕的作者位置、真实材料、核心判断和文章原型，再调用 `human-writing` 生成正文，最后完成个人风格复核、标题、截图与来源、正文配图、`21:9` 主封面和 `1:1` 分享封面。
 
-## 新电脑初始化清单
+“帮我写篇文章”默认表示完整交付，不需要另问用户是否需要标题和封面。公众号长文是首发载体，也是知乎、博客、掘金、小红书、抖音和B站共同使用的唯一内容母稿。长文平台可以原样同步正文和标题；小红书、抖音和B站视频交给 `kakarot-repurposer` 调整长度、节奏与画面，但不能改变母稿中的事实、核心判断、作者态度和来源。
 
-### 1. 安装 skills
+封面优先调用 `guizang-social-card-skill` 的 B 方案，使用官网、官方文档、公告、GitHub 等真实素材。只有专用 Skill 不可用时才回退到 AI 图片，并向用户说明。
 
-运行 `npx skills add Zhangs-11/zs-skills`，或用 `--skill <name>` 安装所需项目。
+写完整成品不代表获得发布授权。只有用户明确说“存到公众号”“发到草稿箱”或“发布”时，才调用 `wechat-publisher` 写入微信公众号。
 
-### 2. 安装 wechat-publisher CLI 依赖
+## 微信公众号发布
+
+发布前先确认文章、标题、摘要、正文图片和封面均已完成，并执行 `wechat-publisher` 的只读预检。凭证从 `~/.wechat-publisher/.env` 读取，不写进仓库，也不在日志和回复中回显。
+
+首次使用时，在实际的 `wechat-publisher` Skill 目录内安装 CLI 依赖：
+
 ```bash
 cd <wechat-publisher-skill-dir>/tools/wechat-publisher
 python3 -m venv venv
 venv/bin/pip install .
 ```
 
-### 3. 配置 WeChat 凭证
-创建 `~/.wechat-publisher/.env`，内容模板：
-```
+凭证文件示例：
+
+```dotenv
 WECHAT_APP_ID=wx你的AppID
 WECHAT_APP_SECRET=你的AppSecret
-WECHAT_AUTHOR=Kakarot说AI
+WECHAT_AUTHOR=卡卡罗特
 WECHAT_DEFAULT_COVER_MEDIA_ID=你的封面media_id
 ```
 
-### 4. 配置 SiliconFlow API Key
-创建 `~/.siliconflow_env`：
-```
-export SILICONFLOW_API_KEY=你的硅基流动APIKey
-```
+如果发布失败并返回 `40164`，只需告诉用户当前公网 IP 需要加入微信公众号后台白名单；其他错误应报告实际原因和下一步，不自动改凭证或外部配置。
 
-### 5. 添加微信 IP 白名单
-去 mp.weixin.qq.com → 开发 → 基本配置 → IP 白名单，添加当前电脑的公网 IP。
+## 维护约定
 
-### 6. 创建草稿目录
-```bash
-mkdir -p ~/公众号草稿/images
-```
-
-## 注意
-
-- 本 CLAUDE.md 中所有 `你的xxx` 占位符需替换为真实值，凭证信息不进 git
-- WeChat 封面 media_id 首次需先用 `wechat-publisher upload-cover` 上传封面图获取
+- 每个 Skill 的触发条件、工作流和边界以该目录的 `SKILL.md` 为准。
+- 个人写作规则由 `kakarot-writer` 管理；通用材料、现实边界和自然中文机制由 `human-writing` 管理。
+- 修改 Skill 后先做结构验证、本地发现和安装测试；未经用户明确授权，不 commit、push 或发布。
+- 所有 `你的xxx` 都是占位符，真实凭证不得进入 Git。

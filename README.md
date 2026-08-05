@@ -16,7 +16,7 @@
 npx skills add Zhangs-11/zs-skills
 ```
 
-## 13 个可安装 skills
+## 14 个可安装 skills
 
 | Skill | 解决什么问题 | 你可以这样说 |
 |---|---|---|
@@ -25,8 +25,9 @@ npx skills add Zhangs-11/zs-skills
 | [dating-chat-coach](dating-chat-coach/) | 相亲或线上认识后的接话、转微信、邀约与安全判断 | “她这么回，我该怎么接？” |
 | [explain-to-master](explain-to-master/) | 用费曼学习法、反例和迁移测试真正弄懂一个主题 | “我好像懂了，考考我。” |
 | [fable-writer](fable-writer/) | 用精炼寓言解释抽象概念，并附理解检验 | “用寓言讲明白沉没成本。” |
-| [kakarot-repurposer](kakarot-repurposer/) | 把公众号长文改成小红书笔记和抖音脚本 | “把这篇一稿多平台。” |
-| [kakarot-writer](kakarot-writer/) | 按「卡卡罗特学AI」风格写公众号长文 | “按我的风格写篇公众号文章。” |
+| [kakarot-repurposer](kakarot-repurposer/) | 从同一内容母稿派生小红书、抖音和B站版本 | “把这篇一稿多平台。” |
+| [human-writing](kakarot-human-writing/) | 写有材料、有判断、有自然中文节奏的通用正文 | “把这些笔记写成一篇有活人感的长文。” |
+| [kakarot-writer](kakarot-writer/) | 调度通用正文引擎，按张硕的个人风格完整交付长文 | “帮我按自己的风格写篇文章。” |
 | [leader](leader/) | 把一句想法拆成 agent 能独立执行的目标任务书 | “把这个想法拆成可执行 brief。” |
 | [life-designer](life-designer/) | 用人生设计方法生成三套五年奥德赛计划 | “我想转行，帮我系统梳理。” |
 | [resume-optimizer](resume-optimizer/) | 从零撰写、优化或评审程序员简历 | “以面试官视角评审这份简历。” |
@@ -59,6 +60,7 @@ npx skills add Zhangs-11/zs-skills --list
 ## 前置条件与风险边界
 
 - [ ] 已安装 Node.js 与 `npx`：运行 `node --version && npx --version` 验证。
+- [ ] 使用 `kakarot-writer` 时同时安装 `human-writing`；如需真实素材封面，再安装 `guizang-social-card-skill`。
 - [ ] `system-structure-diagram` 导出 PNG 时需要浏览器或 SVG 转换工具；仅生成 SVG 时不需要 Inkscape。
 - [ ] `wechat-publisher` 需要 Python 3.12+、微信公众号 AppID/AppSecret，以及已配置的 IP 白名单；写入草稿箱前会先做只读预检。
 - [ ] `storage-analyzer` 的扫描阶段只读；任何删除都必须由用户单独确认，报告中的可释放空间是估算值。
@@ -74,11 +76,17 @@ npx skills add Zhangs-11/zs-skills --list
 ```text
 ai-hot-picker 选题
         ↓
-kakarot-writer 写公众号长文
+kakarot-writer 确定作者位置、材料与判断
         ↓
-kakarot-repurposer 改小红书与抖音版本
+human-writing 生成自然、可靠的正文
         ↓
-wechat-publisher 预检并保存公众号草稿
+kakarot-writer 完成个人复核、标题、配图与封面
+        ↓
+同一篇内容母稿发布到公众号，并同步知乎、博客、掘金、B站专栏
+        ↓
+kakarot-repurposer 按需派生小红书、抖音与B站视频版本
+        ↓
+wechat-publisher 在明确要求发布时保存公众号草稿
 ```
 
 学习与执行也可以组合：先用 `explain-to-master` 建立可靠理解，再让 `leader` 把目标拆成可验收任务书。

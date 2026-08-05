@@ -18,7 +18,10 @@ description: |
 kakarot-writer skill 生成 markdown 文章
        │
        ▼
-scripts/generate_wechat_images.py → 生成正文图 + 封面图
+复用 writer 已交付的正文图 + 21:9 封面
+       │（素材缺失时才补图）
+       ▼
+guizang-social-card-skill 或 scripts/generate_wechat_images.py
        │
        ▼
 wechat-publisher create --title "xxx" --content-file xxx.md --cover-file images/<文章名>/cover.jpg
@@ -87,7 +90,7 @@ ln -sf $(pwd)/tools/wechat-publisher/venv/bin/wechat-publisher ~/.local/bin/wech
 
 如果存在事实缺口，先向用户确认或收窄断言，不要带着问题进入发布流程。
 
-在文章中需要配图的位置，使用以下格式插入占位标记：
+如果 `kakarot-writer` 已交付正文图片、截图和封面，直接复用，不重新生成或覆盖。仍缺少素材时才保留下列占位标记：
 
 ```markdown
 [插图：图片内容描述]
@@ -111,9 +114,11 @@ ln -sf $(pwd)/tools/wechat-publisher/venv/bin/wechat-publisher ~/.local/bin/wech
 ### 第二步：保存
 将文章保存到 `~/公众号草稿/` 目录。
 
-### 第三步：生成图片
+### 第三步：检查并补齐图片
 
-发布前必须先运行图片生成脚本。脚本使用 SiliconFlow 图片生成接口，默认模型是 `Tongyi-MAI/Z-Image-Turbo`。
+先检查文章中引用的本地图片是否存在，并确认已有 `21:9` 主封面。只要 `kakarot-writer` 已完成真实截图、正文图和封面，就跳过生图脚本，避免把已经确认的素材替换成概念图。
+
+素材不完整时，优先回到 `kakarot-writer` 的交付清单补齐；封面优先调用 `guizang-social-card-skill` 的真实素材 B 方案。只有专用 Skill 不可用、且文章仍缺少必要图片时，才使用本 Skill 自带的 SiliconFlow 回退脚本，默认模型是 `Tongyi-MAI/Z-Image-Turbo`。
 
 如果文章包含 `[插图：...]` / `[绘图提示：...]`，脚本会按这些 prompt 生成对应正文图（**优先走这条**，因为 prompt 是你手写的、有创意）。如果文章没有占位符，脚本会按正文段落自动插入 3 张配图，并生成封面图——auto 兜底通道会先用对话模型（`deepseek-ai/DeepSeek-V3`）把中文段落转成英文视觉概念再生图，**绝不把中文塞进画面**，从根上避免图上出现原文和错别字。封面也走概念化（不再把标题原文塞进 prompt，并去掉「杂志封面」这类诱导加标题字的措辞，缩写如 AI/GPT 也会被剔除）。封面对文字最敏感，**要最稳就手动传 `--cover-prompt "英文创意概念"`**。
 
@@ -142,7 +147,7 @@ export WECHAT_PUBLISHER_BIN="$WECHAT_PUBLISHER_SKILL_DIR/tools/wechat-publisher/
 3. 把正文占位符替换成真实 Markdown 图片；没有占位符时，自动在正文段落后插入配图，例如 `![配图1](images/<文章名>/01-image.jpg)`。
 4. 生成封面图 `images/<文章名>/cover.jpg`。
 
-**硬性检查：** 只有当命令输出至少一个 `IMAGE: ...` 和一个 `COVER: ...`，并且文章对应的图片目录里能看到 JPEG 文件时，才能继续发布。否则停止并报告图片生成失败原因，不能跳过图片步骤。
+**硬性检查：** 继续发布前，文章中的所有图片路径都必须存在，所有占位符都已替换，并且有可用封面文件或 `cover_media_id`。只有实际执行回退脚本时，才要求命令输出至少一个 `IMAGE: ...` 和一个 `COVER: ...`。否则停止并报告缺失项。
 
 ### 第四步：对抗式事实审查（强制，不可跳过）
 
@@ -248,7 +253,7 @@ wechat-publisher upload-cover cover.jpg
 
 1. 标题有具体对象、反常识或真实体验，不使用空泛震惊体。
 2. 前三行必须交代“发生了什么”和“为什么值得读”。
-3. 只强调真正决定读者理解的关键判断，避免按固定段数机械加粗；优先使用克制的 `==关键小句==`。
+3. 只强调真正决定读者理解的关键判断，避免按固定段数机械加粗；跨平台母稿优先使用通用的 `**加粗**`，不主动加入平台私有语法。
 4. 配图必须服务理解，且**图里不要出现任何文字**（生图模型画中文会出错别字）。优先用视觉比喻/概念图传达意思，绘图提示用纯英文手写、有创意，不要把正文照搬进 prompt。
 
 ## 常见错误

@@ -92,7 +92,7 @@ python3 <skill-dir>/scripts/fetch_hot.py 10
 1. 把该话题的 summary 和 url 提取出来
 2. 用 WebSearch 或 WebFetch 补充该话题的更多背景（原文内容、社区反响、相关事件）
 3. 把调研结果整理成素材摘要，展示给用户确认角度
-4. 用户确认后，调用 kakarot-writer skill 写文章，走完 wechat-publisher 发布流程
+4. 用户确认后，调用 kakarot-writer skill 完成长文；只有用户同时明确要求存到公众号或发布时，才继续调用 wechat-publisher
 
 ### 注意
 
