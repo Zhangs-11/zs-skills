@@ -27,7 +27,7 @@ npx skills add Zhangs-11/zs-skills
 | [fable-writer](fable-writer/) | 用精炼寓言解释抽象概念，并附理解检验 | “用寓言讲明白沉没成本。” |
 | [kakarot-repurposer](kakarot-repurposer/) | 从同一内容母稿派生小红书、抖音和B站版本 | “把这篇一稿多平台。” |
 | [human-writing](kakarot-human-writing/) | 写有材料、有判断、有自然中文节奏的通用正文 | “把这些笔记写成一篇有活人感的长文。” |
-| [kakarot-writer](kakarot-writer/) | 调度通用正文引擎，按张硕的个人风格完整交付长文 | “帮我按自己的风格写篇文章。” |
+| [kakarot-writer](kakarot-writer/) | 先检查材料与 AI 价值，再按张硕的个人风格完整交付长文 | “帮我按自己的风格写篇文章。” |
 | [leader](leader/) | 把一句想法拆成 agent 能独立执行的目标任务书 | “把这个想法拆成可执行 brief。” |
 | [life-designer](life-designer/) | 用人生设计方法生成三套五年奥德赛计划 | “我想转行，帮我系统梳理。” |
 | [resume-optimizer](resume-optimizer/) | 从零撰写、优化或评审程序员简历 | “以面试官视角评审这份简历。” |
@@ -76,7 +76,7 @@ npx skills add Zhangs-11/zs-skills --list
 ```text
 ai-hot-picker 选题
         ↓
-kakarot-writer 确定作者位置、材料与判断
+kakarot-writer 确定作者位置与材料，通过 AI 价值门槛
         ↓
 human-writing 生成自然、可靠的正文
         ↓
