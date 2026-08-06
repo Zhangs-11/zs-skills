@@ -23,6 +23,12 @@ def markdown_to_wechat_html(md: str) -> str:
 
     soup = BeautifulSoup(html, "html.parser")
 
+    # The WeChat draft API receives the article title separately. A leading
+    # Markdown H1 is therefore document metadata, not body content.
+    first_tag = soup.find()
+    if first_tag is not None and first_tag.name == "h1":
+        first_tag.decompose()
+
     # Remove unsupported elements
     for tag_name in _REMOVE_TAGS:
         for el in soup.find_all(tag_name):

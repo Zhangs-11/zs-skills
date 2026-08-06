@@ -6,6 +6,20 @@ from wechat_publisher.formatter import markdown_to_wechat_html
 
 
 class FormatterTests(unittest.TestCase):
+    def test_leading_document_title_is_not_rendered_in_article_body(self) -> None:
+        html = markdown_to_wechat_html("# My Unique Title\n\nBody text.")
+        soup = BeautifulSoup(html, "html.parser")
+
+        self.assertNotIn("My Unique Title", soup.get_text(" "))
+        self.assertEqual("Body text.", soup.get_text(" ").strip())
+
+    def test_non_leading_h1_is_preserved(self) -> None:
+        html = markdown_to_wechat_html("Intro.\n\n# Section H1")
+        soup = BeautifulSoup(html, "html.parser")
+
+        self.assertIn("Section H1", soup.get_text(" "))
+        self.assertIsNotNone(soup.find("h1"))
+
     def test_first_sentence_is_not_automatically_bolded(self) -> None:
         html = markdown_to_wechat_html("DeepSeek真正重要的变化，是把推理模型的使用门槛打下来。这里是第二句，应该保持普通正文。")
 
