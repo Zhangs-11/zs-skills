@@ -1,0 +1,23 @@
+{
+  "skill_name": "review-handoff",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "我要把这个需求给同事 review。背景：FA 模型选择要展示选择理由；PR 是 https://codeup.example.com/goalfy-core/change/18。帮我生成 MD，放在仓库已有的 review-docs 里。",
+      "expected_output": "创建不覆盖既有文件的 Markdown；顶部列仓库和 PR，正文包含背景、问题、根因、改前改后、验证和 2 至 4 个审查重点。",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "这个需求跨两个仓：后端 PR https://codeup.example.com/backend/change/3，前端 PR https://codeup.example.com/front/change/8。背景是下线资产仍能从历史收藏进入详情页。整理一份直接发群里的 review 文档。",
+      "expected_output": "逐仓核对并在顶部建立两个仓库到 PR 的映射，按业务链路而非文件列表说明跨仓修复，不把一个仓库的验证结果套到另一个。",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "这是我刚提的 PR：https://codeup.example.com/service/change/66，帮我写 review 说明。其他背景你从 PR 看。",
+      "expected_output": "先从 PR 描述、关联工作项和 diff 恢复事实；只能推断的根因明确标注，PR 不可访问时请求必要信息而不编造文档。",
+      "files": []
+    }
+  ]
+}

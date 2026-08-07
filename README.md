@@ -1,6 +1,6 @@
 # zs-skills
 
-> 写公众号、追 AI 热点、做多平台分发、画结构图、清理磁盘……不用为每种工作流重新教 AI 一遍。
+> 写公众号、追 AI 热点、做代码 Review、开会上汇报、画结构图、清理磁盘……不用为每种工作流重新教 AI 一遍。
 
 <p align="center">
   <a href="https://github.com/Zhangs-11/zs-skills/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/Zhangs-11/zs-skills?style=for-the-badge&logo=github" /></a>
@@ -16,12 +16,13 @@
 npx skills add Zhangs-11/zs-skills
 ```
 
-## 14 个可安装 skills
+## 17 个可安装 skills
 
 | Skill | 解决什么问题 | 你可以这样说 |
 |---|---|---|
 | [ai-hot-picker](ai-hot-picker/) | 从当天 AI 热点中筛出适合创作的选题 | “今天写什么 AI 话题？” |
 | [aihot](aihot/) | 查询最新 AI 日报、发布、论文和行业动态 | “今天 AI 圈有什么大事？” |
+| [change-meeting-brief](change-meeting-brief/) | 把需求和 PR 压成 20～40 秒的会议改动口径 | “只说问题、原逻辑和这次怎么解决。” |
 | [dating-chat-coach](dating-chat-coach/) | 相亲或线上认识后的接话、转微信、邀约与安全判断 | “她这么回，我该怎么接？” |
 | [explain-to-master](explain-to-master/) | 用费曼学习法、反例和迁移测试真正弄懂一个主题 | “我好像懂了，考考我。” |
 | [fable-writer](fable-writer/) | 用精炼寓言解释抽象概念，并附理解检验 | “用寓言讲明白沉没成本。” |
@@ -30,6 +31,8 @@ npx skills add Zhangs-11/zs-skills
 | [kakarot-writer](kakarot-writer/) | 先检查材料与 AI 价值，再按张硕的个人风格完整交付长文 | “帮我按自己的风格写篇文章。” |
 | [leader](leader/) | 把一句想法拆成 agent 能独立执行的目标任务书 | “把这个想法拆成可执行 brief。” |
 | [life-designer](life-designer/) | 用人生设计方法生成三套五年奥德赛计划 | “我想转行，帮我系统梳理。” |
+| [peer-pr-review](peer-pr-review/) | 对抗式审查同事的 CodeUp PR，独立核验需求、根因和遗漏 | “我不熟这块代码，帮我判断这个 PR 能不能过。” |
+| [review-handoff](review-handoff/) | 生成可直接发给同事的 Markdown Review 交接说明 | “把我的 PR 整理成一份 MD 给同事审。” |
 | [resume-optimizer](resume-optimizer/) | 从零撰写、优化或评审程序员简历 | “以面试官视角评审这份简历。” |
 | [storage-analyzer](storage-analyzer/) | 只读扫描磁盘并生成分级清理报告 | “电脑空间不够，帮我看看谁占满了。” |
 | [system-structure-diagram](system-structure-diagram-skill/) | 按参考图样式和真实项目模块生成结构图 | “按这张图的样式画项目结构图。” |
@@ -66,6 +69,7 @@ npx skills add Zhangs-11/zs-skills --list
 - [ ] `storage-analyzer` 的扫描阶段只读；任何删除都必须由用户单独确认，报告中的可释放空间是估算值。
 - [ ] `aihot` 与 `ai-hot-picker` 会访问 AI HOT 的公开接口，不需要 API Key，但需要网络。
 - [ ] `dating-chat-coach` 提供沟通建议而非操控话术；遇到诈骗或线下见面风险时以安全为先。
+- [ ] `peer-pr-review` 和 `review-handoff` 需要能够只读访问 CodeUp PR 或对应 Git 仓库；默认不会评论、通过、合并、commit 或 push，也不会把当前 `main` 冒充成某环境已部署版本。
 
 其余纯提示词 skills 无额外依赖。每个目录的 README 会列出更具体的输入、输出和限制。
 
@@ -90,6 +94,16 @@ wechat-publisher 在明确要求发布时保存公众号草稿
 ```
 
 学习与执行也可以组合：先用 `explain-to-master` 建立可靠理解，再让 `leader` 把目标拆成可验收任务书。
+
+代码评审协作可以串起来使用：
+
+```text
+peer-pr-review 帮你审同事的 PR，独立核验背景、问题、根因和遗漏
+        ↓
+review-handoff 把你自己的 PR 整理成可直接转发的 Markdown
+        ↓
+change-meeting-brief 从需求、PR 或 Review 文档压出 20～40 秒会议口径
+```
 
 ## 仓库结构
 

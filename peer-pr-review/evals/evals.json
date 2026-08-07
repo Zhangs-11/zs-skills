@@ -1,0 +1,23 @@
+{
+  "skill_name": "peer-pr-review",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "同事让我帮忙 review。需求背景：定时任务执行完成后偶尔仍显示运行中；他认为是前端刷新不及时。CodeUp PR：https://codeup.example.com/team/task-service/change/42，QA 项目 ID 10086，环境 qa。帮我用几分钟能看懂的方式审一下。",
+      "expected_output": "先固定 PR diff 和运行时事实，独立区分前端现象、状态生产者与消费者，比较同事根因；输出短报告，正式问题不超过 3 个。",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "背景是上传 PDF 后解析结果有时为空，这是 PR：https://codeup.example.com/team/file-service/change/77。没有项目 ID 和环境，同事也没写方案，你帮我 review。",
+      "expected_output": "完成静态审查并从 diff 反推同事假设，明确运行时未验证，不因缺项目 ID 停止，也不把当前 main 当作已部署事实。",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "帮我看这个 CodeUp PR 写得规范不规范：https://codeup.example.com/team/web/change/9。我没有需求背景。",
+      "expected_output": "识别最低输入缺少需求背景；先尝试从 PR 的关联工作项和描述恢复，无法恢复且会影响 spec 审查时再请求补充，不假装完成需求符合性审查。",
+      "files": []
+    }
+  ]
+}
