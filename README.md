@@ -1,6 +1,6 @@
 # zs-skills
 
-> 写公众号、追 AI 热点、做代码 Review、开会上汇报、画结构图、清理磁盘……不用为每种工作流重新教 AI 一遍。
+> 写公众号、追 AI 热点、做严谨分析、审代码、开会上汇报、画结构图、清理磁盘……不用为每种工作流重新教 AI 一遍。
 
 <p align="center">
   <a href="https://github.com/Zhangs-11/zs-skills/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/Zhangs-11/zs-skills?style=for-the-badge&logo=github" /></a>
@@ -16,7 +16,7 @@
 npx skills add Zhangs-11/zs-skills
 ```
 
-## 17 个可安装 skills
+## 18 个可安装 skills
 
 | Skill | 解决什么问题 | 你可以这样说 |
 |---|---|---|
@@ -26,6 +26,7 @@ npx skills add Zhangs-11/zs-skills
 | [dating-chat-coach](dating-chat-coach/) | 相亲或线上认识后的接话、转微信、邀约与安全判断 | “她这么回，我该怎么接？” |
 | [explain-to-master](explain-to-master/) | 用费曼学习法、反例和迁移测试真正弄懂一个主题 | “我好像懂了，考考我。” |
 | [fable-writer](fable-writer/) | 用精炼寓言解释抽象概念，并附理解检验 | “用寓言讲明白沉没成本。” |
+| [first-principles-adversarial-review](first-principles-adversarial-review/) | 用第一性原理重构问题，再主动寻找反证、遗漏和错误事实源 | “别顺着我的方案，先从机制和反证审查一遍。” |
 | [kakarot-repurposer](kakarot-repurposer/) | 从同一内容母稿派生小红书、抖音和B站版本 | “把这篇一稿多平台。” |
 | [human-writing](kakarot-human-writing/) | 写有材料、有判断、有自然中文节奏的通用正文 | “把这些笔记写成一篇有活人感的长文。” |
 | [kakarot-writer](kakarot-writer/) | 先检查材料与 AI 价值，再按张硕的个人风格完整交付长文 | “帮我按自己的风格写篇文章。” |
@@ -94,6 +95,8 @@ wechat-publisher 在明确要求发布时保存公众号草稿
 ```
 
 学习与执行也可以组合：先用 `explain-to-master` 建立可靠理解，再让 `leader` 把目标拆成可验收任务书。
+
+`first-principles-adversarial-review` 可以作为其他 Skills 的推理底盘：需求、设计、诊断、评审和修改任务先核对真实目标、事实源、上下游、替代方案和反证，再由对应领域 Skill 完成具体工作。若希望它稳定介入所有实质性任务，可按其 README 把强制路由句加入全局 `AGENTS.md` 或 `CLAUDE.md`；纯翻译和机械操作仍会跳过。
 
 代码评审协作可以串起来使用：
 

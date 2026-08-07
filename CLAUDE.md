@@ -16,6 +16,12 @@ npx skills add Zhangs-11/zs-skills
 npx skills add Zhangs-11/zs-skills --list
 ```
 
+## 默认推理与核验
+
+需求、设计、诊断、评审、建议和修改等实质性任务，优先使用 `first-principles-adversarial-review` 作为底层推理与核验 Skill。它先区分真实目标、事实、约束和未经验证的假设，再追踪生产者、消费者、上下游与替代方案，并主动寻找能推翻初步结论的证据。
+
+这项 Skill 可以与仓库内其他领域 Skill 叠加：例如 `peer-pr-review` 负责 CodeUp PR 的具体审查流程，`first-principles-adversarial-review` 负责避免顺着 PR 描述接受未经验证的根因。纯翻译、忠实转写、机械格式转换和无判断的一步操作不需要加载。
+
 ## 长文写作工作流
 
 用户说“帮我写篇文章”“按我的风格写”或提供链接、PDF、brief、采访和笔记要求出稿时，使用 `kakarot-writer`。
