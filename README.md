@@ -32,7 +32,7 @@ npx skills add Zhangs-11/zs-skills
 | [kakarot-writer](kakarot-writer/) | 先检查材料与 AI 价值，再按张硕的个人风格完整交付长文 | “帮我按自己的风格写篇文章。” |
 | [leader](leader/) | 把一句想法拆成 agent 能独立执行的目标任务书 | “把这个想法拆成可执行 brief。” |
 | [life-designer](life-designer/) | 用人生设计方法生成三套五年奥德赛计划 | “我想转行，帮我系统梳理。” |
-| [peer-pr-review](peer-pr-review/) | 对抗式审查 CodeUp PR，用横向链路图和代码证据核验根因、改动与遗漏 | “我不熟这块代码，帮我判断这个 PR 能不能过。” |
+| [peer-pr-review](peer-pr-review/) | 对抗式审查 PR、本地 Git 或 worktree 改动，用链路图和代码证据核验根因与遗漏 | “帮我审一下当前还没提交的改动。” |
 | [review-handoff](review-handoff/) | 生成可直接发给同事的 Markdown Review 交接说明 | “把我的 PR 整理成一份 MD 给同事审。” |
 | [resume-optimizer](resume-optimizer/) | 从零撰写、优化或评审程序员简历 | “以面试官视角评审这份简历。” |
 | [storage-analyzer](storage-analyzer/) | 只读扫描磁盘并生成分级清理报告 | “电脑空间不够，帮我看看谁占满了。” |
@@ -70,7 +70,7 @@ npx skills add Zhangs-11/zs-skills --list
 - [ ] `storage-analyzer` 的扫描阶段只读；任何删除都必须由用户单独确认，报告中的可释放空间是估算值。
 - [ ] `aihot` 与 `ai-hot-picker` 会访问 AI HOT 的公开接口，不需要 API Key，但需要网络。
 - [ ] `dating-chat-coach` 提供沟通建议而非操控话术；遇到诈骗或线下见面风险时以安全为先。
-- [ ] `peer-pr-review` 和 `review-handoff` 需要能够只读访问 CodeUp PR 或对应 Git 仓库；默认不会评论、通过、合并、commit 或 push，也不会把当前 `main` 冒充成某环境已部署版本。
+- [ ] `peer-pr-review` 需要能读取目标 PR、Git 工作区或 worktree，`review-handoff` 需要能读取 PR 或对应仓库；二者默认不会评论、通过、合并、commit 或 push，也不会把当前 `main` 冒充成某环境已部署版本。
 
 其余纯提示词 skills 无额外依赖。每个目录的 README 会列出更具体的输入、输出和限制。
 
@@ -101,7 +101,7 @@ wechat-publisher 在明确要求发布时保存公众号草稿
 代码评审协作可以串起来使用：
 
 ```text
-peer-pr-review 帮你审同事的 PR，用横向链路图和真实代码证据核验背景、问题、根因和遗漏
+peer-pr-review 审查同事 PR 或自己的本地/worktree 改动，用横向链路图和真实代码证据核验根因与遗漏
         ↓
 review-handoff 把你自己的 PR 整理成可直接转发的 Markdown
         ↓
