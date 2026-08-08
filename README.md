@@ -32,7 +32,7 @@ npx skills add Zhangs-11/zs-skills
 | [kakarot-writer](kakarot-writer/) | 先检查材料与 AI 价值，再按张硕的个人风格完整交付长文 | “帮我按自己的风格写篇文章。” |
 | [leader](leader/) | 把一句想法拆成 agent 能独立执行的目标任务书 | “把这个想法拆成可执行 brief。” |
 | [life-designer](life-designer/) | 用人生设计方法生成三套五年奥德赛计划 | “我想转行，帮我系统梳理。” |
-| [peer-pr-review](peer-pr-review/) | 对抗式审查同事的 CodeUp PR，独立核验需求、根因和遗漏 | “我不熟这块代码，帮我判断这个 PR 能不能过。” |
+| [peer-pr-review](peer-pr-review/) | 对抗式审查 CodeUp PR，用横向链路图和代码证据核验根因、改动与遗漏 | “我不熟这块代码，帮我判断这个 PR 能不能过。” |
 | [review-handoff](review-handoff/) | 生成可直接发给同事的 Markdown Review 交接说明 | “把我的 PR 整理成一份 MD 给同事审。” |
 | [resume-optimizer](resume-optimizer/) | 从零撰写、优化或评审程序员简历 | “以面试官视角评审这份简历。” |
 | [storage-analyzer](storage-analyzer/) | 只读扫描磁盘并生成分级清理报告 | “电脑空间不够，帮我看看谁占满了。” |
@@ -101,7 +101,7 @@ wechat-publisher 在明确要求发布时保存公众号草稿
 代码评审协作可以串起来使用：
 
 ```text
-peer-pr-review 帮你审同事的 PR，独立核验背景、问题、根因和遗漏
+peer-pr-review 帮你审同事的 PR，用横向链路图和真实代码证据核验背景、问题、根因和遗漏
         ↓
 review-handoff 把你自己的 PR 整理成可直接转发的 Markdown
         ↓

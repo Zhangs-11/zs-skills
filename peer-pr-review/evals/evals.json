@@ -18,6 +18,12 @@
       "prompt": "帮我看这个 CodeUp PR 写得规范不规范：https://codeup.example.com/team/web/change/9。我没有需求背景。",
       "expected_output": "识别最低输入缺少需求背景；先尝试从 PR 的关联工作项和描述恢复，无法恢复且会影响 spec 审查时再请求补充，不假装完成需求符合性审查。",
       "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "帮我 review 这个跨服务 PR：订单落库后会经过风控、库存预占、支付确认和超时释放，里面有很多状态判断。背景是偶尔付款成功后订单仍被超时关闭，PR：https://codeup.example.com/team/order-service/change/88。请让我快速看懂改动前后的代码链路。",
+      "expected_output": "基于真实调用链绘制改动前/后的横向主链路，主图控制在 5～8 个业务节点；将与问题和 PR 相关的复杂判断另画局部图，而不是复制完整控制流；图中节点编号能对应到仓库、文件、函数、行号和锁定 commit 的真实代码片段，未验证推断有明确标记。",
+      "files": []
     }
   ]
 }
