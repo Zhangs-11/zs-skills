@@ -36,6 +36,12 @@
       "prompt": "审一下 /workspace/order-timeout 这个 worktree 里的所有改动，和 origin/main 比。里面既有已提交的 commit，也有没提交的新文件。",
       "expected_output": "确认指定 worktree、当前 HEAD 和最新 origin/main，以 merge-base 为起点审查已提交差异，再叠加该 worktree 的 staged、unstaged 和相关 untracked 文件；审查前后检测快照是否变化，不遗漏新文件，也不污染共享仓库状态。",
       "files": []
+    },
+    {
+      "id": 7,
+      "prompt": "我完全不熟这个项目，也不知道 outbox、幂等和 settled 是什么意思。请 review 这个订单消息 PR，并告诉我图里的 settleOrder()、markProcessed() 到底分别做什么，不要只列方法名。PR：https://codeup.example.com/team/order-service/change/99。",
+      "expected_output": "保持短 Review，但把理解结论必需的术语用业务白话解释，并说明它们在本次链路中的作用；对关键方法基于真实方法体、调用方和被调用方说明谁调用、触发条件、输入、核心行为、输出或副作用及其与问题的关系，附文件、行号和版本；不能根据方法名或注释猜测，无法确认时标注推断未验证。",
+      "files": []
     }
   ]
 }
