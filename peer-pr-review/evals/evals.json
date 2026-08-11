@@ -42,6 +42,12 @@
       "prompt": "我完全不熟这个项目，也不知道 outbox、幂等和 settled 是什么意思。请 review 这个订单消息 PR，并告诉我图里的 settleOrder()、markProcessed() 到底分别做什么，不要只列方法名。PR：https://codeup.example.com/team/order-service/change/99。",
       "expected_output": "保持短 Review，但把理解结论必需的术语用业务白话解释，并说明它们在本次链路中的作用；对关键方法基于真实方法体、调用方和被调用方说明谁调用、触发条件、输入、核心行为、输出或副作用及其与问题的关系，附文件、行号和版本；不能根据方法名或注释猜测，无法确认时标注推断未验证。",
       "files": []
+    },
+    {
+      "id": 8,
+      "prompt": "Review 完以后，最后单独告诉我应该怎么改。不要只写‘补测试’‘加判空’这种短句，我需要能直接转述给同事的完整建议。PR：https://codeup.example.com/team/payment-service/change/108。",
+      "expected_output": "报告最后保留建议改动并按编号逐条书写，默认不超过 3 条；每条说明具体位置、当前行为与触发风险、符合现有结构的最小改法、预期结果和验证方式，并关联对应 finding；没有可靠修改项时明确写无必须修改项，不制造建议，证据不足时优先给出取证或测试动作。",
+      "files": []
     }
   ]
 }

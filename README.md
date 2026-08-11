@@ -32,7 +32,7 @@ npx skills add Zhangs-11/zs-skills
 | [kakarot-writer](kakarot-writer/) | 先检查材料与 AI 价值，再按张硕的个人风格完整交付长文 | “帮我按自己的风格写篇文章。” |
 | [leader](leader/) | 把一句想法拆成 agent 能独立执行的目标任务书 | “把这个想法拆成可执行 brief。” |
 | [life-designer](life-designer/) | 用人生设计方法生成三套五年奥德赛计划 | “我想转行，帮我系统梳理。” |
-| [peer-pr-review](peer-pr-review/) | 对抗式审查 PR、本地 Git 或 worktree 改动，把术语、关键方法和链路翻译成新手能懂的 Review | “我不懂这块代码，先讲明白再告诉我能不能过。” |
+| [peer-pr-review](peer-pr-review/) | 对抗式审查代码改动，把术语、关键方法、链路和可执行修改建议整理成新手能懂的 Review | “我不懂这块代码，先讲明白再告诉我应该怎么改。” |
 | [review-handoff](review-handoff/) | 生成可直接发给同事的 Markdown Review 交接说明 | “把我的 PR 整理成一份 MD 给同事审。” |
 | [resume-optimizer](resume-optimizer/) | 从零撰写、优化或评审程序员简历 | “以面试官视角评审这份简历。” |
 | [storage-analyzer](storage-analyzer/) | 只读扫描磁盘并生成分级清理报告 | “电脑空间不够，帮我看看谁占满了。” |
