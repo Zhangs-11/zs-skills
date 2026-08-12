@@ -17,7 +17,7 @@
 npx skills add Zhangs-11/zs-skills
 ```
 
-## 20 个可安装 skills
+## 21 个可安装 skills
 
 | Skill | 解决什么问题 | 你可以这样说 |
 |---|---|---|
@@ -36,6 +36,7 @@ npx skills add Zhangs-11/zs-skills
 | [leader](leader/) | 把一句想法拆成 agent 能独立执行的目标任务书 | “把这个想法拆成可执行 brief。” |
 | [life-designer](life-designer/) | 用人生设计方法生成三套五年奥德赛计划 | “我想转行，帮我系统梳理。” |
 | [peer-pr-review](peer-pr-review/) | 对抗式审查代码改动，把术语、关键方法、链路和可执行修改建议整理成新手能懂的 Review | “我不懂这块代码，先讲明白再告诉我应该怎么改。” |
+| [project-aware-coding](project-aware-coding/) | 写代码前参考项目已有逻辑、设计与历史经验，再做贴合真实消费者的最小实现 | “参考项目现有写法帮我实现这个需求，别重复踩坑。” |
 | [review-handoff](review-handoff/) | 生成可直接发给同事的 Markdown Review 交接说明 | “把我的 PR 整理成一份 MD 给同事审。” |
 | [resume-optimizer](resume-optimizer/) | 从零撰写、优化或评审程序员简历 | “以面试官视角评审这份简历。” |
 | [storage-analyzer](storage-analyzer/) | 只读扫描磁盘并生成分级清理报告 | “电脑空间不够，帮我看看谁占满了。” |
@@ -74,6 +75,7 @@ npx skills add Zhangs-11/zs-skills --list
 - [ ] `aihot` 与 `ai-hot-picker` 会访问 AI HOT 的公开接口，不需要 API Key，但需要网络。
 - [ ] `dating-chat-coach` 提供沟通建议而非操控话术；遇到诈骗或线下见面风险时以安全为先。
 - [ ] `peer-pr-review` 需要能读取目标 PR、Git 工作区或 worktree，`review-handoff` 需要能读取 PR 或对应仓库；二者默认不会评论、通过、合并、commit 或 push，也不会把当前 `main` 冒充成某环境已部署版本。
+- [ ] `project-aware-coding` 需要能读取目标仓库及其项目说明；它会参考现有代码和历史经验但不会机械照搬，也不会在没有当前授权时 commit、push 或部署。
 - [ ] `clarify-before-action` 与 `diagnose-and-explain` 可以自主只读调查；实现、修复、写数据及其他外部变更必须在说明范围后获得明确确认。
 
 其余纯提示词 skills 无额外依赖。每个目录的 README 会列出更具体的输入、输出和限制。

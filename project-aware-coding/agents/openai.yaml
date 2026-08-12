@@ -1,0 +1,4 @@
+interface:
+  display_name: "结合项目上下文编码"
+  short_description: "参考现有代码、设计与历史踩坑，完成更贴合项目的可靠实现"
+  default_prompt: "Use $project-aware-coding to implement this change by first understanding and referencing the project’s existing logic, conventions, and proven patterns."
