@@ -1,6 +1,6 @@
 # zs-skills 使用说明
 
-本仓库包含张硕维护的 Agent Skills。Claude Code、Codex 和其他兼容工具应从实际安装目录解析每项 Skill 的 `scripts/`、`references/`、`assets/` 和 `tools/`，不要假定它一定安装在某个固定的隐藏目录。
+本仓库包含 Kakarot 维护的 Agent Skills。Claude Code、Codex 和其他兼容工具应从实际安装目录解析每项 Skill 的 `scripts/`、`references/`、`assets/` 和 `tools/`，不要假定它一定安装在某个固定的隐藏目录。
 
 ## 安装与发现
 
@@ -34,7 +34,7 @@ npx skills add Zhangs-11/zs-skills --list
 
 用户说“帮我写篇文章”“按我的风格写”或提供链接、PDF、brief、采访和笔记要求出稿时，使用 `kakarot-writer`。
 
-`kakarot-writer` 是个人长文总调度：它先确定张硕的作者位置、真实材料、核心判断和文章原型，再调用 `human-writing` 生成正文，最后完成个人风格复核、标题、截图与来源、正文配图、`21:9` 主封面和 `1:1` 分享封面。
+`kakarot-writer` 是个人长文总调度：它先确定 Kakarot 的作者位置、真实材料、核心判断和文章原型，再调用 `human-writing` 生成正文，最后完成个人风格复核、标题、截图与来源、正文配图、`21:9` 主封面和 `1:1` 分享封面。
 
 “帮我写篇文章”默认表示完整交付，不需要另问用户是否需要标题和封面。公众号长文是首发载体，也是知乎、博客、掘金、小红书、抖音和B站共同使用的唯一内容母稿。长文平台可以原样同步正文和标题；小红书、抖音和B站视频交给 `kakarot-repurposer` 调整长度、节奏与画面，但不能改变母稿中的事实、核心判断、作者态度和来源。
 

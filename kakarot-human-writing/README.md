@@ -45,7 +45,7 @@ npx skills add Zhangs-11/zs-skills --list
 
 ```text
 kakarot-writer
-  确定张硕的作者位置、材料、判断和完整交付
+  确定 Kakarot 的作者位置、材料、判断和完整交付
         ↓
 human-writing
   生成事实站得住、自然推进的正文

@@ -7,6 +7,7 @@
   <a href="https://github.com/Zhangs-11/zs-skills/network/members"><img alt="Forks" src="https://img.shields.io/github/forks/Zhangs-11/zs-skills?style=for-the-badge&logo=github" /></a>
   <a href="https://github.com/Zhangs-11/zs-skills/issues"><img alt="Issues" src="https://img.shields.io/github/issues/Zhangs-11/zs-skills?style=for-the-badge&logo=github" /></a>
   <a href="https://github.com/Zhangs-11/zs-skills/commits/main"><img alt="Last commit" src="https://img.shields.io/github/last-commit/Zhangs-11/zs-skills?style=for-the-badge&logo=git" /></a>
+  <a href="https://github.com/Zhangs-11/zs-skills/actions/workflows/skill-quality.yml"><img alt="Skill quality" src="https://img.shields.io/github/actions/workflow/status/Zhangs-11/zs-skills/skill-quality.yml?branch=main&style=for-the-badge&label=skill%20quality" /></a>
   <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-blue.svg?style=for-the-badge" /></a>
 </p>
 
@@ -31,7 +32,7 @@ npx skills add Zhangs-11/zs-skills
 | [first-principles-adversarial-review](first-principles-adversarial-review/) | 用第一性原理重构问题，再主动寻找反证、遗漏和错误事实源 | “别顺着我的方案，先从机制和反证审查一遍。” |
 | [kakarot-repurposer](kakarot-repurposer/) | 从同一内容母稿派生小红书、抖音和B站版本 | “把这篇一稿多平台。” |
 | [human-writing](kakarot-human-writing/) | 写有材料、有判断、有自然中文节奏的通用正文 | “把这些笔记写成一篇有活人感的长文。” |
-| [kakarot-writer](kakarot-writer/) | 先检查材料与 AI 价值，再按张硕的个人风格完整交付长文 | “帮我按自己的风格写篇文章。” |
+| [kakarot-writer](kakarot-writer/) | 先检查材料与 AI 价值，再按 Kakarot 的个人风格完整交付长文 | “帮我按自己的风格写篇文章。” |
 | [leader](leader/) | 把一句想法拆成 agent 能独立执行的目标任务书 | “把这个想法拆成可执行 brief。” |
 | [life-designer](life-designer/) | 用人生设计方法生成三套五年奥德赛计划 | “我想转行，帮我系统梳理。” |
 | [peer-pr-review](peer-pr-review/) | 对抗式审查代码改动，把术语、关键方法、链路和可执行修改建议整理成新手能懂的 Review | “我不懂这块代码，先讲明白再告诉我应该怎么改。” |
@@ -77,6 +78,19 @@ npx skills add Zhangs-11/zs-skills --list
 
 其余纯提示词 skills 无额外依赖。每个目录的 README 会列出更具体的输入、输出和限制。
 
+## 仓库自动质检
+
+每次推送到 `main`、创建 PR 或手动触发工作流时，GitHub Actions 会检查所有 Skill 的 frontmatter、目录名与 Skill 名称、`agents/openai.yaml`、评测 JSON、本地 Markdown 链接，以及 Git 中受跟踪的高置信凭据和危险凭据文件。
+
+本地运行同一套检查：
+
+```bash
+python3 -m pip install -r scripts/requirements-ci.txt
+python3 scripts/validate_repo.py
+```
+
+扫描只读取 Git 已跟踪内容，不执行各 Skill 自带脚本，也不会把文件上传到第三方扫描服务。凭据命中只显示文件与行号，不回显疑似秘密本身。
+
 ## 推荐工作流
 
 内容生产可以串起来使用：
@@ -89,6 +103,8 @@ kakarot-writer 确定作者位置与材料，通过 AI 价值门槛
 human-writing 生成自然、可靠的正文
         ↓
 kakarot-writer 完成个人复核、标题、配图与封面
+        ↓
+作者修改后，可比较实际初稿与终稿，生成待确认的个人偏好候选
         ↓
 同一篇内容母稿发布到公众号，并同步知乎、博客、掘金、B站专栏
         ↓
