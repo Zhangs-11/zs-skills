@@ -1,0 +1,4 @@
+interface:
+  display_name: "诊断并讲清楚"
+  short_description: "基于证据诊断技术、业务、产品、流程和数据问题并解释根因"
+  default_prompt: "Use $diagnose-and-explain to investigate this problem and explain the root cause clearly."

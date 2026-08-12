@@ -16,14 +16,16 @@
 npx skills add Zhangs-11/zs-skills
 ```
 
-## 18 个可安装 skills
+## 20 个可安装 skills
 
 | Skill | 解决什么问题 | 你可以这样说 |
 |---|---|---|
 | [ai-hot-picker](ai-hot-picker/) | 从当天 AI 热点中筛出适合创作的选题 | “今天写什么 AI 话题？” |
 | [aihot](aihot/) | 查询最新 AI 日报、发布、论文和行业动态 | “今天 AI 圈有什么大事？” |
 | [change-meeting-brief](change-meeting-brief/) | 把需求和 PR 压成 20～40 秒的会议改动口径 | “只说问题、原逻辑和这次怎么解决。” |
+| [clarify-before-action](clarify-before-action/) | 复杂任务开始前先只读调查并澄清背景、需求、痛点和验收标准 | “先别动手，一次问我一个问题，确认后再做。” |
 | [dating-chat-coach](dating-chat-coach/) | 相亲或线上认识后的接话、转微信、邀约与安全判断 | “她这么回，我该怎么接？” |
+| [diagnose-and-explain](diagnose-and-explain/) | 用证据和可证伪假设诊断技术、业务、产品、流程与数据问题，并给小白讲清根因 | “先只读查根因，把我当小白讲明白，修复前问我。” |
 | [explain-to-master](explain-to-master/) | 用费曼学习法、反例和迁移测试真正弄懂一个主题 | “我好像懂了，考考我。” |
 | [fable-writer](fable-writer/) | 用精炼寓言解释抽象概念，并附理解检验 | “用寓言讲明白沉没成本。” |
 | [first-principles-adversarial-review](first-principles-adversarial-review/) | 用第一性原理重构问题，再主动寻找反证、遗漏和错误事实源 | “别顺着我的方案，先从机制和反证审查一遍。” |
@@ -71,6 +73,7 @@ npx skills add Zhangs-11/zs-skills --list
 - [ ] `aihot` 与 `ai-hot-picker` 会访问 AI HOT 的公开接口，不需要 API Key，但需要网络。
 - [ ] `dating-chat-coach` 提供沟通建议而非操控话术；遇到诈骗或线下见面风险时以安全为先。
 - [ ] `peer-pr-review` 需要能读取目标 PR、Git 工作区或 worktree，`review-handoff` 需要能读取 PR 或对应仓库；二者默认不会评论、通过、合并、commit 或 push，也不会把当前 `main` 冒充成某环境已部署版本。
+- [ ] `clarify-before-action` 与 `diagnose-and-explain` 可以自主只读调查；实现、修复、写数据及其他外部变更必须在说明范围后获得明确确认。
 
 其余纯提示词 skills 无额外依赖。每个目录的 README 会列出更具体的输入、输出和限制。
 
@@ -97,6 +100,22 @@ wechat-publisher 在明确要求发布时保存公众号草稿
 学习与执行也可以组合：先用 `explain-to-master` 建立可靠理解，再让 `leader` 把目标拆成可验收任务书。
 
 `first-principles-adversarial-review` 可以作为其他 Skills 的推理底盘：需求、设计、诊断、评审和修改任务先核对真实目标、事实源、上下游、替代方案和反证，再由对应领域 Skill 完成具体工作。若希望它稳定介入所有实质性任务，可按其 README 把强制路由句加入全局 `AGENTS.md` 或 `CLAUDE.md`；纯翻译和机械操作仍会跳过。
+
+需求与问题处理可以这样分流：
+
+```text
+准备做新需求或复杂任务
+        ↓
+clarify-before-action 先调查并澄清背景、需求、痛点、范围与验收标准
+        ↓
+用户确认后再实现
+
+已经出现异常，想知道为什么
+        ↓
+diagnose-and-explain 用事实源、对照和可证伪假设定位根因并讲明白
+        ↓
+用户确认后再修复
+```
 
 代码评审协作可以串起来使用：
 

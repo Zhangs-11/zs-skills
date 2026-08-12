@@ -1,0 +1,4 @@
+interface:
+  display_name: "行动前澄清"
+  short_description: "在复杂任务开始前澄清背景、需求、痛点、范围与验收标准"
+  default_prompt: "Use $clarify-before-action to clarify this task with me before taking action."
