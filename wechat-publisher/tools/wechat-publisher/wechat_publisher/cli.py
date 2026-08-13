@@ -10,6 +10,8 @@ from .client import WeChatAPIError, WeChatClient
 from .config import Settings
 from .formatter import markdown_to_wechat_html
 from .image import AssetProcessingError, prepare_markdown_assets
+from .linkcheck import check_external_links
+from .publication import publication_contract_findings, split_publication_document
 
 
 def main() -> None:
@@ -75,6 +77,11 @@ def _add_content_args(parser: argparse.ArgumentParser) -> None:
         action="store_true",
         help="Show cover image at the top of the article body",
     )
+    parser.add_argument(
+        "--skip-link-check",
+        action="store_true",
+        help="Skip read-only external link validation (use only when the network is unavailable)",
+    )
 
 
 async def _dispatch(args: argparse.Namespace) -> None:
@@ -91,7 +98,12 @@ async def _dispatch(args: argparse.Namespace) -> None:
         )
         if findings:
             raise AssetProcessingError("；".join(findings))
-        html = markdown_to_wechat_html(md)
+        public_md = split_publication_document(md).public_markdown
+        if not getattr(args, "skip_link_check", False):
+            link_findings = await check_external_links(public_md)
+            if link_findings:
+                raise AssetProcessingError("；".join(link_findings))
+        html = markdown_to_wechat_html(public_md)
         print(f"PREFLIGHT: OK (html_chars={len(html)})")
         return
 
@@ -120,6 +132,11 @@ async def _dispatch(args: argparse.Namespace) -> None:
     )
     if findings:
         raise AssetProcessingError("；".join(findings))
+    md = split_publication_document(md).public_markdown
+    if not getattr(args, "skip_link_check", False):
+        link_findings = await check_external_links(md)
+        if link_findings:
+            raise AssetProcessingError("；".join(link_findings))
     markdown_to_wechat_html(md)  # 先验证 Markdown 可格式化；此时不上传任何内容。
 
     cover_media_id = await _resolve_cover_media_id(client, args)
@@ -216,13 +233,14 @@ def _preflight_findings(
     cover_file: str | None,
     cover_media_id: str | None,
 ) -> list[str]:
-    findings: list[str] = []
+    findings: list[str] = publication_contract_findings(title=title, md=md)
+    public_md = split_publication_document(md).public_markdown
     if not title.strip():
         findings.append("标题不能为空")
-    placeholder = re.search(r"\[插图：.+?\]|\[绘图提示：.+?\]", md)
+    placeholder = re.search(r"\[插图：.+?\]|\[绘图提示：.+?\]", public_md)
     if placeholder:
         findings.append(f"存在未解析插图占位符：{placeholder.group(0)}")
-    for image in re.finditer(r"!\[[^\]]*\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)", md):
+    for image in re.finditer(r"!\[[^\]]*\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)", public_md):
         src = image.group(1).strip()
         parsed = urlparse(src)
         if parsed.scheme in {"http", "https"}:

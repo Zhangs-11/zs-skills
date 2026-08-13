@@ -83,6 +83,7 @@ class CliCoverFileTests(unittest.IsolatedAsyncioTestCase):
             digest="摘要",
             source_url=None,
             show_cover_pic=False,
+            skip_link_check=False,
         )
 
         with (
@@ -91,6 +92,7 @@ class CliCoverFileTests(unittest.IsolatedAsyncioTestCase):
             patch("wechat_publisher.cli._read_content", return_value=("正文", None)),
             patch("wechat_publisher.cli.prepare_markdown_assets", return_value="正文"),
             patch("wechat_publisher.cli.markdown_to_wechat_html", return_value="<p>正文</p>"),
+            patch("wechat_publisher.cli.check_external_links", return_value=[]),
         ):
             await _dispatch(args)
 
@@ -109,6 +111,7 @@ class CliCoverFileTests(unittest.IsolatedAsyncioTestCase):
             digest="摘要",
             source_url=None,
             show_cover_pic=False,
+            skip_link_check=False,
         )
 
         with (
@@ -136,6 +139,7 @@ class CliCoverFileTests(unittest.IsolatedAsyncioTestCase):
             digest="摘要",
             source_url=None,
             show_cover_pic=False,
+            skip_link_check=False,
         )
 
         with (
@@ -150,6 +154,40 @@ class CliCoverFileTests(unittest.IsolatedAsyncioTestCase):
                 await _dispatch(args)
 
         self.assertIsNone(client.uploaded_cover)
+
+    async def test_delivery_appendix_is_not_uploaded_or_rendered(self) -> None:
+        client = FakeClient()
+        args = SimpleNamespace(
+            command="create",
+            title="标题",
+            content_file=None,
+            stdin=True,
+            cover_file=__file__,
+            cover_media_id=None,
+            digest=None,
+            source_url=None,
+            show_cover_pic=False,
+            skip_link_check=False,
+        )
+        md = "正文第一段\n\n<!-- kakarot:delivery-appendix -->\n\n## 截图清单\n\n![内部图](missing.png)"
+
+        with (
+            patch("wechat_publisher.cli.Settings", return_value=object()),
+            patch("wechat_publisher.cli.WeChatClient", return_value=client),
+            patch("wechat_publisher.cli._read_content", return_value=(md, None)),
+            patch("wechat_publisher.cli.check_external_links", return_value=[]),
+            patch(
+                "wechat_publisher.cli.prepare_markdown_assets",
+                new_callable=AsyncMock,
+                return_value="正文第一段\n",
+            ) as prepare_assets,
+            patch("wechat_publisher.cli.markdown_to_wechat_html", return_value="<p>正文第一段</p>"),
+        ):
+            await _dispatch(args)
+
+        prepared_md = prepare_assets.await_args.args[0]
+        self.assertEqual(prepared_md, "正文第一段\n")
+        self.assertNotIn("截图清单", prepared_md)
 
 
 class FakeClient:

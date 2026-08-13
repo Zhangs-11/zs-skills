@@ -4,7 +4,7 @@ import http.client
 import ipaddress
 import socket
 from dataclasses import dataclass
-from urllib.parse import SplitResult, urlsplit, urlunsplit
+from urllib.parse import SplitResult, urljoin, urlsplit, urlunsplit
 
 
 class SecureDownloadError(RuntimeError):
@@ -15,6 +15,45 @@ class SecureDownloadError(RuntimeError):
 class DownloadedContent:
     body: bytes
     content_type: str
+
+
+def check_public_url_status(url: str, *, timeout: float = 8, max_redirects: int = 3) -> int:
+    """Return an HTTP status without allowing requests to private networks."""
+    current = url
+    for redirect_count in range(max_redirects + 1):
+        parsed, addresses = _validated_target(current)
+        status, location = _request_status(parsed, addresses, timeout)
+        if 300 <= status < 400 and location:
+            if redirect_count == max_redirects:
+                raise SecureDownloadError("too many redirects")
+            current = urljoin(current, location)
+            continue
+        return status
+    raise SecureDownloadError("too many redirects")
+
+
+def _request_status(
+    parsed: SplitResult,
+    addresses: list[ipaddress.IPv4Address | ipaddress.IPv6Address],
+    timeout: float,
+) -> tuple[int, str | None]:
+    last_error: Exception | None = None
+    for address in addresses:
+        connection = _connection_for(parsed, str(address), timeout)
+        try:
+            target = urlunsplit(("", "", parsed.path or "/", parsed.query, ""))
+            connection.request(
+                "HEAD",
+                target,
+                headers={"Host": parsed.netloc, "User-Agent": "wechat-publisher/0.2 link preflight"},
+            )
+            response = connection.getresponse()
+            return response.status, response.getheader("location")
+        except (OSError, http.client.HTTPException) as exc:
+            last_error = exc
+        finally:
+            connection.close()
+    raise SecureDownloadError("remote link connection failed") from last_error
 
 
 class _PinnedHTTPConnection(http.client.HTTPConnection):
@@ -106,6 +145,8 @@ def _validated_target(
     require_https: bool = False,
 ) -> tuple[SplitResult, list[ipaddress.IPv4Address | ipaddress.IPv6Address]]:
     parsed = urlsplit(url)
+    if parsed.scheme:
+        parsed = parsed._replace(scheme=parsed.scheme.lower())
     if parsed.scheme not in {"http", "https"} or not parsed.hostname:
         raise SecureDownloadError("remote image URL must use HTTP or HTTPS")
     if require_https and parsed.scheme != "https":

@@ -75,6 +75,20 @@ export WECHAT_PUBLISHER_PYTHON="$WECHAT_PUBLISHER_SKILL_DIR/tools/wechat-publish
 - 已经是微信 CDN 的图片不会重复上传。
 - `[插图：...]` / `[绘图提示：...]` 是写作阶段占位符；发布前必须替换成真实 Markdown 图片，否则命令会失败。
 - 正文外链会转换成底部“参考资料”，避免公众号正文里出现不可点击或体验不稳定的外链。
+- 外链会在上传前逐一做只读可达性检查，避免把错误分支或 `404` 文档链接带进草稿箱。网络确实不可用时可临时加 `--skip-link-check`，但应先用其他方式完成核验。
+
+## 母稿与公开正文
+
+同一份 Markdown 可以同时保存可发布正文和内部交付信息。正文从第一段直接开始，不写 `# 文章标题`；标题用 `--title` 单独传入。截图清单、封面方案、备选标题和事实确认项等不希望读者看到的内容放在精确标记之后：
+
+```markdown
+<!-- kakarot:delivery-appendix -->
+
+## 截图清单
+...
+```
+
+CLI 会在摘要提取、图片上传、链接检查和 HTML 格式化之前统一切掉这部分，也会移除文件开头的 YAML frontmatter。未使用标记却把内部交付标题写进正文，或正文仍含一级标题时，`preflight` 会直接失败。
 
 ## 发布前编辑检查
 
@@ -89,7 +103,7 @@ wechat-publisher preflight \
   --cover-file ~/公众号草稿/images/<文章名>/cover.jpg
 ```
 
-成功时输出 `PREFLIGHT: OK`。该命令不上传图片，也不创建草稿。
+成功时输出 `PREFLIGHT: OK`。该命令不上传图片，也不创建草稿；除本地文件与内容契约外，还会只读检查正文外链。
 
 ## 摘要和封面
 
@@ -125,4 +139,6 @@ tools/wechat-publisher/venv/bin/python -m unittest tests/test_generate_images_sc
 | `40164` | 将报错中的当前公网 IP 加入公众号后台白名单 |
 | 找不到封面 | 传 `--cover-file` / `--cover-media-id`，或配置默认 media ID |
 | 正文仍有插图占位符 | 先运行生图脚本替换为真实 Markdown 图片，再执行 `preflight` |
+| 正文重复标题或出现内部清单 | 删除正文一级标题，并把内部交付内容移到 `<!-- kakarot:delivery-appendix -->` 之后 |
+| 外链返回 404 | 回到一手来源确认当前路径和默认分支，修正后重新预检 |
 | 请求超时 | 先检查草稿箱是否已生成，避免立即重试造成重复草稿 |

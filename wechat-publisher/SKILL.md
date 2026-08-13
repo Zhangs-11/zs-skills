@@ -162,6 +162,10 @@ export WECHAT_PUBLISHER_BIN="$WECHAT_PUBLISHER_SKILL_DIR/tools/wechat-publisher/
 
 `wechat-publisher` 会自动上传正文 Markdown 图片到微信 CDN。封面图用 `--cover-file` 上传成微信永久素材，再用返回的 `media_id` 创建草稿。已经是 `mmbiz.qpic.cn` 的图片不会重复上传。
 
+发布前，CLI 会先执行统一的内容契约：移除开头 YAML frontmatter，只消费 `<!-- kakarot:delivery-appendix -->` 之前的公开正文，并拒绝正文里的一级标题、未隔离的截图清单/封面方案/备选标题/事实确认项。标题只通过 `--title` 传入，因此不会在正文中重复。摘要提取、图片上传、外链检查和 HTML 格式化全部使用同一份公开正文。
+
+外链默认逐一做只读可达性检查，`404` 等失效链接会阻止上传。只有网络环境暂时不可用、且已经用其他方式逐个核验链接时，才能临时传 `--skip-link-check`；它不是常规发布选项。
+
 ```bash
 # 检查当前公网 IP
 curl -s ip.sb
@@ -255,6 +259,8 @@ wechat-publisher upload-cover cover.jpg
 2. 前三行必须交代“发生了什么”和“为什么值得读”。
 3. 只强调真正决定读者理解的关键判断，避免按固定段数机械加粗；跨平台母稿优先使用通用的 `**加粗**`，不主动加入平台私有语法。
 4. 配图必须服务理解，且**图里不要出现任何文字**（生图模型画中文会出错别字）。优先用视觉比喻/概念图传达意思，绘图提示用纯英文手写、有创意，不要把正文照搬进 prompt。
+5. 一手来源标为 POC、Preview、beta、experimental 或 RC 的能力保留成熟度限定；事实、官方说法和作者推断分层表达。
+6. 官方仓库与文档的具体链接必须通过预检实际打开；不能只凭记忆猜默认分支是 `main` 或 `master`。
 
 ## 常见错误
 

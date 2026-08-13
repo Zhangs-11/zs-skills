@@ -41,7 +41,7 @@ npx skills add Zhangs-11/zs-skills
 | [resume-optimizer](resume-optimizer/) | 从零撰写、优化或评审程序员简历 | “以面试官视角评审这份简历。” |
 | [storage-analyzer](storage-analyzer/) | 只读扫描磁盘并生成分级清理报告 | “电脑空间不够，帮我看看谁占满了。” |
 | [system-structure-diagram](system-structure-diagram-skill/) | 按参考图样式和真实项目模块生成结构图 | “按这张图的样式画项目结构图。” |
-| [wechat-publisher](wechat-publisher/) | 把 Markdown 文章预检、配图并存入公众号草稿箱 | “把这篇发到公众号草稿箱。” |
+| [wechat-publisher](wechat-publisher/) | 隔离公开正文与交付附录，检查图片和外链后存入公众号草稿箱 | “把这篇发到公众号草稿箱。” |
 
 ## 安装
 
