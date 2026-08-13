@@ -70,6 +70,11 @@ def markdown_to_wechat_html(md: str) -> str:
     for li in soup.find_all("li"):
         _merge_styles(li, _LI)
 
+    # 微信草稿接口会把 ul/ol 直接子节点之间只用于格式化源码的换行文本，
+    # 重新解释成 <li><br></li>，最终显示为空圆点或空编号。
+    # 发送前压紧列表结构，只删除没有可见内容的直接文本节点。
+    _remove_list_whitespace(soup)
+
     # --- Dividers ---
     for hr in soup.find_all("hr"):
         _wrap_divider(soup, hr)
@@ -264,6 +269,13 @@ def _merge_styles(el: Tag, extra: str) -> None:
         el["style"] = f"{existing}; {extra}" if not existing.rstrip().endswith(";") else f"{existing} {extra}"
     else:
         el["style"] = extra
+
+
+def _remove_list_whitespace(soup: BeautifulSoup) -> None:
+    for container in soup.find_all(["ul", "ol"]):
+        for child in list(container.children):
+            if isinstance(child, NavigableString) and not child.strip():
+                child.extract()
 
 
 # 标题开头若已带 emoji/符号图标，沿用作者写的；否则补一个默认图标

@@ -6,6 +6,33 @@ from wechat_publisher.formatter import markdown_to_wechat_html
 
 
 class FormatterTests(unittest.TestCase):
+    def test_list_markup_has_no_whitespace_nodes_that_wechat_turns_into_empty_items(self) -> None:
+        html = markdown_to_wechat_html(
+            "1. 第一项\n   - 子项\n2. 第二项\n\n- 来源一\n- 来源二"
+        )
+        soup = BeautifulSoup(html, "html.parser")
+
+        for container in soup.find_all(["ul", "ol"]):
+            whitespace = [
+                child
+                for child in container.children
+                if isinstance(child, str) and not child.strip()
+            ]
+            self.assertEqual(whitespace, [])
+
+        self.assertNotIn(">\n<li", html)
+        self.assertNotIn("</li>\n<li", html)
+
+    def test_list_items_preserve_spaces_between_inline_elements(self) -> None:
+        html = markdown_to_wechat_html(
+            "- **加粗** *斜体*\n- `foo` `bar`\n- [甲](#a) [乙](#b)"
+        )
+        items = BeautifulSoup(html, "html.parser").find_all("li")
+
+        self.assertEqual(items[0].get_text(), "加粗 斜体")
+        self.assertEqual(items[1].get_text(), "foo bar")
+        self.assertEqual(items[2].get_text(), "甲 乙")
+
     def test_leading_document_title_is_not_rendered_in_article_body(self) -> None:
         html = markdown_to_wechat_html("# My Unique Title\n\nBody text.")
         soup = BeautifulSoup(html, "html.parser")
