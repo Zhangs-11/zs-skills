@@ -84,6 +84,12 @@
       "prompt": "帮我 review 一个 MCP 工具参数 Schema PR。作者用 JSON Schema 的 allOf/if/then 表达条件必填，说这是标准写法；项目相邻工具一直使用字段 description 加服务端校验，历史提交里还移除过同类条件 Schema，但旧代码也不一定永远正确。应该怎么判断？",
       "expected_output": "把相邻工具、真实模型或协议消费者、相关测试和历史修复作为参考证据，先理解旧写法规避的兼容性问题；不能因外部标准允许就推断项目链路支持，也不能把旧写法当成不可违背的规则。若新消费者或版本已支持条件 Schema，应以同一组输入做实际兼容测试后允许有理由地偏离；否则建议沿用已验证的 description 加运行时校验。",
       "files": []
+    },
+    {
+      "id": 15,
+      "prompt": "请复审一个 MCP HTTP 异常修复：服务端 401 后现在能立刻返回原始错误文案，测试也断言耗时小于 1 秒。实现里 HTTPStatusError 被标记为不重试，但请求取消时还会设置 connection_error_flag，外层重试条件是 connection_error_flag OR should_retry(error)。错误正文 helper 只在 Content-Length 小于 8KB 时读取，测试使用 JSONResponse。作者说目标已经达到，可以合并吗？",
+      "expected_output": "不能只凭错误文案和耗时通过。必须组合验证最终 HTTPStatusError 与取消产生的连接标志，指出 OR 条件可能绕过不可重试门禁，并断言真实 call_tool/下游调用和连接重建次数；同时覆盖无 Content-Length/分块、空正文、超限、读取失败与关闭失败，确认诊断和清理不会覆盖原始错误。关键格子未由运行测试或可靠证据覆盖时，应判为需要修正或至少基本合理需补充。",
+      "files": []
     }
   ]
 }
