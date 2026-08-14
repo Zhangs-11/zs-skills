@@ -27,7 +27,7 @@ npx skills add Zhangs-11/zs-skills
 | [clarify-before-action](clarify-before-action/) | 复杂任务开始前先只读调查并澄清背景、需求、痛点和验收标准 | “先别动手，一次问我一个问题，确认后再做。” |
 | [dating-chat-coach](dating-chat-coach/) | 相亲或线上认识后的接话、转微信、邀约与安全判断 | “她这么回，我该怎么接？” |
 | [diagnose-and-explain](diagnose-and-explain/) | 用证据和可证伪假设诊断技术、业务、产品、流程与数据问题，并给小白讲清根因 | “先只读查根因，把我当小白讲明白，修复前问我。” |
-| [explain-to-master](explain-to-master/) | 用费曼学习法、反例和迁移测试真正弄懂一个主题 | “我好像懂了，考考我。” |
+| [explain-to-master](explain-to-master/) | 用具体 Case、费曼复述、单问题追问和迁移测试真正弄懂一个主题 | “看完还是似懂非懂，用一个 Case 带我走一遍。” |
 | [fable-writer](fable-writer/) | 用精炼寓言解释抽象概念，并附理解检验 | “用寓言讲明白沉没成本。” |
 | [first-principles-adversarial-review](first-principles-adversarial-review/) | 用第一性原理重构问题，再主动寻找反证、遗漏和错误事实源 | “别顺着我的方案，先从机制和反证审查一遍。” |
 | [kakarot-repurposer](kakarot-repurposer/) | 从同一内容母稿派生小红书、抖音和B站版本 | “把这篇一稿多平台。” |
@@ -35,9 +35,9 @@ npx skills add Zhangs-11/zs-skills
 | [kakarot-writer](kakarot-writer/) | 先检查材料与 AI 价值，再按 Kakarot 的个人风格完整交付长文 | “帮我按自己的风格写篇文章。” |
 | [leader](leader/) | 把一句想法拆成 agent 能独立执行的目标任务书 | “把这个想法拆成可执行 brief。” |
 | [life-designer](life-designer/) | 用人生设计方法生成三套五年奥德赛计划 | “我想转行，帮我系统梳理。” |
-| [peer-pr-review](peer-pr-review/) | 对抗式审查代码改动，把术语、关键方法、链路和可执行修改建议整理成新手能懂的 Review | “我不懂这块代码，先讲明白再告诉我应该怎么改。” |
+| [peer-pr-review](peer-pr-review/) | 对抗式审查代码改动，并用一个具体 Case 走通改动前后的真实链路 | “我不懂这块代码，用一个 Case 带我走完再告诉我怎么改。” |
 | [project-aware-coding](project-aware-coding/) | 写代码前参考项目已有逻辑、设计与历史经验，再做贴合真实消费者的最小实现 | “参考项目现有写法帮我实现这个需求，别重复踩坑。” |
-| [review-handoff](review-handoff/) | 生成可直接发给同事的 Markdown Review 交接说明 | “把我的 PR 整理成一份 MD 给同事审。” |
+| [review-handoff](review-handoff/) | 生成可直接发给同事、必要时包含具体 Case 走读的 Markdown Review 交接说明 | “把我的 PR 整理成一份 MD，并用一个 Case 讲清链路。” |
 | [resume-optimizer](resume-optimizer/) | 从零撰写、优化或评审程序员简历 | “以面试官视角评审这份简历。” |
 | [storage-analyzer](storage-analyzer/) | 只读扫描磁盘并生成分级清理报告 | “电脑空间不够，帮我看看谁占满了。” |
 | [system-structure-diagram](system-structure-diagram-skill/) | 按参考图样式和真实项目模块生成结构图 | “按这张图的样式画项目结构图。” |
@@ -115,7 +115,7 @@ kakarot-repurposer 按需派生小红书、抖音与B站视频版本
 wechat-publisher 在明确要求发布时保存公众号草稿
 ```
 
-学习与执行也可以组合：先用 `explain-to-master` 建立可靠理解，再让 `leader` 把目标拆成可验收任务书。
+学习与执行也可以组合：看完分析仍似懂非懂时，先让 `explain-to-master` 用一个具体 Case 建立体感，再通过一次一个问题的追问和复述形成可靠理解；需要执行时，再让 `leader` 把目标拆成可验收任务书。
 
 `first-principles-adversarial-review` 可以作为其他 Skills 的推理底盘：需求、设计、诊断、评审和修改任务先核对真实目标、事实源、上下游、替代方案和反证，再由对应领域 Skill 完成具体工作。若希望它稳定介入所有实质性任务，可按其 README 把强制路由句加入全局 `AGENTS.md` 或 `CLAUDE.md`；纯翻译和机械操作仍会跳过。
 
@@ -138,9 +138,9 @@ diagnose-and-explain 用事实源、对照和可证伪假设定位根因并讲�
 代码评审协作可以串起来使用：
 
 ```text
-peer-pr-review 审查同事 PR 或自己的本地/worktree 改动，用新手白话解释术语、关键方法和改动前/后链路
+peer-pr-review 审查同事 PR 或自己的本地/worktree 改动，用新手白话和一个具体 Case 走通改动前/后链路
         ↓
-review-handoff 把你自己的 PR 整理成可直接转发的 Markdown
+review-handoff 把你自己的 PR 整理成可直接转发、必要时附具体 Case 的 Markdown
         ↓
 change-meeting-brief 从需求、PR 或 Review 文档压出 20～40 秒会议口径
 ```
