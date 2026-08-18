@@ -6,7 +6,7 @@
 [![Last commit](https://img.shields.io/github/last-commit/Zhangs-11/zs-skills?style=flat-square)](https://github.com/Zhangs-11/zs-skills/commits/main)
 [![License](https://img.shields.io/github/license/Zhangs-11/zs-skills?style=flat-square)](../LICENSE)
 
-`kakarot-writer` 是 Kakarot 的个人长文总调度 Skill。它负责作者位置、选题判断、真实材料、个人风格、标题、配图、封面和最终交付；正文由通用的 [`human-writing`](../kakarot-human-writing/) 生成，再经过个人风格复核。
+`kakarot-writer` 是 Kakarot 的个人长文总调度 Skill。它负责作者位置、选题判断、真实材料、个人风格、配图、封面和最终交付；正文由通用的 [`human-writing`](../kakarot-human-writing/) 生成，公众号候选标题由 [`bigpeng-hot-gzh`](https://github.com/BigPengSays/bigpeng-hot-gzh) 生成，再由本 Skill 按正文事实边界筛选。
 
 成稿以公众号首发为基准，同时作为知乎、博客、掘金、小红书、抖音和B站的唯一内容母稿。长文平台可以原文同步；短图文与视频只做形态适配，不另起观点和素材。
 
@@ -18,6 +18,7 @@
 
 ```bash
 npx skills add Zhangs-11/zs-skills --skill kakarot-writer human-writing
+npx skills add BigPengSays/bigpeng-hot-gzh
 ```
 
 如果当前 CLI 版本一次只接受一个 Skill，分别执行两次即可。
@@ -41,7 +42,10 @@ human-writing
   生成事实站得住、自然推进的正文
         ↓
 kakarot-writer
-  个人风格复核、标题、截图、配图和双尺寸封面
+  个人风格复核、截图、配图和双尺寸封面
+        ↓
+bigpeng-hot-gzh
+  基于完整正文生成不同公式的公众号候选标题，由 writer 核对兑现边界
         ↓
 同一篇内容母稿
   公众号首发，并原文同步到知乎、博客、掘金和B站专栏
@@ -81,6 +85,7 @@ AI 封面不会让模型直接生成带中文标题的完整海报，而是先�
 ## 前置条件与边界
 
 - [ ] 安装 `human-writing`，作为正文生成引擎。
+- [ ] 安装 `bigpeng-hot-gzh`，作为公众号候选标题生成器。
 - [ ] 提供链接、PDF、brief、原始笔记或真实经历；材料越完整，文章越可靠。
 - [ ] 如需完整的双尺寸封面，安装 `guizang-social-card-skill`。
 - [ ] 文章中的亲历、采访、数据和测试结果必须有真实依据。
@@ -95,7 +100,7 @@ AI 封面不会让模型直接生成带中文标题的完整海报，而是先�
 | 作者被写成固定的“应届生” | 只把用户本次提供或当前资料确认的职业阶段写进文章 |
 | 各平台观点和素材逐渐不一致 | 把 Markdown 母稿作为唯一内容源；派生稿只改变长度、节奏、画面和平台元数据 |
 | 封面模板化、缺少视觉钩子 | 先把核心冲突转成真实素材关系或 AI 视觉隐喻，再分别编排横版与方形封面 |
-| 标题比正文结论更强 | 降低标题承诺，或补足能兑现标题的证据 |
+| 标题比正文结论更强 | 确认 `bigpeng-hot-gzh` 收到了完整正文和真实兑现点，再降低标题承诺或补足证据 |
 | AI 新闻写得完整却没有新东西 | 先写价值契约；补实测、机制或决策依据，否则缩成短讯或搁置 |
 | 根据一次改稿就改变长期风格 | 一次作品只生成候选；跨作品重复并经作者确认后才更新长期规则 |
 | 私人草稿出现在公开仓库 | 初稿、终稿和差异报告默认放任务临时目录，不提交到 Skill 仓库 |
