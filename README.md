@@ -39,7 +39,7 @@ npx skills add Zhangs-11/zs-skills
 | [project-aware-coding](project-aware-coding/) | 写代码前参考项目已有逻辑、设计与历史经验，再做贴合真实消费者的最小实现 | “参考项目现有写法帮我实现这个需求，别重复踩坑。” |
 | [review-handoff](review-handoff/) | 生成可直接发给同事、必要时包含具体 Case 走读的 Markdown Review 交接说明 | “把我的 PR 整理成一份 MD，并用一个 Case 讲清链路。” |
 | [resume-optimizer](resume-optimizer/) | 从零撰写、优化或评审程序员简历 | “以面试官视角评审这份简历。” |
-| [steelman-before-answer](steelman-before-answer/) | 后台钢人正反双方，只把必要确认、结论和证据展示给用户 | “后台多想一层，有必要确认的再问我。” |
+| [steelman-before-answer](steelman-before-answer/) | 后台钢人正反双方，重要取舍时自动展示三段白话并只问一个问题 | “后台多想一层，有必要权衡时讲人话问我。” |
 | [storage-analyzer](storage-analyzer/) | 只读扫描磁盘并生成分级清理报告 | “电脑空间不够，帮我看看谁占满了。” |
 | [system-structure-diagram](system-structure-diagram-skill/) | 按参考图样式和真实项目模块生成结构图 | “按这张图的样式画项目结构图。” |
 | [wechat-publisher](wechat-publisher/) | 隔离公开正文与交付附录，检查图片和外链后存入公众号草稿箱 | “把这篇发到公众号草稿箱。” |
@@ -119,7 +119,7 @@ wechat-publisher 在明确要求发布时保存公众号草稿
 
 学习与执行也可以组合：看完分析仍似懂非懂时，先让 `explain-to-master` 用一个具体 Case 建立体感，再通过一次一个问题的追问和复述形成可靠理解；需要执行时，再让 `leader` 把目标拆成可验收任务书。
 
-`steelman-before-answer` 是所有新任务的后台审查入口：内部钢人正反双方并寻找关键变量，默认只展示结论、必要证据和确实需要用户决定的一个问题。实质性任务随后由 `first-principles-adversarial-review` 提供推理底盘，再交给需求澄清、诊断、Review、编码或写作等领域 Skill 完成具体工作。只有用户明确要求时才展开完整双向钢人。
+`steelman-before-answer` 是所有新任务的后台审查入口：内部钢人正反双方并寻找关键变量，普通任务只展示结果；存在两个真正可行、必须由用户取舍且代价明显不同的方向时，自动展示“我的判断 / 两个方向的差别 / 只需要你确认”三段白话。实质性任务随后由 `first-principles-adversarial-review` 提供推理底盘，再交给需求澄清、诊断、Review、编码或写作等领域 Skill 完成具体工作。
 
 需求与问题处理可以这样分流：
 
