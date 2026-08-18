@@ -16,6 +16,12 @@ npx skills add Zhangs-11/zs-skills
 npx skills add Zhangs-11/zs-skills --list
 ```
 
+## 全局双向钢人入口
+
+每个新的任务型用户消息先使用 `steelman-before-answer`。第一回合只重述真正的问题、钢人支持方和反对方、指出真正分歧与关键变量，再只问一个最关键问题并停止；用户回答后进入第二回合，给出明确判断、理由和下一步，并继续原任务。回答上一轮问题、纯确认、状态询问和没有新任务的补充不重新启动钢人。
+
+这项 Skill 是交互入口，不代替领域 Skill。实质性判断继续使用 `first-principles-adversarial-review`；需求澄清、问题诊断、代码 Review 和实现分别交给对应 Skill。
+
 ## 默认推理与核验
 
 需求、设计、诊断、评审、建议和修改等实质性任务，优先使用 `first-principles-adversarial-review` 作为底层推理与核验 Skill。它先区分真实目标、事实、约束和未经验证的假设，再追踪生产者、消费者、上下游与替代方案，并主动寻找能推翻初步结论的证据。

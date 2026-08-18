@@ -1,0 +1,4 @@
+interface:
+  display_name: "双向钢人"
+  short_description: "先钢人正反双方并追问关键变量，再给出明确判断与下一步行动"
+  default_prompt: "使用 $steelman-before-answer 先完整钢人我问题的正反双方，只问一个关键问题，等我回答后再判断。"

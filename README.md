@@ -1,6 +1,6 @@
 # zs-skills
 
-> 写公众号、追 AI 热点、做严谨分析、审代码、开会上汇报、画结构图、清理磁盘……不用为每种工作流重新教 AI 一遍。
+> 先把问题的正反双方想完整，再写公众号、追 AI 热点、诊断问题、审代码、开会上汇报、画结构图……不用为每种工作流重新教 AI 一遍。
 
 <p align="center">
   <a href="https://github.com/Zhangs-11/zs-skills/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/Zhangs-11/zs-skills?style=for-the-badge&logo=github" /></a>
@@ -17,7 +17,7 @@
 npx skills add Zhangs-11/zs-skills
 ```
 
-## 21 个可安装 skills
+## 22 个可安装 skills
 
 | Skill | 解决什么问题 | 你可以这样说 |
 |---|---|---|
@@ -39,6 +39,7 @@ npx skills add Zhangs-11/zs-skills
 | [project-aware-coding](project-aware-coding/) | 写代码前参考项目已有逻辑、设计与历史经验，再做贴合真实消费者的最小实现 | “参考项目现有写法帮我实现这个需求，别重复踩坑。” |
 | [review-handoff](review-handoff/) | 生成可直接发给同事、必要时包含具体 Case 走读的 Markdown Review 交接说明 | “把我的 PR 整理成一份 MD，并用一个 Case 讲清链路。” |
 | [resume-optimizer](resume-optimizer/) | 从零撰写、优化或评审程序员简历 | “以面试官视角评审这份简历。” |
+| [steelman-before-answer](steelman-before-answer/) | 每个新任务先钢人正反双方，只问一个关键问题，回答后再判断和行动 | “先别直接回答，找出双方最强论证和真正分歧。” |
 | [storage-analyzer](storage-analyzer/) | 只读扫描磁盘并生成分级清理报告 | “电脑空间不够，帮我看看谁占满了。” |
 | [system-structure-diagram](system-structure-diagram-skill/) | 按参考图样式和真实项目模块生成结构图 | “按这张图的样式画项目结构图。” |
 | [wechat-publisher](wechat-publisher/) | 隔离公开正文与交付附录，检查图片和外链后存入公众号草稿箱 | “把这篇发到公众号草稿箱。” |
@@ -77,6 +78,7 @@ npx skills add Zhangs-11/zs-skills --list
 - [ ] `peer-pr-review` 需要能读取目标 PR、Git 工作区或 worktree，`review-handoff` 需要能读取 PR 或对应仓库；二者默认不会评论、通过、合并、commit 或 push，也不会把当前 `main` 冒充成某环境已部署版本。
 - [ ] `project-aware-coding` 需要能读取目标仓库及其项目说明；它会参考现有代码和历史经验但不会机械照搬，也不会在没有当前授权时 commit、push 或部署。
 - [ ] `clarify-before-action` 与 `diagnose-and-explain` 可以自主只读调查；实现、修复、写数据及其他外部变更必须在说明范围后获得明确确认。
+- [ ] `steelman-before-answer` 会让每个新任务增加一个澄清回合；若要稳定覆盖 Codex 与 Claude Code，需要分别在全局 `AGENTS.md` 和 `CLAUDE.md` 加入强制入口。
 
 其余纯提示词 skills 无额外依赖。每个目录的 README 会列出更具体的输入、输出和限制。
 
@@ -117,7 +119,7 @@ wechat-publisher 在明确要求发布时保存公众号草稿
 
 学习与执行也可以组合：看完分析仍似懂非懂时，先让 `explain-to-master` 用一个具体 Case 建立体感，再通过一次一个问题的追问和复述形成可靠理解；需要执行时，再让 `leader` 把目标拆成可验收任务书。
 
-`first-principles-adversarial-review` 可以作为其他 Skills 的推理底盘：需求、设计、诊断、评审和修改任务先核对真实目标、事实源、上下游、替代方案和反证，再由对应领域 Skill 完成具体工作。若希望它稳定介入所有实质性任务，可按其 README 把强制路由句加入全局 `AGENTS.md` 或 `CLAUDE.md`；纯翻译和机械操作仍会跳过。
+`steelman-before-answer` 是所有新任务的交互入口：第一回合先钢人正反双方、找出关键变量并只问一个问题，用户回答后才进入判断和执行。实质性任务随后由 `first-principles-adversarial-review` 提供推理底盘，再交给需求澄清、诊断、Review、编码或写作等领域 Skill 完成具体工作。纯确认和对上一轮关键问题的回答不会重复启动钢人。
 
 需求与问题处理可以这样分流：
 
