@@ -30,6 +30,25 @@ author: kakarot
         self.assertIn("截图清单", document.delivery_appendix)
         self.assertNotIn("title:", document.public_markdown)
 
+    def test_author_and_contact_footer_remain_in_public_body(self) -> None:
+        md = """正文最后一段。
+
+> / 作者：kakarot
+> / 投稿、合作或交流，欢迎在公众号后台留言
+
+<!-- kakarot:delivery-appendix -->
+
+## 截图清单
+
+- 内部截图
+"""
+
+        document = split_publication_document(md)
+
+        self.assertIn("> / 作者：kakarot", document.public_markdown)
+        self.assertIn("投稿、合作或交流", document.public_markdown)
+        self.assertNotIn("截图清单", document.public_markdown)
+
     def test_repeated_title_is_a_hard_preflight_error(self) -> None:
         findings = publication_contract_findings(
             title="晚上 11 点下班，我为什么还有精力继续学习？",

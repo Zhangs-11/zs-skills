@@ -494,7 +494,7 @@ def _is_content_paragraph(block: str) -> bool:
         )
     ):
         return False
-    if text.startswith(("> / 作者：", "> / 投稿或爆料")):
+    if text.startswith(("> / 作者：", "> / 投稿、合作或交流")):
         return False
     return True
 

@@ -200,6 +200,9 @@ class GenerateImagesScriptTests(unittest.TestCase):
         self.assertFalse(script._is_content_paragraph("| 字段 | 一段很长的表格内容 |"))
         self.assertFalse(script._is_content_paragraph("![配图](images/article/01-image.png)"))
         self.assertFalse(script._is_content_paragraph("> / 作者：卡卡罗特，这里是固定尾部信息。"))
+        self.assertFalse(
+            script._is_content_paragraph("> / 投稿、合作或交流，欢迎在公众号后台留言")
+        )
 
     def test_cover_prompt_uses_title_and_custom_api_base(self) -> None:
         script = load_script_module()
