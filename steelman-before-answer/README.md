@@ -73,6 +73,7 @@ ln -s /path/to/zs-skills/steelman-before-answer ~/.claude/skills/steelman-before
 | 存在会改变行为的用户选择 | 最短影响说明 + 一个问题 |
 | 用户回答上一轮问题 | 判断、理由和继续后的结果 |
 | 两个可行方向且选错代价明显 | 自动三段白话版，控制在一屏内 |
+| 分歧来自尚未取得但可低成本验证的事实 | 给出可逆最小实验、观察指标和继续/停止阈值 |
 
 后台审查不会消失，只是不再把内部过程变成阅读负担。
 
@@ -98,6 +99,7 @@ ln -s /path/to/zs-skills/steelman-before-answer ~/.claude/skills/steelman-before
 - 能通过代码、配置、日志、数据库只读查询或权威来源确认的事实，不会反问用户。
 - 用户对确认问题的回答不会自动扩大成删除、commit、push、部署或数据库写入授权。
 - 领域 Skill 仍负责调查和执行；本 Skill 只负责避免顺着未经检查的前提直接回答。
+- 现实证据能够低成本决定方向时，优先设计最小实验；涉及真实用户、外部写入或成本时，实验执行仍需单独授权。
 
 ## Troubleshooting
 

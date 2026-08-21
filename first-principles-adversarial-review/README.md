@@ -2,7 +2,7 @@
 
 > AI 最危险的不是不会回答，而是沿着错误前提给出一个听起来很完整的答案。
 
-first-principles-adversarial-review 把“先从真实目标和机制重新推导，再主动寻找反证”变成 Agent 的默认工作方式。它不会把每个简单问题都写成长篇分析，但会在需求、设计、诊断、评审和修改任务中检查事实源、上下游、替代方案、失败路径与未验证假设。
+first-principles-adversarial-review 把“先从真实目标和机制重新推导，再主动寻找反证”变成 Agent 的默认工作方式。它会先区分可核验事实、由事实推出的解释或因果结论、取决于目标的价值判断，再在需求、设计、诊断、评审和修改任务中检查事实源、上下游、替代方案、失败路径与未验证假设。
 
 <p align="center">
   <a href="https://github.com/Zhangs-11/zs-skills/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/Zhangs-11/zs-skills?style=flat-square&logo=github" /></a>
@@ -53,6 +53,7 @@ npx skills add Zhangs-11/zs-skills --list
 - “我觉得昨晚的超时就是 Redis 升级导致的，帮我判断根因。”
 - “设计订单创建后的积分发放流程，要求绝不能重复发积分。”
 - “Review 这个方案，重点找事实源、遗漏分支和反例。”
+- “核查这段观点，把事实、推断和价值判断分开，并告诉我可信到什么程度。”
 
 这项 Skill 的目标是自动介入实质性任务，因此通常不需要显式说“使用第一性原理”或“做对抗式审查”。如果所用 Agent 会保守地按需加载 Skill，可以在全局 `AGENTS.md` 或 `CLAUDE.md` 中加入：
 
@@ -82,14 +83,14 @@ npx skills add Zhangs-11/zs-skills --list
 
 ## 测试
 
-仓库包含六类行为用例与可重复脚本：
+仓库包含七类行为用例与可重复脚本：
 
 ```bash
 ./evals/run_codex_evals.sh
 ./evals/run_trigger_stability.sh
 ```
 
-测试覆盖技术方案、故障归因、运营因果判断、删除需求、已确定技术约束和简单翻译负例。首次公开版本在本地 Codex 新会话中完成 23 条行为断言，全部通过；最易欠触发的正例重复 3 次全部加载，翻译负例重复 3 次全部跳过。
+测试覆盖技术方案、故障归因、运营因果判断、删除需求、已确定技术约束、观点主张分类和简单翻译负例。当前七类用例在隔离的 Codex 新会话中完成 27 条行为断言，全部通过；最易欠触发的正例重复 3 次全部加载，翻译负例重复 3 次全部跳过。
 
 ## 边界与限制
 

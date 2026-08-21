@@ -17,7 +17,7 @@
 npx skills add Zhangs-11/zs-skills
 ```
 
-## 22 个可安装 skills
+## 23 个可安装 skills
 
 | Skill | 解决什么问题 | 你可以这样说 |
 |---|---|---|
@@ -26,8 +26,9 @@ npx skills add Zhangs-11/zs-skills
 | [change-meeting-brief](change-meeting-brief/) | 把需求和 PR 压成 20～40 秒的会议改动口径 | “只说问题、原逻辑和这次怎么解决。” |
 | [clarify-before-action](clarify-before-action/) | 复杂任务开始前先只读调查并澄清背景、需求、痛点和验收标准 | “先别动手，一次问我一个问题，确认后再做。” |
 | [dating-chat-coach](dating-chat-coach/) | 相亲或线上认识后的接话、转微信、邀约与安全判断 | “她这么回，我该怎么接？” |
+| [deep-research](deep-research/) | 用历史演化、横向对比和事实核查系统研究陌生对象 | “研究它怎么走到今天、和替代品差在哪、未来可能怎么变。” |
 | [diagnose-and-explain](diagnose-and-explain/) | 用证据和可证伪假设诊断技术、业务、产品、流程与数据问题，并给小白讲清根因 | “先只读查根因，把我当小白讲明白，修复前问我。” |
-| [explain-to-master](explain-to-master/) | 用具体 Case、费曼复述、单问题追问和迁移测试真正弄懂一个主题 | “看完还是似懂非懂，用一个 Case 带我走一遍。” |
+| [explain-to-master](explain-to-master/) | 用双层解释、范例反拆、具体 Case 和迁移测试真正弄懂一个主题 | “先讲白话和专业两层，再让我用新 Case 验证。” |
 | [fable-writer](fable-writer/) | 用精炼寓言解释抽象概念，并附理解检验 | “用寓言讲明白沉没成本。” |
 | [first-principles-adversarial-review](first-principles-adversarial-review/) | 用第一性原理重构问题，再主动寻找反证、遗漏和错误事实源 | “别顺着我的方案，先从机制和反证审查一遍。” |
 | [kakarot-repurposer](kakarot-repurposer/) | 从同一内容母稿派生小红书、抖音和B站版本 | “把这篇一稿多平台。” |
@@ -118,6 +119,8 @@ wechat-publisher 在明确要求发布时保存公众号草稿
 ```
 
 学习与执行也可以组合：看完分析仍似懂非懂时，先让 `explain-to-master` 用一个具体 Case 建立体感，再通过一次一个问题的追问和复述形成可靠理解；需要执行时，再让 `leader` 把目标拆成可验收任务书。
+
+系统研究产品、公司、人物、技术或行业时，使用 `deep-research` 沿关键历史转折和真实替代品两条轴建立框架，再把关键说法拆成事实、推断和价值判断核验；简单事实查询和当天资讯不走完整研究流程。
 
 `steelman-before-answer` 是所有新任务的后台审查入口：内部钢人正反双方并寻找关键变量，普通任务只展示结果；存在两个真正可行、必须由用户取舍且代价明显不同的方向时，自动展示“我的判断 / 两个方向的差别 / 只需要你确认”三段白话。实质性任务随后由 `first-principles-adversarial-review` 提供推理底盘，再交给需求澄清、诊断、Review、编码或写作等领域 Skill 完成具体工作。
 

@@ -1,0 +1,4 @@
+interface:
+  display_name: "可追溯深度研究"
+  short_description: "用历史演化、横向对比和事实核查研究陌生对象"
+  default_prompt: "使用 $deep-research 系统研究这个对象：先固定截止时间和研究问题，再沿历史演化与横向对比两条轴分析，用一手来源核查关键事实，并把未来路径的前提、信号和反证写清楚。"

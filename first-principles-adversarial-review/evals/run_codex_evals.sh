@@ -5,6 +5,7 @@ set -eu
 skill_root=${0:A:h:h}
 workspace=${1:-/tmp/first-principles-adversarial-review-eval/automatic}
 mkdir -p "$workspace"
+eval_context='这是脱离具体仓库的行为评测，不读取本机项目、历史任务或内部知识库；只根据题面提供的信息回答。'
 
 prompts=(
   '1|我们准备把用户偏好同步从每五分钟轮询改成事件推送。请直接给技术方案，最好今天能开始做。'
@@ -13,6 +14,7 @@ prompts=(
   '4|把“这个接口会在任务完成后发送一条通知”翻译成英文。'
   '5|产品说删除按钮加一个二次确认框就能避免误删。请分析这个需求应该怎么做，暂时不要改代码。'
   '6|我已经决定采用消息队列，所以不用讨论替代方案。请设计订单创建后的积分发放流程，要求不能重复发积分。'
+  '7|核查这段话：远程办公公司的生产力一定更高，所以所有公司都应该取消办公室。'
 )
 
 for entry in "${prompts[@]}"; do
@@ -28,7 +30,7 @@ for entry in "${prompts[@]}"; do
     -s read-only \
     -C "$run_dir" \
     -o "$run_dir/final.txt" \
-    "$prompt" \
+    "$eval_context $prompt" \
     > "$run_dir/events.jsonl" \
     2> "$run_dir/stderr.log"
   end_epoch=$(date +%s)
