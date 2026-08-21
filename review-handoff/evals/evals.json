@@ -10,7 +10,7 @@
     {
       "id": 2,
       "prompt": "这个需求跨两个仓：后端 PR https://codeup.example.com/backend/change/3，前端 PR https://codeup.example.com/front/change/8。背景是下线资产仍能从历史收藏进入详情页。整理一份直接发群里的 review 文档。",
-      "expected_output": "逐仓核对并在顶部建立两个仓库到 PR 的映射，按业务链路而非文件列表说明跨仓修复，不把一个仓库的验证结果套到另一个。",
+      "expected_output": "虽然要求直接发群里，但已明确要 review 文档，因此选择完整文档模式；逐仓核对并在顶部建立两个仓库到 PR 的映射，按业务链路而非文件列表说明跨仓修复，不把一个仓库的验证结果套到另一个。",
       "files": []
     },
     {
@@ -23,6 +23,24 @@
       "id": 4,
       "prompt": "这个需求经过 API、任务状态机和异步消息三个环节，同事不熟这块。请根据 PR https://codeup.example.com/task-service/change/92 生成 review MD，并用一个具体任务 Case 把改动前和改动后完整走一遍。",
       "expected_output": "在仓库/PR、背景、问题、根因和修复方案之外加入一个静态可转发的具体 Case；优先使用真实复现或测试样例，否则标明基于代码静态推演。使用同一输入按执行顺序列出初始状态、关键文件和方法的白话职责、判断或状态变化、首次分叉、下游输入及最终用户结果，不通过互动追问打断文档；缺失且会造成两种实质版本的信息才一次追问一个问题。",
+      "files": []
+    },
+    {
+      "id": 5,
+      "prompt": "帮我生成一个简略的 review 内容概要，直接发群里：\\n```diff\\n- 任务：T-2878\\n- 需求：D-2373\\n- PR：GoalfyMax CodeUp #428 (https://codeup.example.com/goalfymax/change/428\\n```\\n)\\n- 验收项目：899082222\\n- 源分支：fix/T2878-agent-plan-and-fa-cost/main",
+      "expected_output": "先归一化代码块、断行和多余括号，再核对 PR 与真实 diff；直接在当前对话输出短版，不创建文件，也不添加 Review 概要或其他标题。输出从任务、需求、可点击 PR、验收项目和源分支开始，正文用约 150 至 300 个汉字说明问题或动机、核心改动与 1 至 2 个 Review 重点；没有证据的改动和验证结果不编造。",
+      "files": []
+    },
+    {
+      "id": 6,
+      "prompt": "PR 是 https://codeup.example.com/task-service/change/105，源分支 fix/T3001-retry/main。给我一句能贴到 review 邀请里的概要，别生成文件。",
+      "expected_output": "选择简略概要模式并直接回复；只展示已提供或已核实的元信息，不强行补任务、需求或验收项目；从真实 PR 和 diff 压缩问题、关键改动与审查重点，无法访问时只请求会改变概要内容的最关键事实。",
+      "files": []
+    },
+    {
+      "id": 7,
+      "prompt": "这次改了 GoalfyMax 和 GoalfyHub 两个项目，各有一个 PR、验收项目和源分支。根据这组 PR 生成简略概要，直接回复，不生成文件。",
+      "expected_output": "选择简略概要模式；按项目分组，每个项目分别对应正确的 PR、验收 project ID 和源分支，正文只保留一份本次改动概要，并说明各项目分别承担的修改及跨项目 Review 重点；不使用‘这个 PR’这种单 PR 表述。",
       "files": []
     }
   ]
