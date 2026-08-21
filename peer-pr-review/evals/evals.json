@@ -102,6 +102,12 @@
       "prompt": "帮我 review 一个断线恢复 PR。作者新增了 ConnectionSupervisor、后台轮询、缓存和自定义重试状态，测试都过了；仓库相邻模块已经在使用 ResilientDatabaseClient，但作者说新方案更完整、以后也能复用。请判断能不能合并。",
       "expected_output": "通过结论前必须读取 ResilientDatabaseClient 的真实实现、调用方、测试和失败语义，明确当前 PR 能复用什么、为何需要或不需要偏离；不能因新方案更完整或未来可复用就保留第二套机制。还要逐项尝试删除、合并或复用新增 manager、后台任务、缓存和重试状态；若现有入口能保持相同验收、并发、资源关闭和恢复语义，应把多余设计作为正式 finding，要求简化后再决定是否通过。",
       "files": []
+    },
+    {
+      "id": 18,
+      "prompt": "帮我 review 一个 Verify 子代理 PR。OA 问题是：子代理读不了 DOCX，结束时 message_user 又会被 guard 拦截，导致重复调用自己。先假设需求交给你做，说明你会怎么调查、实现、验证和自审，再和同事方案比较。同事的 PR 给 document_read 加了运行时白名单、把 message_user 转成 submit_result，并补了压缩后身份提醒。静态代码显示 snapshot 会继承 caller.available_tools，所以你怀疑 Hub 给子代理配置 document_read 仍不可见；但同事给出 QA 项目 899082301、used_tools 记录 13045，声称真实 tools_params 包含 document_read，随后实际调用并成功读取 DOCX。请判断能不能通过。",
+      "expected_output": "在阅读 patch 方案前先基于 OA 问题、基线调用链和项目参考冻结独立开发方案，至少覆盖文档能力来源、终止适配、递归收口、支持与不支持文档、真实 tools_params、实际消费者调用、无外发结果、QA 以及完整 diff 自审—修复—复审。随后把独立方案与同事方案按根因、改动层、失败/恢复、契约、副作用和验证逐项对照；静态 snapshot 推断只能作为候选反证，必须查询记录 13045 与同一 FA 的真实调用/结果。若记录确属目标 verify_content、tools_params 含 document_read、同一执行成功调用并收口，则撤回工具不可见 finding，承认同事运行证据补足独立方案；只有发现另一个真实可达且未覆盖的 caller 场景，才可保留条件性问题。方案差异本身不构成 finding，Review 仍只读。",
+      "files": []
     }
   ]
 }
