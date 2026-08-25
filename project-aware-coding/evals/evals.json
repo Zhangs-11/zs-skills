@@ -36,6 +36,12 @@
       "prompt": "在现有服务里修复数据库断线后不能恢复的问题。你已经完成第一版：新增了 ConnectionSupervisor、后台轮询任务、自定义熔断状态和一套重试 helper。项目相邻模块似乎已有 ResilientDatabaseClient。请按完整开发流程继续到交付。",
       "expected_output": "实现后自审不能只判断第一版是否正确；必须核对 ResilientDatabaseClient 的真实消费者、失败语义、并发和测试，明确可直接复用与必须偏离的部分。若项目现有入口能满足同一验收，应把重复 manager、后台任务、状态和 helper 作为过度设计 finding，在原授权范围内自动简化，重新运行目标测试并基于最新完整 diff 复审；只有现有实现不能满足且有证据时才保留新机制。",
       "files": []
+    },
+    {
+      "id": 7,
+      "prompt": "修复 S3 endpoint 重复 bucket。S3Config.Endpoint 同时给默认文件 client 和 Skill client 使用，两个构造器分别传 Bucket 和 SkillBucket。请实现并按完整流程交付，默认 bucket 的测试已经通过。",
+      "expected_output": "不能用默认 bucket 测试直接交付；应枚举 NewS3Service、NewSkillS3Service 和所有 NewS3ServiceWithBucket 生产调用方，区分 Endpoint 归属的默认 Bucket 与当前 client bucket。至少加入默认 bucket、不同 SkillBucket、fallback bucket 和配置缺失组合，确认共享 endpoint 规范化后由 SDK 添加实际 client bucket；自审发现默认信息串入 Skill client 时应在原范围内修复、重测并完整复审。",
+      "files": []
     }
   ]
 }
