@@ -114,6 +114,24 @@
       "prompt": "帮我 review 一个对象存储修复。S3Config.Endpoint 是共享字段，NewS3Service 用默认 Bucket，NewSkillS3Service 用 SkillBucket，底层都调用 NewS3ServiceWithBucket。作者只测试了默认 bucket 不重复，并说可以合并。仓库配置里两个 bucket 不同，请判断。",
       "expected_output": "必须建立共享配置、构造参数和最终消费者的组合矩阵，枚举默认 client、Skill client 及其他显式 bucket 调用方；不能用默认 bucket 通过推断 SkillBucket 正确。应使用同一 Endpoint 配合不同 bucket 走真实 presign 链路，区分 Endpoint 所属默认 bucket 与当前 client bucket；若 Skill 路径生成 skill.default.s3 一类串桶地址，应作为可达阻塞 finding，并要求补非默认消费者回归测试后再合并。",
       "files": []
+    },
+    {
+      "id": 20,
+      "prompt": "帮我 review 一个资产创建 PR。POST 已成功创建并返回 asset_id，但后续 GET 回读或自动上线失败时函数返回 success=false。作者说资产保持离线所以安全，asset_id 只放在 metadata，没有恢复工具或 retry_action。底层创建没有幂等键、名称唯一约束或重名检查，请判断能不能通过。",
+      "expected_output": "必须把 POST 成功后的所有失败返回当作部分成功，列出资源最终状态和副作用；不能用保持离线代替恢复闭环。应对照仓库同类失败返回，要求安全清理或真实存在的同 ID 恢复入口、结构化 retry_action 与参数。还要用同一输入重试并断言创建次数、ID 和副作用；在无幂等和唯一约束时，应指出直接重跑创建会产生重复离线孤儿，判为需要修正。",
+      "files": []
+    },
+    {
+      "id": 21,
+      "prompt": "帮我 review 一个 MCP 工具 Schema PR。新字段 requires_capability 的 description 写了‘每次必须显式传’，但没加到 JSON Schema required。测试注释说加进 required 会被框架提前拦截，所以函数内稳定 reason_code 无法命中。本仓库 override_tool_schema 把 arg_model 换成了不做校验的 PassthroughArgsModel，跨仓还有根据实时 Schema 生成调用的阶段 Skill。请判断。",
+      "expected_output": "不能相信测试注释或只直调 .fn()。必须分开对外 Schema 广播契约与服务端运行时校验，追到 PassthroughArgsModel 和真实 Tool.run 或 transport 路径，实测加入 required 前后缺字段调用。若 required 只影响模型看到的契约而函数门禁仍命中，应要求 Schema required 加函数内 reason_code 双保险，并搜索会持续漏传的跨仓 Skill 生产者，把同步缺口列为 finding 或建议，不在 Review 中直接修改。",
+      "files": []
+    },
+    {
+      "id": 22,
+      "prompt": "帮我 review 一个可观测性修复。日志要同时记录 requested_tool_ids 和 actual_tool_ids。作者在回读失败、响应没有 actual 或只有配置值时，用 requested_tool_ids 回填 actual_tool_ids，并说这是兼容旧客户端；测试也断言两者相等。请判断。",
+      "expected_output": "必须追溯 actual_tool_ids 声明的运行时事实源，不得用请求值或配置值静默回退。应分开 requested/configured/actual，回读不可得时让 actual 留空或 null，并增加 actual_source 或 readback_status。还要用请求与回读不同、只有配置、回读抛错三类反例证明旧 fallback 会失败，不能用绿灯测试把误导性口径钉成兼容行为。",
+      "files": []
     }
   ]
 }
