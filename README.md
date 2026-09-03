@@ -1,6 +1,8 @@
 # zs-skills
 
-> 先把问题的正反双方想完整，再写公众号、追 AI 热点、诊断问题、审代码、开会上汇报、画结构图……不用为每种工作流重新教 AI 一遍。
+[English](README.md) | [简体中文](README.zh-CN.md)
+
+> Think through the strongest case on both sides before writing a WeChat article, tracking AI news, diagnosing a problem, reviewing code, briefing a meeting, or drawing a system diagram—without teaching the AI each workflow from scratch.
 
 <p align="center">
   <a href="https://github.com/Zhangs-11/zs-skills/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/Zhangs-11/zs-skills?style=for-the-badge&logo=github" /></a>
@@ -11,168 +13,168 @@
   <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-blue.svg?style=for-the-badge" /></a>
 </p>
 
-这是一套面向 Claude Code、Codex 及其他 Agent Skills 兼容工具的中文 skills 合集。每个 skill 都把触发场景、工作流程、边界与配套资源放进独立目录，安装后直接用自然语言调用。
+This repository is a collection of primarily Chinese-language skills for Claude Code, Codex, and other Agent Skills-compatible tools. Each skill keeps its triggers, workflow, boundaries, and supporting resources in a self-contained directory and can be invoked with natural language after installation.
 
 ```bash
 npx skills add Zhangs-11/zs-skills
 ```
 
-## 23 个可安装 skills
+## 23 installable skills
 
-| Skill | 解决什么问题 | 你可以这样说 |
+| Skill | What it solves | Example prompt |
 |---|---|---|
-| [ai-hot-picker](ai-hot-picker/) | 从当天 AI 热点中筛出适合创作的选题 | “今天写什么 AI 话题？” |
-| [aihot](aihot/) | 查询最新 AI 日报、发布、论文和行业动态 | “今天 AI 圈有什么大事？” |
-| [change-meeting-brief](change-meeting-brief/) | 把需求和 PR 压成 20～40 秒的会议改动口径 | “只说问题、原逻辑和这次怎么解决。” |
-| [clarify-before-action](clarify-before-action/) | 复杂任务开始前先只读调查并澄清背景、需求、痛点和验收标准 | “先别动手，一次问我一个问题，确认后再做。” |
-| [dating-chat-coach](dating-chat-coach/) | 相亲或线上认识后的接话、转微信、邀约与安全判断 | “她这么回，我该怎么接？” |
-| [deep-research](deep-research/) | 用历史演化、横向对比和事实核查系统研究陌生对象 | “研究它怎么走到今天、和替代品差在哪、未来可能怎么变。” |
-| [diagnose-and-explain](diagnose-and-explain/) | 用证据和可证伪假设诊断技术、业务、产品、流程与数据问题，并给小白讲清根因 | “先只读查根因，把我当小白讲明白，修复前问我。” |
-| [explain-to-master](explain-to-master/) | 用双层解释、范例反拆、具体 Case 和迁移测试真正弄懂一个主题 | “先讲白话和专业两层，再让我用新 Case 验证。” |
-| [fable-writer](fable-writer/) | 用精炼寓言解释抽象概念，并附理解检验 | “用寓言讲明白沉没成本。” |
-| [first-principles-adversarial-review](first-principles-adversarial-review/) | 用第一性原理重构问题，再主动寻找反证、遗漏和错误事实源 | “别顺着我的方案，先从机制和反证审查一遍。” |
-| [kakarot-repurposer](kakarot-repurposer/) | 从同一内容母稿派生小红书、抖音和B站版本 | “把这篇一稿多平台。” |
-| [human-writing](kakarot-human-writing/) | 写有材料、有判断、有自然中文节奏的通用正文 | “把这些笔记写成一篇有活人感的长文。” |
-| [kakarot-writer](kakarot-writer/) | 先检查材料与 AI 价值，再按 Kakarot 的个人风格完整交付长文 | “帮我按自己的风格写篇文章。” |
-| [leader](leader/) | 把一句想法拆成 agent 能独立执行的目标任务书 | “把这个想法拆成可执行 brief。” |
-| [life-designer](life-designer/) | 用人生设计方法生成三套五年奥德赛计划 | “我想转行，帮我系统梳理。” |
-| [peer-pr-review](peer-pr-review/) | 对抗式审查代码改动，并用一个具体 Case 走通改动前后的真实链路 | “我不懂这块代码，用一个 Case 带我走完再告诉我怎么改。” |
-| [project-aware-coding](project-aware-coding/) | 写代码前参考项目已有逻辑、设计与历史经验，再做贴合真实消费者的最小实现 | “参考项目现有写法帮我实现这个需求，别重复踩坑。” |
-| [review-handoff](review-handoff/) | 生成可直接发给同事、必要时包含具体 Case 走读的 Markdown Review 交接说明 | “把我的 PR 整理成一份 MD，并用一个 Case 讲清链路。” |
-| [resume-optimizer](resume-optimizer/) | 从零撰写、优化或评审程序员简历 | “以面试官视角评审这份简历。” |
-| [steelman-before-answer](steelman-before-answer/) | 后台钢人正反双方，重要取舍时自动展示三段白话并只问一个问题 | “后台多想一层，有必要权衡时讲人话问我。” |
-| [storage-analyzer](storage-analyzer/) | 只读扫描磁盘并生成分级清理报告 | “电脑空间不够，帮我看看谁占满了。” |
-| [system-structure-diagram](system-structure-diagram-skill/) | 按参考图样式和真实项目模块生成结构图 | “按这张图的样式画项目结构图。” |
-| [wechat-publisher](wechat-publisher/) | 隔离公开正文与交付附录，检查图片和外链后存入公众号草稿箱 | “把这篇发到公众号草稿箱。” |
+| [ai-hot-picker](ai-hot-picker/) | Selects creation-worthy topics from today's AI news | “What AI topic should I write about today?” |
+| [aihot](aihot/) | Retrieves the latest AI briefings, releases, papers, and industry news | “What happened in AI today?” |
+| [change-meeting-brief](change-meeting-brief/) | Compresses a requirement or PR into a 20–40 second change briefing | “Only cover the problem, the old behavior, and the fix.” |
+| [clarify-before-action](clarify-before-action/) | Investigates and clarifies context, requirements, pain points, and acceptance criteria before complex work starts | “Do not change anything yet. Ask one question at a time, then act after I confirm.” |
+| [dating-chat-coach](dating-chat-coach/) | Helps with replies, moving to WeChat, invitations, and safety when dating or meeting someone online | “She replied with this. What should I say next?” |
+| [deep-research](deep-research/) | Studies an unfamiliar subject through historical development, comparison, and fact-checking | “Research how it got here, how it differs from alternatives, and where it may go next.” |
+| [diagnose-and-explain](diagnose-and-explain/) | Diagnoses technical, business, product, process, and data problems with evidence and falsifiable hypotheses, then explains the root cause clearly | “Investigate the root cause read-only, explain it to a beginner, and ask before fixing it.” |
+| [explain-to-master](explain-to-master/) | Builds real understanding through two-layer explanations, reverse-engineered examples, concrete cases, and transfer tests | “Explain it in plain and technical language, then test me with a new case.” |
+| [fable-writer](fable-writer/) | Explains an abstract concept through a concise fable and a comprehension check | “Explain sunk cost with a fable.” |
+| [first-principles-adversarial-review](first-principles-adversarial-review/) | Reconstructs a problem from first principles and actively searches for counterevidence, omissions, and incorrect sources of truth | “Do not accept my plan at face value. Review the mechanism and counterevidence first.” |
+| [kakarot-repurposer](kakarot-repurposer/) | Adapts one source article for Xiaohongshu, Douyin, and Bilibili | “Repurpose this article for multiple platforms.” |
+| [human-writing](kakarot-human-writing/) | Writes grounded prose with clear judgment and a natural Chinese rhythm | “Turn these notes into a well-supported article that sounds human.” |
+| [kakarot-writer](kakarot-writer/) | Checks sources and AI relevance, then delivers a complete long-form article in Kakarot's personal style | “Write an article in my own style.” |
+| [leader](leader/) | Turns a one-line idea into an independently executable task brief for an agent | “Turn this idea into an actionable brief.” |
+| [life-designer](life-designer/) | Produces three five-year Odyssey Plans with life-design methods | “I am considering a career change. Help me work through it systematically.” |
+| [peer-pr-review](peer-pr-review/) | Adversarially reviews code changes and walks through the real before-and-after path with one concrete case | “I do not know this code. Walk me through one case, then tell me what should change.” |
+| [project-aware-coding](project-aware-coding/) | Studies existing project logic, design, and history before implementing the smallest change that fits real consumers | “Implement this using the project's existing patterns without repeating old mistakes.” |
+| [review-handoff](review-handoff/) | Creates a Markdown review handoff that can be sent directly to a colleague, with a concrete walkthrough when needed | “Turn my PR into a Markdown handoff and explain the path with one case.” |
+| [resume-optimizer](resume-optimizer/) | Writes, improves, or reviews a software engineer's résumé | “Review this résumé as a technical interviewer.” |
+| [steelman-before-answer](steelman-before-answer/) | Steelmans both sides in the background, then presents a three-part plain-language trade-off and asks one question only when a meaningful choice exists | “Think one level deeper in the background and explain any real trade-off plainly.” |
+| [storage-analyzer](storage-analyzer/) | Scans disk usage read-only and produces a tiered cleanup report | “My computer is running out of space. Show me what is using it.” |
+| [system-structure-diagram](system-structure-diagram-skill/) | Generates a system structure diagram from a visual reference and real project modules | “Draw the project structure in the style of this image.” |
+| [wechat-publisher](wechat-publisher/) | Separates public copy from delivery notes, validates images and links, then saves an article to WeChat Official Account drafts | “Save this article to my WeChat Official Account drafts.” |
 
-## 安装
+## Installation
 
-安装全部 skills：
+Install all skills:
 
 ```bash
 npx skills add Zhangs-11/zs-skills
 ```
 
-只安装一个：
+Install one skill:
 
 ```bash
 npx skills add Zhangs-11/zs-skills --skill aihot
 ```
 
-查看仓库中可发现的名称：
+List the names discoverable in this repository:
 
 ```bash
 npx skills add Zhangs-11/zs-skills --list
 ```
 
-安装后重新启动或新开一次 Claude Code / Codex 会话，让工具重新发现 skills。
+Restart Claude Code or Codex, or open a new session, after installation so the tool discovers the skills again.
 
-## 前置条件与风险边界
+## Requirements and safety boundaries
 
-- [ ] 已安装 Node.js 与 `npx`：运行 `node --version && npx --version` 验证。
-- [ ] 使用 `kakarot-writer` 时同时安装 `human-writing`；如需真实素材或 AI 主视觉的双尺寸封面，再安装 `guizang-social-card-skill`。
-- [ ] `system-structure-diagram` 导出 PNG 时需要浏览器或 SVG 转换工具；仅生成 SVG 时不需要 Inkscape。
-- [ ] `wechat-publisher` 需要 Python 3.12+、微信公众号 AppID/AppSecret，以及已配置的 IP 白名单；写入草稿箱前会先做只读预检。
-- [ ] `storage-analyzer` 的扫描阶段只读；任何删除都必须由用户单独确认，报告中的可释放空间是估算值。
-- [ ] `aihot` 与 `ai-hot-picker` 会访问 AI HOT 的公开接口，不需要 API Key，但需要网络。
-- [ ] `dating-chat-coach` 提供沟通建议而非操控话术；遇到诈骗或线下见面风险时以安全为先。
-- [ ] `peer-pr-review` 需要能读取目标 PR、Git 工作区或 worktree，`review-handoff` 需要能读取 PR 或对应仓库；二者默认不会评论、通过、合并、commit 或 push，也不会把当前 `main` 冒充成某环境已部署版本。
-- [ ] `project-aware-coding` 需要能读取目标仓库及其项目说明；它会参考现有代码和历史经验但不会机械照搬，也不会在没有当前授权时 commit、push 或部署。
-- [ ] `clarify-before-action` 与 `diagnose-and-explain` 可以自主只读调查；实现、修复、写数据及其他外部变更必须在说明范围后获得明确确认。
-- [ ] `steelman-before-answer` 默认不增加澄清回合；只有存在会实质改变结果的用户选择时才提问。若要稳定覆盖 Codex 与 Claude Code，需要分别在全局 `AGENTS.md` 和 `CLAUDE.md` 加入后台入口。
+- [ ] Install Node.js and `npx`; verify them with `node --version && npx --version`.
+- [ ] Install `human-writing` with `kakarot-writer`. For real source material or AI key art in two cover sizes, also install `guizang-social-card-skill`.
+- [ ] Exporting a PNG with `system-structure-diagram` requires a browser or SVG conversion tool. Generating SVG alone does not require Inkscape.
+- [ ] `wechat-publisher` requires Python 3.12+, a WeChat Official Account AppID and AppSecret, and an allowed IP address. It performs a read-only preflight before writing a draft.
+- [ ] `storage-analyzer` scans read-only. Every deletion requires separate user confirmation, and the reclaimable-space estimate is approximate.
+- [ ] `aihot` and `ai-hot-picker` access AI HOT's public API. They require a network connection but no API key.
+- [ ] `dating-chat-coach` provides communication guidance rather than manipulation scripts. Safety takes priority when fraud or in-person meeting risks appear.
+- [ ] `peer-pr-review` needs read access to the target PR, Git workspace, or worktree. `review-handoff` needs access to the PR or repository. Neither comments, approves, merges, commits, or pushes by default, and neither presents the current `main` branch as proof of a deployed environment.
+- [ ] `project-aware-coding` needs read access to the target repository and project instructions. It studies existing code and history without copying them mechanically, and never commits, pushes, or deploys without current authorization.
+- [ ] `clarify-before-action` and `diagnose-and-explain` may investigate read-only on their own. Implementation, repairs, data writes, and other external changes require explicit confirmation after the scope is explained.
+- [ ] `steelman-before-answer` does not add a clarification round by default. It asks only when a user choice would materially change the result. To apply it consistently in both Codex and Claude Code, add its background entry point to the global `AGENTS.md` and `CLAUDE.md` respectively.
 
-其余纯提示词 skills 无额外依赖。每个目录的 README 会列出更具体的输入、输出和限制。
+The remaining prompt-only skills have no additional dependencies. Each directory's README lists more specific inputs, outputs, and limitations.
 
-## 仓库自动质检
+## Automated repository checks
 
-每次推送到 `main`、创建 PR 或手动触发工作流时，GitHub Actions 会检查所有 Skill 的 frontmatter、目录名与 Skill 名称、`agents/openai.yaml`、评测 JSON、本地 Markdown 链接，以及 Git 中受跟踪的高置信凭据和危险凭据文件。
+On every push to `main`, pull request, and manual workflow run, GitHub Actions validates skill frontmatter, directory and skill names, `agents/openai.yaml`, evaluation JSON, local Markdown links, tracked high-confidence credentials, and dangerous credential files.
 
-本地运行同一套检查：
+Run the same checks locally:
 
 ```bash
 python3 -m pip install -r scripts/requirements-ci.txt
 python3 scripts/validate_repo.py
 ```
 
-扫描只读取 Git 已跟踪内容，不执行各 Skill 自带脚本，也不会把文件上传到第三方扫描服务。凭据命中只显示文件与行号，不回显疑似秘密本身。
+The scanner reads only Git-tracked content. It does not execute scripts bundled with individual skills or upload files to a third-party scanning service. Credential findings show only the file and line number, never the suspected secret itself.
 
-## 推荐工作流
+## Recommended workflows
 
-内容生产可以串起来使用：
-
-```text
-ai-hot-picker 选题
-        ↓
-kakarot-writer 确定作者位置与材料，通过 AI 价值门槛
-        ↓
-human-writing 生成自然、可靠的正文
-        ↓
-kakarot-writer 完成个人复核、标题、配图与封面
-        ↓
-作者修改后，可比较实际初稿与终稿，生成待确认的个人偏好候选
-        ↓
-同一篇内容母稿发布到公众号，并同步知乎、博客、掘金、B站专栏
-        ↓
-kakarot-repurposer 按需派生小红书、抖音与B站视频版本
-        ↓
-wechat-publisher 在明确要求发布时保存公众号草稿
-```
-
-学习与执行也可以组合：看完分析仍似懂非懂时，先让 `explain-to-master` 用一个具体 Case 建立体感，再通过一次一个问题的追问和复述形成可靠理解；需要执行时，再让 `leader` 把目标拆成可验收任务书。
-
-系统研究产品、公司、人物、技术或行业时，使用 `deep-research` 沿关键历史转折和真实替代品两条轴建立框架，再把关键说法拆成事实、推断和价值判断核验；简单事实查询和当天资讯不走完整研究流程。
-
-`steelman-before-answer` 是所有新任务的后台审查入口：内部钢人正反双方并寻找关键变量，普通任务只展示结果；存在两个真正可行、必须由用户取舍且代价明显不同的方向时，自动展示“我的判断 / 两个方向的差别 / 只需要你确认”三段白话。实质性任务随后由 `first-principles-adversarial-review` 提供推理底盘，再交给需求澄清、诊断、Review、编码或写作等领域 Skill 完成具体工作。
-
-需求与问题处理可以这样分流：
+A content-production workflow can combine several skills:
 
 ```text
-准备做新需求或复杂任务
+ai-hot-picker selects a topic
         ↓
-clarify-before-action 先调查并澄清背景、需求、痛点、范围与验收标准
+kakarot-writer establishes the author's position and sources, then passes the AI-value gate
         ↓
-用户确认后再实现
-
-已经出现异常，想知道为什么
+human-writing produces natural, reliable prose
         ↓
-diagnose-and-explain 用事实源、对照和可证伪假设定位根因并讲明白
+kakarot-writer completes personal review, titles, images, and covers
         ↓
-用户确认后再修复
+after author edits, compare the real draft and final copy to propose personal preference candidates for confirmation
+        ↓
+publish the same source article to WeChat, Zhihu, blogs, Juejin, and Bilibili columns
+        ↓
+kakarot-repurposer optionally adapts it for Xiaohongshu, Douyin, and Bilibili video
+        ↓
+wechat-publisher saves a WeChat draft only after an explicit publishing request
 ```
 
-代码评审协作可以串起来使用：
+Learning and execution can also work together. If an explanation still feels vague, use `explain-to-master` to build intuition with one concrete case, then solidify understanding through one-question-at-a-time prompting and teach-back. When it is time to execute, use `leader` to turn the goal into an acceptance-ready task brief.
+
+For systematic research into a product, company, person, technology, or industry, use `deep-research` to build a framework around historical turning points and real alternatives, then separate key claims into facts, inferences, and value judgments. Simple fact lookups and today's news do not require the full research workflow.
+
+`steelman-before-answer` is the background review entry point for every new task. It internally strengthens both sides and looks for key variables. Ordinary tasks show only the result. When two fact-checked directions remain viable, require a user choice, and have meaningfully different costs, it presents **My judgment / How the two directions differ / What I need you to confirm** in plain language. Substantive tasks then use `first-principles-adversarial-review` as their reasoning foundation before routing to requirement clarification, diagnosis, review, implementation, or writing skills.
+
+Requirements and incidents follow separate paths:
 
 ```text
-peer-pr-review 审查同事 PR 或自己的本地/worktree 改动，用新手白话和一个具体 Case 走通改动前/后链路
+Preparing a new feature or complex task
         ↓
-review-handoff 把你自己的 PR 整理成可直接转发、必要时附具体 Case 的 Markdown
+clarify-before-action investigates and clarifies context, requirements, pain points, scope, and acceptance criteria
         ↓
-change-meeting-brief 从需求、PR 或 Review 文档压出 20～40 秒会议口径
+implementation begins after user confirmation
+
+An issue already exists and the cause is unknown
+        ↓
+diagnose-and-explain locates and explains the root cause with sources, controls, and falsifiable hypotheses
+        ↓
+repairs begin after user confirmation
 ```
 
-## 仓库结构
+Code-review collaboration can combine these skills:
 
-每个一级子目录是一项独立 skill：
+```text
+peer-pr-review examines a colleague's PR or local/worktree changes and walks through the before-and-after path with beginner-friendly language and one concrete case
+        ↓
+review-handoff turns your own PR into a directly shareable Markdown handoff, adding a concrete walkthrough when needed
+        ↓
+change-meeting-brief compresses the requirement, PR, or review document into a 20–40 second meeting update
+```
+
+## Repository structure
+
+Each top-level directory is an independent skill:
 
 ```text
 <skill-name>/
-├── SKILL.md       # 触发描述与执行说明
-├── README.md      # 面向使用者的安装和使用说明
-├── scripts/       # 可选：确定性脚本
-├── references/    # 可选：按需读取的参考资料
-└── assets/        # 可选：模板和静态资源
+├── SKILL.md       # Trigger description and execution instructions
+├── README.md      # Installation and usage documentation for people
+├── scripts/       # Optional deterministic scripts
+├── references/    # Optional references loaded on demand
+└── assets/        # Optional templates and static resources
 ```
 
 ## Troubleshooting
 
-| 问题 | 原因 | 解决方法 |
+| Problem | Cause | Fix |
 |---|---|---|
-| `No valid skills found` | `SKILL.md` frontmatter 无效，或仓库路径错误 | 先运行 `npx skills add Zhangs-11/zs-skills --list`，确认目标名称存在 |
-| 安装后没有触发 | 当前会话尚未刷新 skill 清单，或提示过于模糊 | 新开会话，并使用表格中的自然语言示例重试 |
-| 只想装一个 skill | 默认命令会进入多选或安装多个 | 增加 `--skill <name>`，名称以 `--list` 输出为准 |
-| 脚本提示路径不存在 | skill 被安装到了不同 agent 的目录 | 优先从当前 skill 根目录解析脚本；必要时重新安装到当前 agent |
-| 微信发布失败 `40164` | 当前公网 IP 未加入公众号白名单 | 在微信公众平台添加报错中的 IP，再重新执行预检与发布 |
+| `No valid skills found` | Invalid `SKILL.md` frontmatter or an incorrect repository path | Run `npx skills add Zhangs-11/zs-skills --list` and verify that the target name exists |
+| A skill does not trigger after installation | The current session has not refreshed the skill list, or the prompt is too vague | Open a new session and retry with a natural-language example from the table |
+| Only one skill should be installed | The default command opens multi-select or installs several skills | Add `--skill <name>`, using the exact name shown by `--list` |
+| A script reports a missing path | The skill was installed under a different agent's directory | Resolve scripts from the current skill root first; reinstall for the current agent if necessary |
+| WeChat publishing fails with `40164` | The current public IP is not on the Official Account allowlist | Add the IP shown in the error to the WeChat Official Account platform, then rerun the preflight and publish |
 
 ## License
 
-MIT。详见 [LICENSE](LICENSE)。
+MIT. See [LICENSE](LICENSE).
