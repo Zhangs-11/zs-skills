@@ -15,6 +15,18 @@ class DeliveryContractTests(unittest.TestCase):
         self.assertIn(footer, delivery)
         self.assertNotIn("投稿或爆料", delivery)
 
+    def test_emphasis_preserves_text_and_is_conditional(self) -> None:
+        delivery = (
+            Path(__file__).resolve().parents[1] / "references" / "delivery.md"
+        ).read_text(encoding="utf-8")
+        for requirement in (
+            "可选择复制的原生文字", "具体元素的行内 style",
+            "颜色不能成为唯一", "没有重点材料的文章不增加区块",
+            "去样式检查", "未进后台只报告本地预览结果",
+        ):
+            with self.subTest(requirement=requirement):
+                self.assertIn(requirement, delivery)
+
 
 if __name__ == "__main__":
     unittest.main()
