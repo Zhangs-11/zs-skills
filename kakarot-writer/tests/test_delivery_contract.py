@@ -27,6 +27,18 @@ class DeliveryContractTests(unittest.TestCase):
             with self.subTest(requirement=requirement):
                 self.assertIn(requirement, delivery)
 
+    def test_delivery_links_require_actual_access_verification(self) -> None:
+        delivery = (
+            Path(__file__).resolve().parents[1] / "references" / "delivery.md"
+        ).read_text(encoding="utf-8")
+        for requirement in (
+            "逐个验证最终发给用户的链接", "状态及响应内容",
+            "引用图片是否加载", "无法验证用户端访问时明确说明限制",
+            "依赖服务持续运行", "不能靠关闭安全边界",
+        ):
+            with self.subTest(requirement=requirement):
+                self.assertIn(requirement, delivery)
+
 
 if __name__ == "__main__":
     unittest.main()
