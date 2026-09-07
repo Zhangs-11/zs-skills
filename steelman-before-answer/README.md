@@ -61,7 +61,7 @@ ln -s /path/to/zs-skills/steelman-before-answer ~/.claude/skills/steelman-before
 在 Codex 的全局 `AGENTS.md` 和 Claude Code 的全局 `CLAUDE.md` 中加入：
 
 ```markdown
-每个新任务先使用 `$steelman-before-answer` 在后台完成正反钢人和关键变量审查。无需用户选择时直接回答或执行；普通缺口只问一个原子问题；存在两个真正可行且代价明显不同的方向时，自动展示“我的判断 / 两个方向的差别 / 只需要你确认”三段白话，不依赖用户输入触发口令。
+任务目标或方案存在实质歧义、竞争解释或重要取舍时，使用 `$steelman-before-answer`；明确的简单任务直接核对相关事实并执行。需要用户决定时只问一个关键问题，回答后继续原任务。
 ```
 
 ## 默认可见内容
@@ -75,20 +75,20 @@ ln -s /path/to/zs-skills/steelman-before-answer ~/.claude/skills/steelman-before
 | 两个可行方向且选错代价明显 | 自动三段白话版，控制在一屏内 |
 | 分歧来自尚未取得但可低成本验证的事实 | 给出可逆最小实验、观察指标和继续/停止阈值 |
 
-后台审查不会消失，只是不再把内部过程变成阅读负担。
+简单任务不加载完整审查流程；复杂取舍的内部过程也不变成固定输出。
 
 ## 你可以这样说
 
 - “这个方案靠谱不？”
 - “帮我找一下真正根因。”
-- “直接修改这个文件。”
+- “我给的修改方案有没有更简单的替代？”
 - “这两个方案应该选哪个？”
 
 ## 前置条件
 
 - [ ] 使用支持 Agent Skills 的 Codex、Claude Code 或其他兼容工具。
 - [ ] 安装后新开会话，让工具重新发现 Skill。
-- [ ] 若要稳定覆盖全部任务，在对应全局规则文件中加入上面的入口。
+- [ ] 如需全局路由，在对应规则文件中加入上面的条件入口。
 - [ ] 实质性判断建议同时安装 `first-principles-adversarial-review`；代码 Review 建议同时安装 `peer-pr-review`。
 
 本 Skill 没有 Python、Node.js、账号或外部 API 依赖。

@@ -18,13 +18,13 @@ npx skills add Zhangs-11/zs-skills --list
 
 ## 全局双向钢人入口
 
-每个新的任务型用户消息先使用 `steelman-before-answer`，在后台重述真正问题、钢人支持方和反对方并寻找关键变量。无需用户选择时直接回答或执行；普通信息缺口只问一个原子问题；存在两个事实核验后仍可行的方向、必须由用户取舍且选错代价明显时，自动展示“我的判断 / 两个方向的差别 / 只需要你确认”三段白话并控制在一屏内。用户回答后继续原任务，不重新审问。
+任务目标或方案存在实质歧义、竞争解释或重要取舍时，使用 `steelman-before-answer`。明确的简单任务直接核对相关事实并执行；需要用户决定时每次只问一个关键问题，回答后继续原任务。
 
-这项 Skill 是交互入口，不代替领域 Skill。实质性判断继续使用 `first-principles-adversarial-review`；需求澄清、问题诊断、代码 Review 和实现分别交给对应 Skill。
+这项 Skill 是交互入口，不代替领域 Skill。需要机制推导与反证时使用 `first-principles-adversarial-review`；需求澄清、问题诊断、代码 Review 和实现分别交给对应 Skill。
 
 ## 默认推理与核验
 
-需求、设计、诊断、评审、建议和修改等实质性任务，优先使用 `first-principles-adversarial-review` 作为底层推理与核验 Skill。它先区分真实目标、事实、约束和未经验证的假设，再追踪生产者、消费者、上下游与替代方案，并主动寻找能推翻初步结论的证据。
+需求设计、根因诊断、复杂实现或关键事实争议需要机制推导与反证时，使用 `first-principles-adversarial-review`；简单查询、忠实摘要和不改变行为的局部修订只核对直接相关材料。它先区分真实目标、事实、约束和未经验证的假设，再追踪生产者、消费者、上下游与替代方案，并主动寻找能推翻初步结论的证据。
 
 这项 Skill 可以与仓库内其他领域 Skill 叠加：例如 `peer-pr-review` 负责 CodeUp PR 的具体审查流程，`first-principles-adversarial-review` 负责避免顺着 PR 描述接受未经验证的根因。纯翻译、忠实转写、机械格式转换和无判断的一步操作不需要加载。
 
