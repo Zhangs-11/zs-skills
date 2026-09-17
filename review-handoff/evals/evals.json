@@ -3,7 +3,7 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "我要把这个需求给同事 review。背景：FA 模型选择要展示选择理由；PR 是 https://codeup.example.com/goalfy-core/change/18。帮我生成 MD，放在仓库已有的 review-docs 里。",
+      "prompt": "我要把这个需求给同事 review。背景：FA 模型选择要展示选择理由；PR 是 https://codeup.example.com/task-service/change/18。帮我生成 MD，放在仓库已有的 review-docs 里。",
       "expected_output": "创建不覆盖既有文件的 Markdown；顶部列仓库和 PR，正文包含背景、问题、根因、改前改后、验证和 2 至 4 个审查重点。",
       "files": []
     },
@@ -27,7 +27,7 @@
     },
     {
       "id": 5,
-      "prompt": "帮我生成一个简略的 review 内容概要，直接发群里：\\n```diff\\n- 任务：T-2878\\n- 需求：D-2373\\n- PR：GoalfyMax CodeUp #428 (https://codeup.example.com/goalfymax/change/428\\n```\\n)\\n- 验收项目：899082222\\n- 源分支：fix/T2878-agent-plan-and-fa-cost/main",
+      "prompt": "帮我生成一个简略的 review 内容概要，直接发群里：\\n```diff\\n- 任务：T-2878\\n- 需求：D-2373\\n- PR：task-service CodeUp #428 (https://codeup.example.com/task-service/change/428\\n```\\n)\\n- 验收项目：899082222\\n- 源分支：fix/T2878-agent-plan-and-fa-cost/main",
       "expected_output": "先归一化代码块、断行和多余括号，再核对 PR 与真实 diff；直接在当前对话输出短版，不创建文件，也不添加 Review 概要或其他标题。输出从任务、需求、可点击 PR、验收项目和源分支开始，正文用约 150 至 300 个汉字说明问题或动机、核心改动与 1 至 2 个 Review 重点；没有证据的改动和验证结果不编造。",
       "files": []
     },
@@ -39,7 +39,7 @@
     },
     {
       "id": 7,
-      "prompt": "这次改了 GoalfyMax 和 GoalfyHub 两个项目，各有一个 PR、验收项目和源分支。根据这组 PR 生成简略概要，直接回复，不生成文件。",
+      "prompt": "这次改了 task-service 和 order-service 两个项目，各有一个 PR、验收项目和源分支。根据这组 PR 生成简略概要，直接回复，不生成文件。",
       "expected_output": "选择简略概要模式；按项目分组，每个项目分别对应正确的 PR、验收 project ID 和源分支，正文只保留一份本次改动概要，并说明各项目分别承担的修改及跨项目 Review 重点；不使用‘这个 PR’这种单 PR 表述。",
       "files": []
     }

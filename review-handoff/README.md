@@ -35,7 +35,7 @@ npx skills add Zhangs-11/zs-skills --skill review-handoff
 ```markdown
 - 任务：`T-2878`
 - 需求：`D-2373`
-- PR：[GoalfyMax CodeUp #428](https://codeup.example.com/...)
+- PR：[task-service CodeUp #428](https://codeup.example.com/...)
 - 验收项目：`899082222`
 - 源分支：`fix/T2878-agent-plan-and-fa-cost/main`
 
@@ -49,7 +49,7 @@ npx skills add Zhangs-11/zs-skills --skill review-handoff
 ```markdown
 | 仓库 | PR |
 |---|---|
-| `goalfy-core` | [CodeUp PR](https://codeup.example.com/...) |
+| `task-service` | [CodeUp PR](https://codeup.example.com/...) |
 ```
 
 ## 前置条件
