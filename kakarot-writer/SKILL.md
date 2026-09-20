@@ -2,7 +2,7 @@
 name: kakarot-writer
 description: 用户要求写文章、按我的风格写、改稿或图解文章时使用；为 Kakarot 制作公众号与跨平台母稿，含按需图解、标题与封面。只要标题或摘要时不生成全文。
 metadata:
-  compatibility: 需要 human-writing 和 bigpeng-hot-gzh；完整封面优先使用 guizang-social-card-skill。
+  compatibility: 需要 human-writing 和 bigpeng-hot-gzh；完整封面优先使用 baoyu-cover-image 的叙事插画方法，并分别编排 21:9 与 1:1。
 ---
 
 # Kakarot 长文总调度
@@ -147,7 +147,7 @@ Kakarot 的稳定身份是：持续探索 AI、愿意亲自尝试、关心普通
 - 解释关系、流程、责任交接或对比时，按 visual-storytelling.md 制作可编辑、可核对的图；不受氛围图的一至两张建议限制。
 - 抽象主题的无字主视觉按需使用，一篇通常不超过一至两张；它不能代替解释图，也不能充当事实证据。
 
-完整文章默认制作封面。若 `guizang-social-card-skill` 可用，调用它分别制作 `21:9` 主封面和 `1:1` 分享封面。AI 路线默认使用“图像生成工具生成无字、无 Logo、无假 UI 的主题主视觉，再由 HTML/CSS 独立排版两个比例”，不要让图像模型一次性生成带中文标题的成品海报，也不要把横版机械裁成方形。详细选择和回退规则见 `references/delivery.md`。
+完整文章默认制作封面。默认采用 `baoyu-cover-image` 的叙事插画方法，先从文章中提炼一个具体矛盾、人物关系或机制，再生成一张有明确故事动作的主视觉；标题放在画面留白区，使用少量真实关键词辅助识别，避免泛化的 AI 科幻图、孤立 Logo、信息面板和无关装饰。随后分别编排 `21:9` 主封面与 `1:1` 分享封面，不能机械裁切横版。若 `baoyu-cover-image` 不可用，再回退到 `guizang-social-card-skill` 的 Swiss / Editorial 方法；两者都不可用时才使用通用图像生成流程。详细选择和回退规则见 `references/delivery.md`。
 
 ## 第六步：后台终审
 
