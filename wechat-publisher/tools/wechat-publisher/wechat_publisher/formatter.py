@@ -220,17 +220,18 @@ _CODE = (
 )
 
 _PRE = (
-    f"background-color: #1a202c; padding: 18px 20px;"
+    f"background-color: {_BG_SOFT}; padding: 18px 20px;"
+    f"border: 1px solid #d8e2ec; border-left: 4px solid {_ACCENT};"
     f"border-radius: 8px; overflow-x: auto;"
-    f"font-size: 14px; line-height: 1.6;"
-    f"margin: 20px 0;"
+    f"font-size: 14px; line-height: 1.8;"
+    f"margin: 20px 0; color: #1a202c;"
 )
 
 _PRE_CODE = (
-    f"background: transparent; padding: 0;"
-    f"border-radius: 0; color: #e2e8f0;"
+    f"background-color: transparent; padding: 0;"
+    f"border-radius: 0; color: #1a202c;"
     f"font-family: 'SF Mono', Menlo, monospace;"
-    f"font-size: 14px;"
+    f"font-size: 14px; white-space: pre-wrap; word-break: break-word;"
 )
 
 _IMG = (

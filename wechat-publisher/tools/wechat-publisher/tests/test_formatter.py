@@ -69,6 +69,20 @@ class FormatterTests(unittest.TestCase):
         self.assertIn("<th", html)
         self.assertIn("<td", html)
 
+    def test_code_blocks_remain_readable_if_wechat_strips_inner_style(self) -> None:
+        html = markdown_to_wechat_html(
+            "```text\n员工类型 | 请假条件 | 审批人\n```"
+        )
+        soup = BeautifulSoup(html, "html.parser")
+        pre = soup.find("pre")
+        code = pre.find("code")
+
+        self.assertIn("background-color: #f7fafc", pre["style"])
+        self.assertIn("color: #1a202c", pre["style"])
+        self.assertIn("color: #1a202c", code["style"])
+        self.assertIn("white-space: pre-wrap", code["style"])
+        self.assertIn("word-break: break-word", code["style"])
+
 
 if __name__ == "__main__":
     unittest.main()
