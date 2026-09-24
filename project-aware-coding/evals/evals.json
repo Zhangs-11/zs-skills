@@ -42,6 +42,12 @@
       "prompt": "修复 S3 endpoint 重复 bucket。S3Config.Endpoint 同时给默认文件 client 和 Skill client 使用，两个构造器分别传 Bucket 和 SkillBucket。请实现并按完整流程交付，默认 bucket 的测试已经通过。",
       "expected_output": "不能用默认 bucket 测试直接交付；应枚举 NewS3Service、NewSkillS3Service 和所有 NewS3ServiceWithBucket 生产调用方，区分 Endpoint 归属的默认 Bucket 与当前 client bucket。至少加入默认 bucket、不同 SkillBucket、fallback bucket 和配置缺失组合，确认共享 endpoint 规范化后由 SDK 添加实际 client bucket；自审发现默认信息串入 Skill client 时应在原范围内修复、重测并完整复审。",
       "files": []
+    },
+    {
+      "id": 8,
+      "prompt": "给业务流程补一个提醒：任务被取消时发一条 level=warning 的平台提醒事件，前端通知列表会展示。代码写完、单测也过了，按完整流程交付。",
+      "expected_output": "交付前逐条回答自审四问并给出证据：过度设计（逐项试删新增抽象）、逻辑错误（列出任务被取消的全部触发来源，如停服、暂停、卡死重试与用户停止，只在真正停止时发送）、整条链路（没挂实时通道的对象也能收到信号）、已有功能（搜出这类事件的全部现有消费方，包括其他仓库的 SDK 与契约文档，核对 warning 等取值按现有语义会被怎样理解）。发现问题在原授权范围内修复、重测并完整复审；涉及他人负责的代码先确认负责人再决定是否修改。",
+      "files": []
     }
   ]
 }
