@@ -34,6 +34,7 @@ npx skills add Zhangs-11/zs-skills
 | [fable-writer](fable-writer/) | 用精炼寓言解释抽象概念，并附理解检验 | “用寓言讲明白沉没成本。” |
 | [first-principles-adversarial-review](first-principles-adversarial-review/) | 用第一性原理重构问题，再主动寻找反证、遗漏和错误事实源 | “别顺着我的方案，先从机制和反证审查一遍。” |
 | [kakarot-repurposer](kakarot-repurposer/) | 从同一内容母稿派生小红书、抖音和B站版本 | “把这篇一稿多平台。” |
+| [kakarot-visual-explainer](kakarot-visual-explainer/) | 把复杂解释、流程和方案比较整理成一页可读的 HTML | “把这个调用链做成一页 HTML。” |
 | [human-writing](kakarot-human-writing/) | 写有材料、有判断、有自然中文节奏的通用正文 | “把这些笔记写成一篇有活人感的长文。” |
 | [kakarot-writer](kakarot-writer/) | 先检查材料与 AI 价值，再按 Kakarot 的个人风格完整交付长文 | “帮我按自己的风格写篇文章。” |
 | [leader](leader/) | 把一句想法拆成 agent 能独立执行的目标任务书 | “把这个想法拆成可执行 brief。” |

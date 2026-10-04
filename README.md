@@ -34,6 +34,7 @@ npx skills add Zhangs-11/zs-skills
 | [fable-writer](fable-writer/) | Explains an abstract concept through a concise fable and a comprehension check | “Explain sunk cost with a fable.” |
 | [first-principles-adversarial-review](first-principles-adversarial-review/) | Reconstructs a problem from first principles and actively searches for counterevidence, omissions, and incorrect sources of truth | “Do not accept my plan at face value. Review the mechanism and counterevidence first.” |
 | [kakarot-repurposer](kakarot-repurposer/) | Adapts one source article for Xiaohongshu, Douyin, and Bilibili | “Repurpose this article for multiple platforms.” |
+| [kakarot-visual-explainer](kakarot-visual-explainer/) | Turns complex explanations, flows, and comparisons into readable one-page HTML | “Turn this call chain into one HTML page.” |
 | [human-writing](kakarot-human-writing/) | Writes grounded prose with clear judgment and a natural Chinese rhythm | “Turn these notes into a well-supported article that sounds human.” |
 | [kakarot-writer](kakarot-writer/) | Checks sources and AI relevance, then delivers a complete long-form article in Kakarot's personal style | “Write an article in my own style.” |
 | [leader](leader/) | Turns a one-line idea into an independently executable task brief for an agent | “Turn this idea into an actionable brief.” |
