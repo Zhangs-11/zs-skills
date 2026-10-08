@@ -2,7 +2,7 @@
 
 [English](README.md) | [简体中文](README.zh-CN.md)
 
-> 先把问题的正反双方想完整，再写公众号、追 AI 热点、诊断问题、审代码、开会上汇报、画结构图……不用为每种工作流重新教 AI 一遍。
+> 先把问题的正反双方想完整，再写公众号、追 AI 热点、诊断问题、审代码、开会上汇报、画结构图、制作幼儿园教案与课件……不用为每种工作流重新教 AI 一遍。
 
 <p align="center">
   <a href="https://github.com/Zhangs-11/zs-skills/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/Zhangs-11/zs-skills?style=for-the-badge&logo=github" /></a>
@@ -19,7 +19,7 @@
 npx skills add Zhangs-11/zs-skills
 ```
 
-## 23 个可安装 skills
+## 25 个可安装 skills
 
 | Skill | 解决什么问题 | 你可以这样说 |
 |---|---|---|
@@ -40,6 +40,7 @@ npx skills add Zhangs-11/zs-skills
 | [leader](leader/) | 把一句想法拆成 agent 能独立执行的目标任务书 | “把这个想法拆成可执行 brief。” |
 | [life-designer](life-designer/) | 用人生设计方法生成三套五年奥德赛计划 | “我想转行，帮我系统梳理。” |
 | [peer-pr-review](peer-pr-review/) | 对抗式审查代码改动，并用一个具体 Case 走通改动前后的真实链路 | “我不懂这块代码，用一个 Case 带我走完再告诉我怎么改。” |
+| [preschool-lesson-kit](preschool-lesson-kit/) | 制作目标清楚的幼儿园Word教案与可爱PPT，过程标题写明活动和目的 | “参考这个教案另选课题，做一套教案和可爱PPT。” |
 | [project-aware-coding](project-aware-coding/) | 写代码前参考项目已有逻辑、设计与历史经验，再做贴合真实消费者的最小实现 | “参考项目现有写法帮我实现这个需求，别重复踩坑。” |
 | [review-handoff](review-handoff/) | 生成可直接发给同事、必要时包含具体 Case 走读的 Markdown Review 交接说明 | “把我的 PR 整理成一份 MD，并用一个 Case 讲清链路。” |
 | [resume-optimizer](resume-optimizer/) | 从零撰写、优化或评审程序员简历 | “以面试官视角评审这份简历。” |
@@ -75,6 +76,7 @@ npx skills add Zhangs-11/zs-skills --list
 - [ ] 已安装 Node.js 与 `npx`：运行 `node --version && npx --version` 验证。
 - [ ] 使用 `kakarot-writer` 时同时安装 `human-writing`；如需真实素材或 AI 主视觉的双尺寸封面，再安装 `guizang-social-card-skill`。
 - [ ] `system-structure-diagram` 导出 PNG 时需要浏览器或 SVG 转换工具；仅生成 SVG 时不需要 Inkscape。
+- [ ] `preschool-lesson-kit` 生成文件需要文档与演示文稿制作及渲染能力；课堂插图使用图像生成工具或经过核查的现有图片。具体输入和依赖见该 Skill 的 README。
 - [ ] `wechat-publisher` 需要 Python 3.12+、微信公众号 AppID/AppSecret，以及已配置的 IP 白名单；写入草稿箱前会先做只读预检。
 - [ ] `storage-analyzer` 的扫描阶段只读；任何删除都必须由用户单独确认，报告中的可释放空间是估算值。
 - [ ] `aihot` 与 `ai-hot-picker` 会访问 AI HOT 的公开接口，不需要 API Key，但需要网络。
@@ -100,6 +102,8 @@ python3 scripts/validate_repo.py
 扫描只读取 Git 已跟踪内容，不执行各 Skill 自带脚本，也不会把文件上传到第三方扫描服务。凭据命中只显示文件与行号，不回显疑似秘密本身。
 
 ## 推荐工作流
+
+制作幼儿园教学材料时，`preschool-lesson-kit` 先读取参考材料，选择或确认课题和班级，再写教学目标与对应活动，随后制作Word教案和可爱PPT。教案标题说明活动方式与目的，幼儿页面保留简短提问，教师讲解放入备注。两份文件逐页渲染检查后交付。
 
 内容生产可以串起来使用：
 

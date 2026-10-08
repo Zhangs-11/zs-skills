@@ -2,7 +2,7 @@
 
 [English](README.md) | [简体中文](README.zh-CN.md)
 
-> Think through the strongest case on both sides before writing a WeChat article, tracking AI news, diagnosing a problem, reviewing code, briefing a meeting, or drawing a system diagram—without teaching the AI each workflow from scratch.
+> Think through the strongest case on both sides before writing a WeChat article, tracking AI news, diagnosing a problem, reviewing code, briefing a meeting, drawing a system diagram, or preparing kindergarten teaching materials—without teaching the AI each workflow from scratch.
 
 <p align="center">
   <a href="https://github.com/Zhangs-11/zs-skills/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/Zhangs-11/zs-skills?style=for-the-badge&logo=github" /></a>
@@ -19,7 +19,7 @@ This repository is a collection of primarily Chinese-language skills for Claude 
 npx skills add Zhangs-11/zs-skills
 ```
 
-## 23 installable skills
+## 25 installable skills
 
 | Skill | What it solves | Example prompt |
 |---|---|---|
@@ -40,6 +40,7 @@ npx skills add Zhangs-11/zs-skills
 | [leader](leader/) | Turns a one-line idea into an independently executable task brief for an agent | “Turn this idea into an actionable brief.” |
 | [life-designer](life-designer/) | Produces three five-year Odyssey Plans with life-design methods | “I am considering a career change. Help me work through it systematically.” |
 | [peer-pr-review](peer-pr-review/) | Adversarially reviews code changes and walks through the real before-and-after path with one concrete case | “I do not know this code. Walk me through one case, then tell me what should change.” |
+| [preschool-lesson-kit](preschool-lesson-kit/) | Creates kindergarten Word lesson plans and cute classroom PPTs with observable goals and clear activity purposes | “Use this reference to create one lesson plan and a cute PPT for a new topic.” |
 | [project-aware-coding](project-aware-coding/) | Studies existing project logic, design, and history before implementing the smallest change that fits real consumers | “Implement this using the project's existing patterns without repeating old mistakes.” |
 | [review-handoff](review-handoff/) | Creates a Markdown review handoff that can be sent directly to a colleague, with a concrete walkthrough when needed | “Turn my PR into a Markdown handoff and explain the path with one case.” |
 | [resume-optimizer](resume-optimizer/) | Writes, improves, or reviews a software engineer's résumé | “Review this résumé as a technical interviewer.” |
@@ -75,6 +76,7 @@ Restart Claude Code or Codex, or open a new session, after installation so the t
 - [ ] Install Node.js and `npx`; verify them with `node --version && npx --version`.
 - [ ] Install `human-writing` with `kakarot-writer`. For real source material or AI key art in two cover sizes, also install `guizang-social-card-skill`.
 - [ ] Exporting a PNG with `system-structure-diagram` requires a browser or SVG conversion tool. Generating SVG alone does not require Inkscape.
+- [ ] `preschool-lesson-kit` needs document and presentation authoring and rendering capabilities for file output, plus image generation or verified images for classroom visuals. Its README explains the inputs and dependencies.
 - [ ] `wechat-publisher` requires Python 3.12+, a WeChat Official Account AppID and AppSecret, and an allowed IP address. It performs a read-only preflight before writing a draft.
 - [ ] `storage-analyzer` scans read-only. Every deletion requires separate user confirmation, and the reclaimable-space estimate is approximate.
 - [ ] `aihot` and `ai-hot-picker` access AI HOT's public API. They require a network connection but no API key.
@@ -100,6 +102,8 @@ python3 scripts/validate_repo.py
 The scanner reads only Git-tracked content. It does not execute scripts bundled with individual skills or upload files to a third-party scanning service. Credential findings show only the file and line number, never the suspected secret itself.
 
 ## Recommended workflows
+
+For kindergarten teaching materials, `preschool-lesson-kit` reads the reference, selects or confirms the topic and age group, writes observable goals and matching activities, then creates a formatted Word lesson plan and a cute PPT. Lesson headings state the activity and its purpose; slides use short prompts with teacher guidance in notes. Both files are rendered and checked before delivery.
 
 A content-production workflow can combine several skills:
 

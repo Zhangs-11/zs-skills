@@ -1,0 +1,4 @@
+interface:
+  display_name: "幼儿园教案与可爱课件"
+  short_description: "制作目标清楚、活动可操作的幼儿园教案，以及适合幼儿观看的可爱PPT。"
+  default_prompt: "使用 $preschool-lesson-kit 参考我提供的材料，制作一套幼儿园教案 Word 和对应的可爱 PPT，重点写清教学目标与每个环节的活动和目的。"
