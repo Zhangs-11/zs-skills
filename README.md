@@ -105,6 +105,8 @@ The scanner reads only Git-tracked content. It does not execute scripts bundled 
 
 For kindergarten teaching materials, `preschool-lesson-kit` reads the reference, selects or confirms the topic and age group, writes observable goals and matching activities, then creates a formatted Word lesson plan and a cute PPT. Lesson headings state the activity and its purpose; slides use short prompts with teacher guidance in notes. Both files are rendered and checked before delivery.
 
+Goals, activities, and evaluation differ by age group. A slide storyboard separates observation, demonstration, hands-on play, and sharing, with checks for visual variety and scientific accuracy.
+
 A content-production workflow can combine several skills:
 
 ```text

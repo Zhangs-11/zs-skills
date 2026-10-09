@@ -33,6 +33,8 @@ npx skills add Zhangs-11/zs-skills --skill preschool-lesson-kit
 
 未另行指定时，Word采用1.5倍行间距，主标题黑体四号加粗居中，章节标题宋体四号加粗顶格，正文宋体小四并首行缩进2字符。小班、中班、大班的目标与任务分别设计，单套材料明确一个班级。
 
+年龄适配会同时调整观察任务、操作步骤、课堂提问和评价。制作课件前先写逐页设计表，按活动拆分材料、示范、操作和分享页面；页数依据课堂需要确定。统一插图风格，并检查构图变化、可编辑文字与每页实际渲染。具体要求见[年龄与活动设计](references/age-and-activity-design.md)和[课件设计与检查](references/slide-storyboard.md)。
+
 ## 前置条件与安装验证
 
 - [ ] 安装[Node.js](https://nodejs.org/)，运行 `node --version` 和 `npx --version` 确认命令可用。
