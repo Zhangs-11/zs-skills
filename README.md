@@ -19,7 +19,7 @@ This repository is a collection of primarily Chinese-language skills for Claude 
 npx skills add Zhangs-11/zs-skills
 ```
 
-## 25 installable skills
+## 26 installable skills
 
 | Skill | What it solves | Example prompt |
 |---|---|---|
@@ -27,6 +27,7 @@ npx skills add Zhangs-11/zs-skills
 | [aihot](aihot/) | Retrieves the latest AI briefings, releases, papers, and industry news | “What happened in AI today?” |
 | [change-meeting-brief](change-meeting-brief/) | Compresses a requirement or PR into a 20–40 second change briefing | “Only cover the problem, the old behavior, and the fix.” |
 | [clarify-before-action](clarify-before-action/) | Investigates and clarifies context, requirements, pain points, and acceptance criteria before complex work starts | “Do not change anything yet. Ask one question at a time, then act after I confirm.” |
+| [coder-style-test](coder-style-test/) | Finds your coding style in the AI era with 20 scenario questions and 16 types | “What kind of programmer am I? Give me the test.” |
 | [dating-chat-coach](dating-chat-coach/) | Helps with replies, moving to WeChat, invitations, and safety when dating or meeting someone online | “She replied with this. What should I say next?” |
 | [deep-research](deep-research/) | Studies an unfamiliar subject through historical development, comparison, and fact-checking | “Research how it got here, how it differs from alternatives, and where it may go next.” |
 | [diagnose-and-explain](diagnose-and-explain/) | Diagnoses technical, business, product, process, and data problems with evidence and falsifiable hypotheses, then explains the root cause clearly | “Investigate the root cause read-only, explain it to a beginner, and ask before fixing it.” |

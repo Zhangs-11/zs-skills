@@ -19,7 +19,7 @@
 npx skills add Zhangs-11/zs-skills
 ```
 
-## 25 个可安装 skills
+## 26 个可安装 skills
 
 | Skill | 解决什么问题 | 你可以这样说 |
 |---|---|---|
@@ -27,6 +27,7 @@ npx skills add Zhangs-11/zs-skills
 | [aihot](aihot/) | 查询最新 AI 日报、发布、论文和行业动态 | “今天 AI 圈有什么大事？” |
 | [change-meeting-brief](change-meeting-brief/) | 把需求和 PR 压成 20～40 秒的会议改动口径 | “只说问题、原逻辑和这次怎么解决。” |
 | [clarify-before-action](clarify-before-action/) | 复杂任务开始前先只读调查并澄清背景、需求、痛点和验收标准 | “先别动手，一次问我一个问题，确认后再做。” |
+| [coder-style-test](coder-style-test/) | 用 20 道情景题测出你在 AI 时代的编程风格，共 16 种类型 | “测测我的编程风格。” |
 | [dating-chat-coach](dating-chat-coach/) | 相亲或线上认识后的接话、转微信、邀约与安全判断 | “她这么回，我该怎么接？” |
 | [deep-research](deep-research/) | 用历史演化、横向对比和事实核查系统研究陌生对象 | “研究它怎么走到今天、和替代品差在哪、未来可能怎么变。” |
 | [diagnose-and-explain](diagnose-and-explain/) | 用证据和可证伪假设诊断技术、业务、产品、流程与数据问题，并给小白讲清根因 | “先只读查根因，把我当小白讲明白，修复前问我。” |
