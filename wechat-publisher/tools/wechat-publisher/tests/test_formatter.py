@@ -2,7 +2,7 @@ import unittest
 
 from bs4 import BeautifulSoup
 
-from wechat_publisher.formatter import markdown_to_wechat_html
+from wechat_publisher.formatter import markdown_to_wechat_html, wechat_html_to_text
 
 
 class FormatterTests(unittest.TestCase):
@@ -82,6 +82,63 @@ class FormatterTests(unittest.TestCase):
         self.assertIn("color: #1a202c", code["style"])
         self.assertIn("white-space: pre-wrap", code["style"])
         self.assertIn("word-break: break-word", code["style"])
+
+    def test_bare_url_line_becomes_its_own_copyable_block(self) -> None:
+        html = markdown_to_wechat_html("REA 官方仓库：\nhttps://github.com/morluto/rea")
+        soup = BeautifulSoup(html, "html.parser")
+        blocks = [s for s in soup.find_all("section") if "monospace" in s.get("style", "")]
+
+        self.assertEqual([b.get_text() for b in blocks], ["https://github.com/morluto/rea"])
+        self.assertIn("word-break: break-all", blocks[0]["style"])
+        self.assertIn("background-color: #f7fafc", blocks[0]["style"])
+        label = blocks[0].find_previous_sibling("section")
+        self.assertEqual(label.get_text(), "REA 官方仓库：")
+        self.assertIsNone(soup.find("p"))
+        self.assertNotIn("参考资料", html)
+
+    def test_consecutive_url_lines_and_labels_keep_their_order(self) -> None:
+        html = markdown_to_wechat_html(
+            "仓库：\nhttps://a.example/x\nhttps://b.example/y\n文档：\nhttps://c.example/z"
+        )
+        soup = BeautifulSoup(html, "html.parser")
+        wrapper = soup.find("section")
+
+        self.assertEqual(
+            [child.get_text() for child in wrapper.children],
+            ["仓库：", "https://a.example/x", "https://b.example/y", "文档：", "https://c.example/z"],
+        )
+
+    def test_url_inside_sentence_or_quote_is_left_inline(self) -> None:
+        html = markdown_to_wechat_html(
+            "访问 https://a.example/x 查看。\n\n> https://b.example/y"
+        )
+        soup = BeautifulSoup(html, "html.parser")
+
+        self.assertFalse([s for s in soup.find_all("section") if "monospace" in s.get("style", "")])
+        self.assertIn("访问 https://a.example/x 查看。", soup.find("p").get_text())
+
+
+    def test_draft_html_reads_back_as_one_block_per_line(self) -> None:
+        html = markdown_to_wechat_html(
+            "开头一段。\n\n## 小节\n\n仓库：\nhttps://a.example/x\n\n"
+            "> 引用一句\n\n- 第一项\n- 第二项\n\n![图](https://mmbiz.qpic.cn/a.png)\n\n"
+            "```bash\nnpx foo --json\n```"
+        )
+
+        self.assertEqual(
+            wechat_html_to_text(html).split("\n\n"),
+            [
+                "开头一段。",
+                "## 🔹  小节",
+                "仓库：",
+                "https://a.example/x",
+                "> 引用一句",
+                "第一项",
+                "第二项",
+                "![](https://mmbiz.qpic.cn/a.png)",
+                "npx foo --json\n",
+            ],
+        )
 
 
 if __name__ == "__main__":

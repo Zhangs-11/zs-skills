@@ -8,7 +8,7 @@ from urllib.parse import urlparse
 
 from .client import WeChatAPIError, WeChatClient
 from .config import Settings
-from .formatter import markdown_to_wechat_html
+from .formatter import markdown_to_wechat_html, wechat_html_to_text
 from .image import AssetProcessingError, prepare_markdown_assets
 from .linkcheck import check_external_links
 from .publication import publication_contract_findings, split_publication_document
@@ -39,6 +39,17 @@ def main() -> None:
     # --- upload-cover ---
     cover = sub.add_parser("upload-cover", help="Upload a cover image and get media_id")
     cover.add_argument("file", help="Path to the cover image file")
+
+    # --- get ---
+    get = sub.add_parser(
+        "get",
+        help="Save an existing draft's current HTML and readable text for comparison",
+    )
+    get.add_argument("--media-id", "-m", required=True)
+    get.add_argument(
+        "--out", "-o", required=True,
+        help="HTML output path; readable text is saved next to it with a .txt suffix",
+    )
 
     # --- preflight ---
     preflight = sub.add_parser("preflight", help="Validate an article without uploading it")
@@ -113,6 +124,18 @@ async def _dispatch(args: argparse.Namespace) -> None:
     if cmd == "upload-image":
         result = await client.upload_image(args.file)
         print(f"SUCCESS: Image uploaded → {result.url}")
+        return
+
+    if cmd == "get":
+        item = await client.get_draft(args.media_id)
+        out = Path(args.out)
+        out.write_text(item["content"], encoding="utf-8")
+        text_out = out.with_suffix(".txt")
+        text_out.write_text(wechat_html_to_text(item["content"]), encoding="utf-8")
+        print(f"TITLE: {item.get('title', '')}")
+        print(f"AUTHOR: {item.get('author', '')}")
+        print(f"DIGEST: {item.get('digest', '')}")
+        print(f"SAVED: {out} {text_out}")
         return
 
     if cmd == "upload-cover":

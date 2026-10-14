@@ -44,6 +44,13 @@ python3 -m venv venv
 venv/bin/pip install -e .
 ```
 
+系统 Python 缺少 ensurepip、`python3 -m venv` 报错时，改用 uv 创建环境（uv 建的环境不带 pip，安装也用 uv）：
+
+```bash
+uv venv --python 3.12 venv
+uv pip install --python venv/bin/python -e .
+```
+
 ### 2. 创建配置文件
 
 在 `~/.wechat-publisher/.env` 中写入：
@@ -118,7 +125,7 @@ ln -sf $(pwd)/tools/wechat-publisher/venv/bin/wechat-publisher ~/.local/bin/wech
 
 先检查文章中引用的本地图片是否存在，并确认已有 `21:9` 主封面。只要 `kakarot-writer` 已完成真实截图、正文图和封面，就跳过生图脚本，避免把已经确认的素材替换成概念图。
 
-素材不完整时，优先回到 `kakarot-writer` 的交付清单补齐；封面优先调用 `guizang-social-card-skill` 的真实素材 B 方案。只有专用 Skill 不可用、且文章仍缺少必要图片时，才使用本 Skill 自带的 SiliconFlow 回退脚本，默认模型是 `Tongyi-MAI/Z-Image-Turbo`。
+素材不完整时，优先回到 `kakarot-writer` 的交付清单补齐，封面工具顺序按 `kakarot-writer/references/delivery.md` 的「封面」一节执行。只有那里的工具都不可用、且文章仍缺少必要图片时，才使用本 Skill 自带的 SiliconFlow 回退脚本，默认模型是 `Tongyi-MAI/Z-Image-Turbo`。
 
 如果文章包含 `[插图：...]` / `[绘图提示：...]`，脚本会按这些 prompt 生成对应正文图（**优先走这条**，因为 prompt 是你手写的、有创意）。如果文章没有占位符，脚本会按正文段落自动插入 3 张配图，并生成封面图——auto 兜底通道会先用对话模型（`deepseek-ai/DeepSeek-V3`）把中文段落转成英文视觉概念再生图，**绝不把中文塞进画面**，从根上避免图上出现原文和错别字。封面也走概念化（不再把标题原文塞进 prompt，并去掉「杂志封面」这类诱导加标题字的措辞，缩写如 AI/GPT 也会被剔除）。封面对文字最敏感，**要最稳就手动传 `--cover-prompt "英文创意概念"`**。
 
@@ -130,7 +137,8 @@ ln -sf $(pwd)/tools/wechat-publisher/venv/bin/wechat-publisher ~/.local/bin/wech
 
 ```bash
 export SILICONFLOW_API_KEY="用户提供的 SiliconFlow API Key"
-export WECHAT_PUBLISHER_SKILL_DIR="${WECHAT_PUBLISHER_SKILL_DIR:-$HOME/.codex/skills/wechat-publisher}"
+# 填本 Skill 的实际安装目录，例如 ~/.claude/skills/wechat-publisher 或 ~/.codex/skills/wechat-publisher
+export WECHAT_PUBLISHER_SKILL_DIR="<本 Skill 的实际安装目录>"
 export WECHAT_PUBLISHER_PYTHON="$WECHAT_PUBLISHER_SKILL_DIR/tools/wechat-publisher/venv/bin/python"
 export WECHAT_PUBLISHER_BIN="$WECHAT_PUBLISHER_SKILL_DIR/tools/wechat-publisher/venv/bin/wechat-publisher"
 
@@ -163,6 +171,8 @@ export WECHAT_PUBLISHER_BIN="$WECHAT_PUBLISHER_SKILL_DIR/tools/wechat-publisher/
 `wechat-publisher` 会自动上传正文 Markdown 图片到微信 CDN。封面图用 `--cover-file` 上传成微信永久素材，再用返回的 `media_id` 创建草稿。已经是 `mmbiz.qpic.cn` 的图片不会重复上传。
 
 发布前，CLI 会先执行统一的内容契约：移除开头 YAML frontmatter，只消费 `<!-- kakarot:delivery-appendix -->` 之前的公开正文，并拒绝正文里的一级标题、未隔离的截图清单/封面方案/备选标题/事实确认项。标题只通过 `--title` 传入，因此不会在正文中重复。摘要提取、图片上传、外链检查和 HTML 格式化全部使用同一份公开正文。
+
+要读者复制的网址写成「标签：」一行、完整网址单独一行，CLI 会把这一行渲染成独立网址块；不要给标签再套 Markdown 链接，否则底部参考资料会重复同一个地址。
 
 外链默认逐一做只读可达性检查，`404` 等失效链接会阻止上传。只有网络环境暂时不可用、且已经用其他方式逐个核验链接时，才能临时传 `--skip-link-check`；它不是常规发布选项。
 
@@ -216,6 +226,16 @@ wechat-publisher update --media-id "xxx" --title "新标题" --content-file arti
 ```
 
 **⚠️ 必须每次都带 `--cover-file` 或 `--cover-media-id`**，否则封面会被重置为默认封面（WECHAT_DEFAULT_COVER_MEDIA_ID）。只改正文/标题时也不能省。
+
+**更新前先读回后台版本。** 作者可能已经在公众号后台手改过草稿，直接 update 会用本地母稿整篇覆盖这些修改。每次 update 前先执行：
+
+```bash
+wechat-publisher get --media-id "xxx" --out draft-current.html
+```
+
+它把后台当前的 HTML 存到 `draft-current.html`，把一块一行的可读文本存到 `draft-current.txt`。拿这份文本和本地母稿逐段比对，把作者在后台的修改先合进母稿，再 update。比对时忽略小标题前的图标、引用开头的 💡 和参考资料编号，这些是格式化时加的。
+
+update 会重新提交封面，作者在后台调过的封面裁剪位置会恢复默认。更新后告诉作者需要重新检查封面裁剪。
 
 ### upload-image — 上传正文图片（返回 CDN URL）
 

@@ -22,6 +22,8 @@ npx skills add Zhangs-11/zs-skills --skill wechat-publisher
 cd ~/.agents/skills/wechat-publisher/tools/wechat-publisher
 python3 -m venv venv
 venv/bin/pip install -e .
+# 系统 Python 缺少 ensurepip 时改用 uv：
+# uv venv --python 3.12 venv && uv pip install --python venv/bin/python -e .
 
 # 3. 配置
 # 编辑 ~/.wechat-publisher/.env，填入 AppID 和 AppSecret
@@ -42,7 +44,8 @@ IP 白名单：登录 mp.weixin.qq.com → 开发 → 基本配置 → IP 白名
 | `wechat-publisher create --title "标题" --content-file article.md --cover-media-id "xxx"` | 用指定封面创建草稿 |
 | `wechat-publisher preflight --title "标题" --content-file article.md --cover-file images/<文章名>/cover.jpg` | 只读检查文章、图片和 HTML，不上传 |
 | `wechat-publisher create --title "标题" --content-file article.md --cover-file images/<文章名>/cover.jpg` | 上传封面文件后创建草稿 |
-| `wechat-publisher update --media-id "xxx" --title "标题" --content-file article.md` | 更新草稿 |
+| `wechat-publisher get --media-id "xxx" --out draft-current.html` | 读回后台当前草稿，另存一份可读文本，更新前用来比对作者的手改 |
+| `wechat-publisher update --media-id "xxx" --title "标题" --content-file article.md --cover-file cover.png` | 更新草稿；会整篇覆盖后台内容，封面裁剪恢复默认 |
 | `wechat-publisher upload-image photo.jpg` | 上传正文图片 |
 | `wechat-publisher upload-cover cover.jpg` | 上传封面图 |
 
@@ -52,7 +55,8 @@ IP 白名单：登录 mp.weixin.qq.com → 开发 → 基本配置 → IP 白名
 
 ```bash
 export SILICONFLOW_API_KEY="your_key_here"
-export WECHAT_PUBLISHER_SKILL_DIR="${WECHAT_PUBLISHER_SKILL_DIR:-$HOME/.codex/skills/wechat-publisher}"
+# 填本 Skill 的实际安装目录，例如 ~/.claude/skills/wechat-publisher 或 ~/.codex/skills/wechat-publisher
+export WECHAT_PUBLISHER_SKILL_DIR="<本 Skill 的实际安装目录>"
 export WECHAT_PUBLISHER_PYTHON="$WECHAT_PUBLISHER_SKILL_DIR/tools/wechat-publisher/venv/bin/python"
 
 "$WECHAT_PUBLISHER_PYTHON" "$WECHAT_PUBLISHER_SKILL_DIR/scripts/generate_wechat_images.py" \
@@ -75,6 +79,7 @@ export WECHAT_PUBLISHER_PYTHON="$WECHAT_PUBLISHER_SKILL_DIR/tools/wechat-publish
 - 已经是微信 CDN 的图片不会重复上传。
 - `[插图：...]` / `[绘图提示：...]` 是写作阶段占位符；发布前必须替换成真实 Markdown 图片，否则命令会失败。
 - 正文外链会转换成底部“参考资料”，避免公众号正文里出现不可点击或体验不稳定的外链。
+- 段落里单独占一行的纯文本网址会渲染成独立网址块：浅色背景、蓝色左边线、等宽字，长网址整段换行，方便读者长按复制。写法是标签一行、网址一行，例如 `REA 官方仓库：` 换行后写 `https://github.com/morluto/rea`。网址写在句子中间、引用或列表里时保持原样。
 - 外链会在上传前逐一做只读可达性检查，避免把错误分支或 `404` 文档链接带进草稿箱。网络确实不可用时可临时加 `--skip-link-check`，但应先用其他方式完成核验。
 
 ## 母稿与公开正文

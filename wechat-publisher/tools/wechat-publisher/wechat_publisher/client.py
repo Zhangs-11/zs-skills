@@ -137,15 +137,19 @@ class WeChatClient:
             raise RuntimeError(f"draft creation response missing media_id: {data}")
         return CreateDraftResponse(media_id=media_id)
 
-    async def get_draft_cover(self, media_id: str) -> str | None:
-        """Fetch the existing draft's thumb_media_id."""
+    async def get_draft(self, media_id: str) -> dict:
+        """Fetch the first article of an existing draft, as WeChat stores it now."""
         data = await self._request(
             "POST", "/draft/get", json={"media_id": media_id}
         )
         items = data.get("news_item") or []
-        if items:
-            return items[0].get("thumb_media_id")
-        return None
+        if not items:
+            raise RuntimeError(f"draft {media_id} has no article")
+        return items[0]
+
+    async def get_draft_cover(self, media_id: str) -> str | None:
+        """Fetch the existing draft's thumb_media_id."""
+        return (await self.get_draft(media_id)).get("thumb_media_id")
 
     async def update_draft(
         self,

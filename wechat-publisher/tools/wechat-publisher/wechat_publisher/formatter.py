@@ -34,6 +34,11 @@ def markdown_to_wechat_html(md: str) -> str:
         for el in soup.find_all(tag_name):
             el.decompose()
 
+    # 段落里单独占一行的纯文本网址拆成独立网址块，前面的文字作为标签
+    for p in soup.find_all("p"):
+        if p.find_parent(["blockquote", "li", "table"]) is None:
+            _split_url_lines(soup, p)
+
     # --- Paragraphs ---
     for p in soup.find_all("p"):
         _merge_styles(p, _P)
@@ -136,6 +141,33 @@ def markdown_to_wechat_html(md: str) -> str:
     return str(soup)
 
 
+_TEXT_BLOCK_TAGS = ["p", "h1", "h2", "h3", "h4", "li", "pre", "img", "section"]
+
+
+def wechat_html_to_text(html: str) -> str:
+    """把草稿 HTML 转成一块一行的可读文本，用来和本地母稿比对作者在后台做的修改。"""
+    soup = BeautifulSoup(html, "html.parser")
+    blocks: list[str] = []
+    for el in soup.find_all(_TEXT_BLOCK_TAGS):
+        if el.name == "img":
+            blocks.append(f"![]({el.get('data-src') or el.get('src', '')})")
+            continue
+        # 列表项和代码块整块输出；其余只取最内层的文本块，外层容器的文字已经由子块输出
+        if el.find_parent(["li", "pre"]):
+            continue
+        if el.name not in ("li", "pre") and el.find(_TEXT_BLOCK_TAGS):
+            continue
+        text = el.get_text().replace("\xa0", " ").strip()
+        if not text:
+            continue
+        if el.name in ("h1", "h2", "h3", "h4"):
+            text = "#" * int(el.name[1]) + " " + text
+        elif el.find_parent("blockquote"):
+            text = "> " + text
+        blocks.append(text)
+    return "\n\n".join(blocks) + "\n"
+
+
 # ── Style definitions ──────────────────────────────────────────────────
 
 _P = (
@@ -234,6 +266,26 @@ _PRE_CODE = (
     f"font-size: 14px; white-space: pre-wrap; word-break: break-word;"
 )
 
+# 网址块：独占一行、浅底等宽字，长网址在手机上整段换行，方便长按复制
+_URL_WRAPPER = "margin: 0 0 16px 0; padding: 0;"
+
+_URL_LABEL = (
+    f"margin: 0 0 8px 0; padding: 0;"
+    f"font-size: 16px; color: {_TEXT};"
+    f"letter-spacing: 1.2px; line-height: 1.85;"
+)
+
+_URL_BLOCK = (
+    f"margin: 0; padding: 10px 14px;"
+    f"background-color: {_BG_SOFT};"
+    f"border: 1px solid #d8e2ec; border-left: 4px solid {_ACCENT};"
+    f"border-radius: 6px;"
+    f"font-family: 'SF Mono', Menlo, monospace;"
+    f"font-size: 14px; color: #1a202c;"
+    f"letter-spacing: 0; line-height: 1.6;"
+    f"word-break: break-all;"
+)
+
 _IMG = (
     f"max-width: 100%; height: auto;"
     f"border-radius: 8px; margin: 20px auto; display: block;"
@@ -292,6 +344,63 @@ def _prepend_heading_icon(heading: Tag, icon: str) -> None:
     if _LEADING_ICON_RE.match(text):
         return
     heading.insert(0, NavigableString(f"{icon}  "))
+
+
+_BARE_URL_RE = re.compile(r"^https?://\S+$")
+
+
+def _split_url_lines(soup: BeautifulSoup, p: Tag) -> None:
+    """把段落里单独一行的纯文本网址拆成网址块，其余行按原样保留为标签文字。"""
+    # Markdown 的软换行在 HTML 里是 "\n"，微信会显示成空格，所以先按 "\n" 切行
+    lines: list[list] = [[]]
+    for child in p.children:
+        if isinstance(child, NavigableString):
+            for i, part in enumerate(str(child).split("\n")):
+                if i:
+                    lines.append([])
+                if part:
+                    lines[-1].append(part)
+        else:
+            lines[-1].append(child)
+
+    def is_url_line(line: list) -> bool:
+        return len(line) == 1 and isinstance(line[0], str) and bool(_BARE_URL_RE.match(line[0].strip()))
+
+    if not any(is_url_line(line) for line in lines):
+        return
+
+    wrapper = soup.new_tag("section")
+    wrapper["style"] = _URL_WRAPPER
+    label: Tag | None = None
+    for line in lines:
+        if is_url_line(line):
+            block = soup.new_tag("section")
+            # 连续两个网址块之间留一点间距
+            follows_block = bool(wrapper.contents) and label is None
+            block["style"] = _URL_BLOCK + (" margin-top: 8px;" if follows_block else "")
+            span = soup.new_tag("span")
+            span.string = line[0].strip()
+            block.append(span)
+            wrapper.append(block)
+            label = None
+            continue
+        if not line:
+            continue
+        if label is None:
+            label = soup.new_tag("section")
+            label["style"] = _URL_LABEL + (" margin-top: 12px;" if wrapper.contents else "")
+            wrapper.append(label)
+        else:
+            # 标签里的多行文字用 <br> 保留换行，微信会把 "\n" 显示成空格
+            label.append(soup.new_tag("br"))
+        for node in line:
+            if isinstance(node, str):
+                span = soup.new_tag("span")
+                span.string = node
+                label.append(span)
+            else:
+                label.append(node)
+    p.replace_with(wrapper)
 
 
 def _wrap_divider(soup: BeautifulSoup, hr: Tag) -> None:
