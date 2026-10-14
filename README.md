@@ -75,7 +75,7 @@ Restart Claude Code or Codex, or open a new session, after installation so the t
 ## Requirements and safety boundaries
 
 - [ ] Install Node.js and `npx`; verify them with `node --version && npx --version`.
-- [ ] Install `human-writing` with `kakarot-writer`. For real source material or AI key art in two cover sizes, also install `guizang-social-card-skill`.
+- [ ] Install `human-writing` with `kakarot-writer`. For narrative cover art, also install `baoyu-cover-image`, with `guizang-social-card-skill` as the second choice; without either, covers are drawn with HTML/SVG.
 - [ ] Exporting a PNG with `system-structure-diagram` requires a browser or SVG conversion tool. Generating SVG alone does not require Inkscape.
 - [ ] `preschool-lesson-kit` needs document and presentation authoring and rendering capabilities for file output, plus image generation or verified images for classroom visuals. Its README explains the inputs and dependencies.
 - [ ] `wechat-publisher` requires Python 3.12+, a WeChat Official Account AppID and AppSecret, and an allowed IP address. It performs a read-only preflight before writing a draft.
