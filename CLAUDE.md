@@ -48,7 +48,7 @@ npx skills add Zhangs-11/zs-skills --list
 
 “帮我写篇文章”默认表示完整交付，不需要另问用户是否需要标题和封面。公众号长文是首发载体，也是知乎、博客、掘金、小红书、抖音和B站共同使用的唯一内容母稿。长文平台可以原样同步正文和标题；小红书、抖音和B站视频交给 `kakarot-repurposer` 调整长度、节奏与画面，但不能改变母稿中的事实、核心判断、作者态度和来源。
 
-封面和正文叙事配图的工具顺序以 `kakarot-writer/references/delivery.md` 的「封面」一节为准：`baoyu-cover-image` → `guizang-social-card-skill` → 当前可用的图像生成工具 → HTML/SVG 代码绘制。回退时向用户说明实际用了哪一项。
+封面和正文叙事配图的工具顺序以 `kakarot-writer/references/delivery.md` 的「封面」一节为准：`baoyu-cover-image` → `guizang-social-card-skill` → `handraw-style` 产出提示词再交给当前可用的图像生成工具 → HTML/SVG 代码绘制。回退时向用户说明实际用了哪一项。`handraw-style` 只给提示词，封面用它的 `article-cover-designer`，正文配图用 `article-illustration-planner`，出图仍由图像模型或作者自己的工具完成。
 
 写完整成品不代表获得发布授权。只有用户明确说“存到公众号”“发到草稿箱”或“发布”时，才调用 `wechat-publisher` 写入微信公众号。
 
