@@ -1,6 +1,6 @@
 ---
 name: review-handoff
-description: 根据自己的需求背景和一个或多个 CodeUp PR，生成可直接发给同事的 Review 交接内容。用户要“简略 Review 概要”“群里发一段 Review 说明”时直接输出含任务、需求、PR、验收项目、源分支和改动摘要的短版；用户要“Review 文档”“整理 PR 说明”“把背景、根因和修复方案写成 MD”时生成完整 Markdown。两种模式都先核对真实仓库与 diff，只解释有证据的改动，不替 reviewer 下最终通过结论。
+description: "编写代码审查交接说明时用。不用于执行代码审查、修改代码或发送通知。"
 ---
 
 # Review 交接内容

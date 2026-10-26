@@ -1,6 +1,6 @@
 ---
 name: first-principles-adversarial-review
-description: 需求设计、根因诊断、复杂实现或关键事实争议需要机制推导与反证时使用；简单查询、忠实摘要和不改变行为的局部修订不加载。
+description: "需要机制推导或寻找反证时用。不用于纯翻译、机械转换或简单材料摘要。"
 ---
 
 # 第一性原理与对抗式审查

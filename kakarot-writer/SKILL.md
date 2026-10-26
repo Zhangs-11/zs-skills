@@ -1,6 +1,6 @@
 ---
 name: kakarot-writer
-description: 用户要求写文章、按我的风格写、改稿或图解文章时使用；为 Kakarot 制作公众号与跨平台母稿，含按需图解、标题与封面。只要标题或摘要时不生成全文。
+description: "撰写或修改个人风格文章时用。不用于独立标题、简短消息或外部发布操作。"
 metadata:
   compatibility: 需要 human-writing 和 bigpeng-hot-gzh；完整封面优先使用 baoyu-cover-image 的叙事插画方法，并分别编排 21:9 与 1:1。
 ---

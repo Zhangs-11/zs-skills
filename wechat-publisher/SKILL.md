@@ -1,11 +1,6 @@
 ---
 name: wechat-publisher
-description: |
-  公众号文章发布工具。当用户说"存到公众号"、"发布到公众号"、"发到草稿箱"、"推到公众号"、"写到公众号"时触发。配合 kakarot-writer skill 使用：先用 kakarot-writer 风格生成 markdown 文章 → 用 wechat-publisher CLI 格式化并存入微信草稿箱。也支持纯 markdown 文件直接发布。
-
-  触发词：存到公众号、发布到公众号、发到草稿箱、推到公众号、写到公众号、发公众号、wechat publish
-
-  不触发情况：纯写作不涉及发布、不需要存草稿箱的情况。
+description: "将文章存入公众号草稿时用。不用于纯写作、个人微信消息或无需上传的本地排版。"
 ---
 
 # wechat-publisher 公众号发布工具

@@ -1,6 +1,6 @@
 ---
 name: peer-pr-review
-description: 用户要求审查 PR、分支、worktree 或本地改动，或实现完成需自审时使用；只读核对完整 diff、需求与证据，并用具体 Case 解释结论。
+description: "审查代码改动或实现自审时用。不用于需求实现、代码修改或交接文案。"
 ---
 
 # 代码改动第一性审查
