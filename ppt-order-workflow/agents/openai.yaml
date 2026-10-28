@@ -1,0 +1,4 @@
+interface:
+  display_name: "AI PPT 美化接单"
+  short_description: "从样稿、报价到可编辑 PPT 验收与结算，整理 AI PPT 接单流程。"
+  default_prompt: "使用 $ppt-order-workflow 帮我准备 AI PPT 美化接单，整理提示词、样稿、报价和可编辑性验收流程。"

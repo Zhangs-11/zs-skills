@@ -19,7 +19,7 @@ This repository is a collection of primarily Chinese-language skills for Claude 
 npx skills add Zhangs-11/zs-skills
 ```
 
-## 26 installable skills
+## 27 installable skills
 
 | Skill | What it solves | Example prompt |
 |---|---|---|
@@ -42,6 +42,7 @@ npx skills add Zhangs-11/zs-skills
 | [life-designer](life-designer/) | Produces three five-year Odyssey Plans with life-design methods | “I am considering a career change. Help me work through it systematically.” |
 | [peer-pr-review](peer-pr-review/) | Adversarially reviews code changes and walks through the real before-and-after path with one concrete case | “I do not know this code. Walk me through one case, then tell me what should change.” |
 | [preschool-lesson-kit](preschool-lesson-kit/) | Creates kindergarten Word lesson plans and cute classroom PPTs with observable goals and clear activity purposes | “Use this reference to create one lesson plan and a cute PPT for a new topic.” |
+| [ppt-order-workflow](ppt-order-workflow/) | Guides PPT design orders from portfolio and pricing to editable-file checks and payment | “Help me prepare for PPT design orders and check the delivery requirements.” |
 | [project-aware-coding](project-aware-coding/) | Studies existing project logic, design, and history before implementing the smallest change that fits real consumers | “Implement this using the project's existing patterns without repeating old mistakes.” |
 | [review-handoff](review-handoff/) | Creates a Markdown review handoff that can be sent directly to a colleague, with a concrete walkthrough when needed | “Turn my PR into a Markdown handoff and explain the path with one case.” |
 | [resume-optimizer](resume-optimizer/) | Writes, improves, or reviews a software engineer's résumé | “Review this résumé as a technical interviewer.” |
@@ -78,6 +79,7 @@ Restart Claude Code or Codex, or open a new session, after installation so the t
 - [ ] Install `human-writing` with `kakarot-writer`. For narrative cover art, also install `baoyu-cover-image`, with `guizang-social-card-skill` as the second choice; without either, covers are drawn with HTML/SVG.
 - [ ] Exporting a PNG with `system-structure-diagram` requires a browser or SVG conversion tool. Generating SVG alone does not require Inkscape.
 - [ ] `preschool-lesson-kit` needs document and presentation authoring and rendering capabilities for file output, plus image generation or verified images for classroom visuals. Its README explains the inputs and dependencies.
+- [ ] `ppt-order-workflow` needs presentation tools to create and verify PPTX files; follow the official setup for PPT Rebuilder King and obtain permission before uploading client materials.
 - [ ] `wechat-publisher` requires Python 3.12+, a WeChat Official Account AppID and AppSecret, and an allowed IP address. It performs a read-only preflight before writing a draft.
 - [ ] `storage-analyzer` scans read-only. Every deletion requires separate user confirmation, and the reclaimable-space estimate is approximate.
 - [ ] `aihot` and `ai-hot-picker` access AI HOT's public API. They require a network connection but no API key.

@@ -19,7 +19,7 @@
 npx skills add Zhangs-11/zs-skills
 ```
 
-## 26 个可安装 skills
+## 27 个可安装 skills
 
 | Skill | 解决什么问题 | 你可以这样说 |
 |---|---|---|
@@ -41,6 +41,7 @@ npx skills add Zhangs-11/zs-skills
 | [leader](leader/) | 把一句想法拆成 agent 能独立执行的目标任务书 | “把这个想法拆成可执行 brief。” |
 | [life-designer](life-designer/) | 用人生设计方法生成三套五年奥德赛计划 | “我想转行，帮我系统梳理。” |
 | [peer-pr-review](peer-pr-review/) | 对抗式审查代码改动，并用一个具体 Case 走通改动前后的真实链路 | “我不懂这块代码，用一个 Case 带我走完再告诉我怎么改。” |
+| [ppt-order-workflow](ppt-order-workflow/) | 从 PPT 练习样稿、店铺合作到可编辑性验收与结算，整理接单流程和提示词 | “帮我准备 PPT 美化接单，检查交付要求。” |
 | [preschool-lesson-kit](preschool-lesson-kit/) | 制作目标清楚的幼儿园Word教案与可爱PPT，过程标题写明活动和目的 | “参考这个教案另选课题，做一套教案和可爱PPT。” |
 | [project-aware-coding](project-aware-coding/) | 写代码前参考项目已有逻辑、设计与历史经验，再做贴合真实消费者的最小实现 | “参考项目现有写法帮我实现这个需求，别重复踩坑。” |
 | [review-handoff](review-handoff/) | 生成可直接发给同事、必要时包含具体 Case 走读的 Markdown Review 交接说明 | “把我的 PR 整理成一份 MD，并用一个 Case 讲清链路。” |
@@ -78,6 +79,7 @@ npx skills add Zhangs-11/zs-skills --list
 - [ ] 使用 `kakarot-writer` 时同时安装 `human-writing`；如需叙事插画封面，再安装 `baoyu-cover-image`，其次是 `guizang-social-card-skill`；都没有时会用 HTML/SVG 代码绘制。
 - [ ] `system-structure-diagram` 导出 PNG 时需要浏览器或 SVG 转换工具；仅生成 SVG 时不需要 Inkscape。
 - [ ] `preschool-lesson-kit` 生成文件需要文档与演示文稿制作及渲染能力；课堂插图使用图像生成工具或经过核查的现有图片。具体输入和依赖见该 Skill 的 README。
+- [ ] `ppt-order-workflow` 制作和验收 PPTX 需要演示文稿工具；使用 PPT Rebuilder King 时需按其官方说明配置，上传客户资料前需获许可。
 - [ ] `wechat-publisher` 需要 Python 3.12+、微信公众号 AppID/AppSecret，以及已配置的 IP 白名单；写入草稿箱前会先做只读预检。
 - [ ] `storage-analyzer` 的扫描阶段只读；任何删除都必须由用户单独确认，报告中的可释放空间是估算值。
 - [ ] `aihot` 与 `ai-hot-picker` 会访问 AI HOT 的公开接口，不需要 API Key，但需要网络。
