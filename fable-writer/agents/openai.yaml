@@ -1,2 +1,6 @@
+interface:
+  display_name: "寓言写作"
+  short_description: "用一则寓言解释概念，并提供解析和理解检验问题。"
+  default_prompt: "使用 $fable-writer 用一则寓言解释我提供的概念，并附上概念解析和检验问题。"
 policy:
   allow_implicit_invocation: false
