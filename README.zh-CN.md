@@ -42,6 +42,7 @@ npx skills add Zhangs-11/zs-skills
 | [life-designer](life-designer/) | 用人生设计方法生成三套五年奥德赛计划 | “我想转行，帮我系统梳理。” |
 | [peer-pr-review](peer-pr-review/) | 对抗式审查代码改动，并用一个具体 Case 走通改动前后的真实链路 | “我不懂这块代码，用一个 Case 带我走完再告诉我怎么改。” |
 | [ppt-order-workflow](ppt-order-workflow/) | 从 PPT 练习样稿、店铺合作到可编辑性验收与结算，整理接单流程和提示词 | “帮我准备 PPT 美化接单，检查交付要求。” |
+| [story-video-workflow](story-video-workflow/) | 制作历史人物故事短视频，按需核对视频号带货权限和佣金 | “帮我制作人物故事视频并核对图书带货条件。” |
 | [preschool-lesson-kit](preschool-lesson-kit/) | 制作目标清楚的幼儿园Word教案与可爱PPT，过程标题写明活动和目的 | “参考这个教案另选课题，做一套教案和可爱PPT。” |
 | [project-aware-coding](project-aware-coding/) | 写代码前参考项目已有逻辑、设计与历史经验，再做贴合真实消费者的最小实现 | “参考项目现有写法帮我实现这个需求，别重复踩坑。” |
 | [review-handoff](review-handoff/) | 生成可直接发给同事、必要时包含具体 Case 走读的 Markdown Review 交接说明 | “把我的 PR 整理成一份 MD，并用一个 Case 讲清链路。” |

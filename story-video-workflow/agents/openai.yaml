@@ -1,0 +1,4 @@
+interface:
+  display_name: "历史人物故事短视频"
+  short_description: "制作故事短视频并核对视频号带货条件。"
+  default_prompt: "使用 $story-video-workflow 帮我制作历史人物故事短视频，核实事实并按需生成剪映草稿。"
